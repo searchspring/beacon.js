@@ -1,0 +1,29 @@
+{
+  "name": "@searchspring/snap-beacon.js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "openapi-generator-cli version-manager set 7.9.0",
+		"generate": "openapi-generator-cli generate -i ./beacon.oas.yaml -g typescript-fetch -o ./src/client"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/searchspring/beacon.js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/searchspring/beacon.js/issues"
+  },
+  "homepage": "https://github.com/searchspring/beacon.js#readme",
+  "dependencies": {
+    "@searchspring/snap-toolbox": "^0.61.5",
+    "deepmerge": "4.3.1",
+		"uuid": "9.0.1"
+  },
+  "devDependencies": {
+		"@openapitools/openapi-generator-cli": "^2.15.3"	
+	}
+}
