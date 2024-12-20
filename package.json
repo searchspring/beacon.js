@@ -1,5 +1,5 @@
 {
-  "name": "@searchspring/snap-beacon.js",
+  "name": "@searchspring/beacon",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/searchspring/beacon.js#readme",
   "dependencies": {
-    "@searchspring/snap-toolbox": "^0.61.5",
     "deepmerge": "4.3.1",
 		"uuid": "9.0.1"
   },

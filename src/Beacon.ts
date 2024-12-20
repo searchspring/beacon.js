@@ -1,7 +1,52 @@
 import deepmerge from 'deepmerge';
 import { v4 as uuidv4 } from 'uuid';
-import { cookies, getFlags, AppMode, charsParams } from '@searchspring/snap-toolbox';
-import { Context, AutocompleteAddtocartRequest, AutocompleteApi, AutocompleteClickthroughRequest, AutocompleteImpressionRequest, AutocompleteRedirectRequest, AutocompleteRenderRequest, AutocompleteSchemaData, CartAddRequest, CartRemoveRequest, CartViewRequest, CategoryAddtocartRequest, CategoryClickthroughRequest, CategoryImpressionRequest, CategoryRenderRequest, LoginRequest, OrderTransactionRequest, ProductApi, ProductPageviewRequest, RecommendationsAddtocartRequest, RecommendationsClickthroughRequest, RecommendationsImpressionRequest, RecommendationsRenderRequest, SearchAddtocartRequest, SearchClickthroughRequest, SearchImpressionRequest, SearchRedirectRequest, SearchRenderRequest, ShopperApi, AutocompleteRedirectSchemaData, SearchRedirectSchemaData, SearchSchemaData, CategorySchemaData, RecommendationsSchemaData, CartSchemaData, OrderTransactionSchemaData, ProductPageviewSchemaData, Item, Product, ContextAttributionInner, ContextCurrency } from './client'
+import { Context, 
+    AutocompleteAddtocartRequest, 
+    AutocompleteApi, 
+    AutocompleteClickthroughRequest, 
+    AutocompleteImpressionRequest, 
+    AutocompleteRedirectRequest, 
+    AutocompleteRenderRequest, 
+    AutocompleteSchemaData, 
+    CartAddRequest, 
+    CartRemoveRequest, 
+    CartViewRequest, 
+    CategoryAddtocartRequest, 
+    CategoryClickthroughRequest, 
+    CategoryImpressionRequest, 
+    CategoryRenderRequest, 
+    LoginRequest, 
+    OrderTransactionRequest, 
+    ProductApi, 
+    ProductPageviewRequest, 
+    RecommendationsAddtocartRequest, 
+    RecommendationsClickthroughRequest, 
+    RecommendationsImpressionRequest, 
+    RecommendationsRenderRequest, 
+    SearchAddtocartRequest, 
+    SearchClickthroughRequest, 
+    SearchImpressionRequest, 
+    SearchRedirectRequest, 
+    SearchRenderRequest, 
+    ShopperApi, 
+    AutocompleteRedirectSchemaData, 
+    SearchRedirectSchemaData, 
+    SearchSchemaData, 
+    CategorySchemaData, 
+    RecommendationsSchemaData, 
+    CartSchemaData, 
+    OrderTransactionSchemaData, 
+    ProductPageviewSchemaData, 
+    Item, 
+    Product, 
+    ContextAttributionInner, 
+    ContextCurrency,
+    SearchApi,
+    CategoryApi,
+    RecommendationsApi,
+    OrderApi,
+    CartApi, 
+} from './client';
 
 declare global {
 	interface Window {
@@ -19,13 +64,13 @@ export type PreflightRequestModel = {
 
 type BeaconConfig = {
     id?: string;
-    mode?: AppMode;
-    framework: 'snap';
+    mode?: 'development' | 'production';
+    framework?: string;
     version?: string;
     apis?: {
         cookie?: {
             get: (name?: string) => Promise<string>;
-            set: (cookieOrName: string, value: string) => Promise<string>;
+            set: (cookieString: string) => Promise<string>;
         },
         localStorage?: {
             clear: () => Promise<void>;
@@ -33,9 +78,9 @@ type BeaconConfig = {
             setItem: (key: string, value: any) => Promise<void>;
             removeItem: (key: string) => Promise<void>;
         },
-        href?: string;
-        userAgent?: string;
-    }
+    },
+    href?: string;
+    userAgent?: string;
 }
 type BeaconGlobals = {
 	siteId: string;
@@ -63,8 +108,8 @@ type Payload<T> = {
 
 const defaultConfig: BeaconConfig = {
 	id: 'track',
-	framework: 'snap',
-	mode: AppMode.production,
+	framework: 'snap/preact',
+	mode: 'production',
 };
 
 const USER_ID_KEY = 'ssUserId';
@@ -82,7 +127,7 @@ const COOKIE_DOMAIN = (typeof window !== 'undefined' && window.location.hostname
 
 export class Beacon {
     private config: BeaconConfig;
-    private mode: AppMode = AppMode.production;
+    private mode: 'production' | 'development';
     private globals: BeaconGlobals;
 
     private currency: ContextCurrency = {
@@ -102,8 +147,8 @@ export class Beacon {
 
         this.config = deepmerge(defaultConfig, config || {});
 
-        if (Object.values(AppMode).includes(this.config.mode as AppMode)) {
-            this.mode = this.config.mode as AppMode;
+        if (this.config.mode && ['production', 'development'].includes(this.config.mode)) {
+            this.mode = this.config.mode;
         }
 
         this.globals = globals;
@@ -112,50 +157,86 @@ export class Beacon {
             this.setCurrency(this.globals.currency);
 		}
 
-        // TODO: rename beacon to tracker to keep backwards compatibility?
         if (typeof window !== 'undefined' && !window.searchspring?.beacon) {
 			window.searchspring = window.searchspring || {};
 			window.searchspring.beacon = this;
 		}
-
-        // TODO: attribute tracking?
 
         this.processPayloadPool();
     }
 
     handleResponse = (response: any): void => {
         // TODO: handle response
-        this.mode === AppMode.development && console.log('event resolved response:', response);
+        this.mode === 'development' && console.log('event resolved response:', response);
     }
 
     handleError = (error: any): void => {
         // TODO: handle error
-        this.mode === AppMode.development && console.log('event resolved error:', error);
+        this.mode === 'development' && console.log('event resolved error:', error);
     }
 
     private async getCookie(name: string): Promise<string> {
-        try {
-            const getCookieFn = this.config.apis?.cookie?.get;
-            if(getCookieFn) {
+        const getCookieFn = this.config.apis?.cookie?.get;
+        if(getCookieFn) {
+            try {
                 return await getCookieFn(name);
+            } catch(e) {
+                console.error('Failed to get cookie using custom API:', e);
             }
-        } catch(e) {
-            console.error('Failed to get cookie using custom API:', e);
+        } else if(typeof window !== 'undefined') {
+            try {
+                const cookieName = name + '=';
+                const cookiesList = window.document.cookie.split(';');
+                
+                for (let i = 0; i < cookiesList.length; i++) {
+                    let cookie = cookiesList[i];
+    
+                    while (cookie.charAt(0) == ' ') {
+                        cookie = cookie.substring(1);
+                    }
+    
+                    if (cookie.indexOf(cookieName) == 0) {
+                        return decodeURIComponent(cookie.substring(cookieName.length, cookie.length));
+                    }
+                }
+                return '';
+            } catch(e) {
+                console.error('Failed to get cookie:', e);
+            }
         }
-        return cookies.get(name);
+        return '';
     }
 
     private async setCookie(name: string, value: string, samesite: string, expiration: number, domain?: string): Promise<void> {
-        try {
-            const setCookieFn = this.config.apis?.cookie?.set;
-            if(setCookieFn) {
-                await setCookieFn(name, value);
-                return;
-            }
-        } catch(e) {
-            console.error('Failed to set cookie using custom API:', e);
+        let cookie = `${name}=${encodeURIComponent(value)};` + `SameSite=${samesite};` + 'path=/;';
+        if (!(typeof window !== 'undefined' && window.location.protocol == 'http:')) {
+            // adds secure by default and for shopify pixel - only omits secure if protocol is http and not shopify pixel
+            cookie += 'Secure;';
         }
-        cookies.set(name, value, samesite, expiration, domain);
+        if (expiration) {
+            const d = new Date()
+            d.setTime(d.getTime() + expiration);
+            cookie += `expires=${d['toUTCString']()};`;
+        }
+        if (domain) {
+            cookie += `domain=${domain};`;
+        }
+
+        const setCookieFn = this.config.apis?.cookie?.set;
+        if(setCookieFn) {
+            try {
+                await setCookieFn(cookie);
+                return;
+            } catch(e) {
+                console.error('Failed to set cookie using custom API:', e);
+            }
+        } else if(typeof window !== 'undefined') {
+            try {
+                window.document.cookie = cookie;
+            } catch(e) {
+                console.error('Failed to set cookie:', e);
+            }
+        }
     }
 
     private async getLocalStorageItem(name: string): Promise<string> {
@@ -252,25 +333,23 @@ export class Beacon {
 
     events = {
         shopper: {
-            login: async (event?: Payload<{ id: string }>): Promise<void> => {
-                if(event?.data?.id) {
-                    await this.setShopperId(event.data.id);
-                }
-
+            login: async (event: Payload<{ id: string }>): Promise<void> => {
                 const shopperId = await this.getShopperId();
-                if(!shopperId) {
+                if(!shopperId && !event.data?.id) {
                     console.error('beacon.events.shopper.login event: requires a valid shopper ID to exist');
                     return;
                 }
 
-                const payload: LoginRequest = { 
-                    siteId: event?.siteId || this.globals.siteId,
-                    shopperLoginSchema: {
-                        context: await this.getContext(),
-                    },
-                };
-
-                this.addToPayloadPool('shopper', 'login', payload);
+                if(event.data?.id && event?.data?.id != shopperId) {
+                    await this.setShopperId(event.data.id);
+                    const payload: LoginRequest = { 
+                        siteId: event?.siteId || this.globals.siteId,
+                        shopperLoginSchema: {
+                            context: await this.getContext(),
+                        },
+                    };
+                    this.addToPayloadPool('shopper', 'login', payload);
+                }
             }
         },
         autocomplete: {
@@ -544,7 +623,6 @@ export class Beacon {
                 };
 
                 this.addToPayloadPool('cart', 'cartView', payload);
-                // TODO: Tracker was calling cart.cookie.add() but set makes more sense? Also instead of string[], should it save the Item|Product[]?
                 await this.cookies.cart.set(event.data.results.map((product) => this.getSku(product))); 
             },
         },
@@ -575,10 +653,10 @@ export class Beacon {
 			shopperId: await this.getShopperId(),
 			pageLoadId: this.generateId(),
 			timestamp: this.getTimestamp(),
-			pageUrl: typeof window !== 'undefined' && window.location.href || this.config.apis?.href || 'https://searchspring.com', // TODO: should this be full URL or just hostname + path?
+			pageUrl: typeof window !== 'undefined' && window.location.href || this.config.href || '', 
             initiator: `searchspring/${this.config.framework}${this.config.version ? `/${this.config.version}` : ''}`,
 			attribution: await this.getAttribution(),
-			userAgent: navigator.userAgent || this.config.apis?.userAgent,
+			userAgent: navigator?.userAgent || this.config.userAgent,
 		};
         if(this.currency.code) {
             context.currency = this.currency;
@@ -586,93 +664,108 @@ export class Beacon {
         return context;
     }
 
-    private async getStoredUUID(key: string, expiration: number): Promise<string> {
-        let uuid;
-        try {
-            if (getFlags().cookies() || this.config.apis?.cookie?.get) {
-                const storedValue = await this.getCookie(key);
-                uuid = storedValue || this.generateId();
-                await this.setCookie(key, uuid, COOKIE_SAMESITE, expiration, COOKIE_DOMAIN);
-            } else if (getFlags().storage() || this.config.apis?.localStorage?.getItem) {
-                const storedValue = await this.getLocalStorageItem(key);
-                if(storedValue) {
-                    try {
-                        const data = JSON.parse(storedValue);
-                        if(data.timestamp && new Date(data.timestamp).getTime() < Date.now() - expiration) {
-                            uuid = this.generateId();
-                        } else {
-                            uuid = data.id;
-                        }
-                    } catch(e) {
-                        console.error('Failed to parse stored UUID, generating new UUID:', e);
-                    }
+    private async getStoredID(key: string, expiration: number): Promise<string> {
+        // try to get the value from the cookie
+        const storedCookieValue = await this.getCookie(key);
+        if(storedCookieValue) {
+            await this.setCookie(key, storedCookieValue, COOKIE_SAMESITE, expiration, COOKIE_DOMAIN);
+            return storedCookieValue;
+        }
+
+        // try to get the value from the local storage
+        const storedLocalStorageValue = await this.getLocalStorageItem(key);
+        if(storedLocalStorageValue) {
+            let uuid;
+            try {
+                const data = JSON.parse(storedLocalStorageValue);
+                if(data.timestamp && new Date(data.timestamp).getTime() < Date.now() - expiration) {
+                    uuid = this.generateId();
+                } else {
+                    uuid = data.id;
                 }
-                const data = { 
+            } catch(e) {
+                console.error('Failed to parse stored UUID, generating new UUID:', e);
+            } finally {
+                const data = {
                     id: uuid || this.generateId(), 
                     timestamp: this.getTimestamp() 
-                };
+                }
                 await this.setLocalStorageItem(key, JSON.stringify(data));
-            } else {
-                throw new Error('No storage method available');
+                await this.setCookie(key, data.id, COOKIE_SAMESITE, expiration, COOKIE_DOMAIN); // attempt to store in cookie
+                return data.id;
             }
+        }
+
+        // if no stored value, generate a new one and store it in both cookie and local storage
+        try {
+            const data = { 
+                id: this.generateId(), 
+                timestamp: this.getTimestamp() 
+            };
+            await this.setCookie(key, data.id, COOKIE_SAMESITE, expiration, COOKIE_DOMAIN);
+            await this.setLocalStorageItem(key, JSON.stringify(data));
+            return data.id;
         } catch(e) {
             console.error('Failed to persist user id to cookie or local storage:', e);
         }
 
-        return uuid;
+        return ''; // empty string will cause beacon validation to fail
     }
 
     private async getUserId(): Promise<string> {
-        return await this.getStoredUUID(USER_ID_KEY, THIRTY_MINUTES);
+        return await this.getStoredID(USER_ID_KEY, THIRTY_MINUTES);
     }
 
     private async getSessionId(): Promise<string> {
-        return await this.getStoredUUID(SESSION_ID_KEY, 0);
+        return await this.getStoredID(SESSION_ID_KEY, 0);
     }
 
     private async getShopperId(): Promise<string> {
         let shopperId: string | null = null;
         try {
-            if (getFlags().cookies() || this.config.apis?.cookie?.get) {
-                shopperId = await this.getCookie(SHOPPER_ID_KEY);
-            } else if (getFlags().storage() || this.config.apis?.localStorage?.getItem) {
-                shopperId = await this.getLocalStorageItem(SHOPPER_ID_KEY);
-            } else {
-                throw new Error('No storage method available');
-            }
-        } catch(e) {
-            console.error('Failed to persist shopper id to cookie or local storage:', e);
+            shopperId = (await this.getCookie(SHOPPER_ID_KEY)) || (await this.getLocalStorageItem(SHOPPER_ID_KEY));
+        } catch(_) {
+            // noop
         }
 
         return shopperId || '';
     }
 
     public async setShopperId(shopperId: string): Promise<void> {
-        if (getFlags().cookies() || this.config.apis?.cookie?.set) {
-            await this.setCookie(SHOPPER_ID_KEY, shopperId, COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
-        } else if (getFlags().storage() || this.config.apis?.localStorage?.setItem) {
-            await this.setLocalStorageItem(SHOPPER_ID_KEY, shopperId);
+        if(!shopperId) {
+            console.error('Shopper ID is required when setShopperId is called');
+            return;
         }
-        await this.sendPreflight();
+        const exisitingShopperId = await this.getShopperId();
+        if(exisitingShopperId !== shopperId) {
+            await this.setCookie(SHOPPER_ID_KEY, shopperId, COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
+            await this.setLocalStorageItem(SHOPPER_ID_KEY, shopperId);
+            await this.sendPreflight();
+        }
     }
 
     private async getAttribution(): Promise<ContextAttributionInner[] | undefined> {
-        // TODO: only ever returns a single attribution, but attribution can be an array - add other attributions
         let attribution: string | null = null;
-        if(typeof window !== 'undefined') {
-            const url = new URL(window.location.href);
-            attribution = url.searchParams.get(ATTRIBUTION_QUERY_PARAM)
-        }
         
+        try {
+            const url = new URL((await this.getContext()).pageUrl);
+            attribution = url.searchParams.get(ATTRIBUTION_QUERY_PARAM)
+        } catch(e) {
+            // noop - URL failed to parse empty url
+        }
+    
+        // TODO: should this also fallback to storage?
+        // TODO: should append attribution to existiing attribution data? 
+        // TODO: What are the other attributions and how do we handle them? 
+        // TODO: Do/should a/b campaigns use attribution?
         if(attribution) {
             const [type, id] = attribution.split(':');
             if(type && id) {
-                if (getFlags().cookies() || this.config.apis?.cookie?.set) {
-                    await this.setCookie(ATTRIBUTION_KEY, attribution, COOKIE_SAMESITE, 0, COOKIE_DOMAIN);
-                }
+                
+                await this.setCookie(ATTRIBUTION_KEY, attribution, COOKIE_SAMESITE, 0, COOKIE_DOMAIN);
                 return [{ type, id }];
             }
-        } else if (getFlags().cookies() || this.config.apis?.cookie?.get){
+        } else {
             const storedAttribution = await this.getCookie(ATTRIBUTION_KEY);
             if(storedAttribution) {
                 const [type, id] = storedAttribution.split(':');
@@ -694,7 +787,7 @@ export class Beacon {
     setCurrency(currency: ContextCurrency): void {
         this.currency = currency;
     }
-    // TODO: add preflightCache to API spec?
+    
     // TODO: add helper methods:
     // resetSession
     // syncPersonalization
@@ -722,10 +815,17 @@ export class Beacon {
             case 'autocomplete':
                 return new AutocompleteApi();
             case 'search':
+                return new SearchApi();
             case 'category':
+                return new CategoryApi();
             case 'recommendations':
+                return new RecommendationsApi();
             case 'product':
                 return new ProductApi();
+            case 'cart':
+                return new CartApi();
+            case 'order':
+                return new OrderApi();
             default:
                 throw new Error(`Unknown API type: ${apiType}`);
         }
@@ -752,12 +852,7 @@ export class Beacon {
         }
     }
 
-    public clearPayloadPool(): void {
-        this.payloadPool.requests = [];
-    }
-
     public async sendPreflight(): Promise<void> {
-        // TODO: add preflightCache to API spec?
         const userId = await this.getUserId();
 		const siteId = this.globals.siteId;
 		const shopper = await this.getShopperId();
@@ -799,4 +894,34 @@ export class Beacon {
 			}
 		}
     }
+}
+
+
+
+export type ParameterObject = Record<string, boolean | string | string[] | number | number[] | unknown>;
+
+export function charsParams(params: ParameterObject): number {
+	if (typeof params != 'object') {
+		throw new Error('function requires an object');
+	}
+
+	const count = Object.keys(params).reduce((count, key) => {
+		const keyLength = key.length;
+		const value = params[key];
+		if (Array.isArray(value)) {
+			return (
+				count +
+				(value as string[]).reduce((length, val) => {
+					return length + keyLength + 1 + ('' + val).length;
+				}, 0)
+			);
+		} else if (typeof value == 'object') {
+			//recursive check
+			return count + keyLength + 1 + charsParams(value as any);
+		} else if (typeof value == 'string' || typeof value == 'number') {
+			return count + keyLength + 1 + ('' + value).length;
+		} else return count + keyLength;
+	}, 1);
+
+	return count;
 }
