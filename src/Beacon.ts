@@ -53,7 +53,6 @@ import {
 	CategorySchema,
 	ErrorLogsApi,
 	LogShopifypixelRequest,
-
 	Log,
 	LogSnapRequest,
 } from './client';
@@ -81,20 +80,20 @@ type BeaconConfig = {
 		cookie?: {
 			get: (name?: string) => Promise<string>;
 			set: (cookieString: string) => Promise<string>;
-		},
+		};
 		localStorage?: {
 			clear: () => Promise<void>;
 			getItem: (key: string) => Promise<string | null>;
 			setItem: (key: string, value: string) => Promise<void>;
 			removeItem: (key: string) => Promise<void>;
-		},
-	},
+		};
+	};
 	href?: string;
 	userAgent?: string;
-}
+};
 type BeaconGlobals = {
 	siteId: string;
-	currency?: ContextCurrency
+	currency?: ContextCurrency;
 };
 
 type PayloadRequest = {
@@ -121,7 +120,8 @@ const ATTRIBUTION_KEY = 'ssAttribution';
 const MAX_EXPIRATION = 47304000000; // 18 months
 const THIRTY_MINUTES = 1800000; // 30 minutes
 const MAX_VIEWED_COUNT = 20;
-const COOKIE_DOMAIN = (typeof window !== 'undefined' && window.location.hostname && '.' + window.location.hostname.replace(/^www\./, '')) || undefined;
+const COOKIE_DOMAIN =
+	(typeof window !== 'undefined' && window.location.hostname && '.' + window.location.hostname.replace(/^www\./, '')) || undefined;
 
 export class Beacon {
 	private config: BeaconConfig;
@@ -135,7 +135,7 @@ export class Beacon {
 	private currency: ContextCurrency = {
 		code: '',
 	};
-	queue: { eventFn: (...args: any[]) => Promise<void>, payload: any }[] = [];
+	queue: { eventFn: (...args: any[]) => Promise<void>; payload: any }[] = [];
 	batchIntervalTimeout: number | NodeJS.Timeout = 0;
 	private apis: {
 		shopper: ShopperApi;
@@ -157,12 +157,15 @@ export class Beacon {
 			throw new Error(`Invalid config passed to tracker. The "siteId" attribute must be provided.`);
 		}
 
-		this.config = deepmerge({
-			id: 'track',
-			framework: 'snap/preact',
-			mode: 'production',
-		}, config || {});
-		console.log("beacon this.config after merge", this.config)
+		this.config = deepmerge(
+			{
+				id: 'track',
+				framework: 'snap/preact',
+				mode: 'production',
+			},
+			config || {}
+		);
+		console.log('beacon this.config after merge', this.config);
 
 		if (this.config.mode && ['production', 'development'].includes(this.config.mode)) {
 			this.mode = this.config.mode;
@@ -178,7 +181,7 @@ export class Beacon {
 			cart: new CartApi(),
 			order: new OrderApi(),
 			error: new ErrorLogsApi(),
-		}
+		};
 
 		this.globals = globals;
 		this.init();
@@ -235,7 +238,7 @@ export class Beacon {
 			cookie += 'Secure;';
 		}
 		if (expiration) {
-			const d = new Date()
+			const d = new Date();
 			d.setTime(d.getTime() + expiration);
 			cookie += `expires=${d['toUTCString']()};`;
 		}
@@ -271,7 +274,7 @@ export class Beacon {
 		}
 
 		try {
-			const data = JSON.parse(storedValue)
+			const data = JSON.parse(storedValue);
 			return data[this.globals.siteId] || '';
 		} catch (e) {
 			return '';
@@ -385,7 +388,6 @@ export class Beacon {
 					// remove products with qty 0
 					const updatedCartProducts = cartProducts.filter((product) => product.qty > 0);
 
-
 					const storedProducts = JSON.stringify(updatedCartProducts);
 					await this.setCookie(CART_KEY, storedProducts, COOKIE_SAMESITE, 0, COOKIE_DOMAIN);
 					await this.setLocalStorageItem(CART_KEY, storedProducts);
@@ -437,7 +439,7 @@ export class Beacon {
 					const request = this.createRequest('shopper', 'login', payload);
 					this.sendRequests([request]);
 				}
-			}
+			},
 		},
 		autocomplete: {
 			render: async (event: Payload<AutocompleteSchemaData>): Promise<void> => {
@@ -681,13 +683,7 @@ export class Beacon {
 				if (sku) {
 					const lastViewedProducts = await this.storage.viewed.get();
 					const uniqueCartItems = Array.from(new Set([sku, ...lastViewedProducts])).map((item) => `${item}`.trim());
-					await this.setCookie(
-						VIEWED_KEY,
-						uniqueCartItems.slice(0, MAX_VIEWED_COUNT).join(','),
-						COOKIE_SAMESITE,
-						MAX_EXPIRATION,
-						COOKIE_DOMAIN
-					);
+					await this.setCookie(VIEWED_KEY, uniqueCartItems.slice(0, MAX_VIEWED_COUNT).join(','), COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
 					await this.setLocalStorageItem(VIEWED_KEY, uniqueCartItems.slice(0, MAX_VIEWED_COUNT).join(','));
 					if (!lastViewedProducts.includes(sku)) {
 						await this.sendPreflight();
@@ -704,7 +700,7 @@ export class Beacon {
 						data: event.data,
 					},
 				};
-				console.log("cart add payload", payload)
+				console.log('cart add payload', payload);
 				const request = this.createRequest('cart', 'cartAdd', payload);
 				this.sendRequests([request]);
 				// await this.storage.cart.add(event.data.results.map((product) => this.getSku(product)));
@@ -777,9 +773,8 @@ export class Beacon {
 				const request = this.createRequest('error', 'logSnap', payload);
 				this.sendRequests([request]);
 			},
-		}
-
-	}
+		},
+	};
 
 	queueRequest(request: PayloadRequest): void {
 		this.requests.push(request);
@@ -802,7 +797,7 @@ export class Beacon {
 			shopperId: this.shopperId,
 			pageLoadId: this.pageLoadId,
 			timestamp: this.getTimestamp(),
-			pageUrl: this.config.href || typeof window !== 'undefined' && window.location.href || '',
+			pageUrl: this.config.href || (typeof window !== 'undefined' && window.location.href) || '',
 			initiator: `searchspring/${this.config.framework}${this.config.version ? `/${this.config.version}` : ''}`,
 			attribution: this.attribution,
 			userAgent: navigator?.userAgent || this.config.userAgent,
@@ -836,8 +831,8 @@ export class Beacon {
 		} finally {
 			const data = {
 				id: uuid || this.generateId(),
-				timestamp: this.getTimestamp()
-			}
+				timestamp: this.getTimestamp(),
+			};
 			await this.setLocalStorageItem(key, JSON.stringify(data));
 			await this.setCookie(key, data.id, COOKIE_SAMESITE, expiration, COOKIE_DOMAIN); // attempt to store in cookie
 			return data.id;
@@ -848,7 +843,7 @@ export class Beacon {
 		try {
 			return await this.getStoredID(USER_ID_KEY, THIRTY_MINUTES);
 		} catch (e) {
-			console.error("Failed to get user id:", e);
+			console.error('Failed to get user id:', e);
 			return '';
 		}
 	}
@@ -887,13 +882,13 @@ export class Beacon {
 
 		try {
 			const url = new URL((await this.getContext()).pageUrl);
-			attribution = url.searchParams.get(ATTRIBUTION_QUERY_PARAM)
+			attribution = url.searchParams.get(ATTRIBUTION_QUERY_PARAM);
 		} catch (e) {
 			// noop - URL failed to parse empty url
 		}
 
 		// TODO: should this also fallback to storage? - yes - save in storage as json parsable array for future multiple attribution types
-		// TODO: should append attribution to existiing attribution data? 
+		// TODO: should append attribution to existiing attribution data?
 		if (attribution) {
 			const [type, id] = attribution.split(':');
 			if (type && id) {
@@ -963,60 +958,63 @@ export class Beacon {
 		for (const request of requests) {
 			const api = this.getApiClient(request.apiType);
 			const apiMethod = request.endpoint as keyof typeof api;
-			console.log("sending request", apiMethod, request.payload)
+			console.log('sending request', apiMethod, request.payload);
 			api[apiMethod](request.payload, { keepalive: true } as any); // TODO: fix typing
 		}
 	}
 	private async processRequests(): Promise<void> {
 		// TODO: remove async so if this is running other events cant get queues - move requests = [] to end of function
-		console.log("processRequests", this.requests);
+		console.log('processRequests', this.requests);
 
 		// clone requests to process to allow more requests to be queued while processing
-		const requestToProcess = structuredClone(this.requests); // TODO: try deepmerge
+		const requestToProcess = deepmerge([], this.requests);
 		this.requests = [];
 
 		const data = requestToProcess.reduce<{
-			nonBatched: PayloadRequest[],
-			batches: Record<string, PayloadRequest>
-		}>((acc, request) => {
-			let key = `${request.payload.siteId}||${request.endpoint}`;
+			nonBatched: PayloadRequest[];
+			batches: Record<string, PayloadRequest>;
+		}>(
+			(acc, request) => {
+				let key = `${request.payload.siteId}||${request.endpoint}`;
 
-			switch (request.endpoint) {
-				case 'recommendationsRender':
-				case 'recommendationsImpression':
-					const recommendationsSchema = request.payload.recommendationsSchema as RecommendationsSchema;
-					key += additionalRequestKeys(key, 'recommendation', recommendationsSchema);
-					appendResults(acc, key, 'recommendationsSchema', request);
-					break;
-				case 'searchRender':
-				case 'searchImpression':
-					const searchSchema = request.payload.searchSchema as SearchSchema;
-					key += additionalRequestKeys(key, 'search', searchSchema);
-					appendResults(acc, key, 'searchSchema', request);
-					break;
-				case 'autocompleteRender':
-				case 'autocompleteImpression':
-					const autocompleteSchema = request.payload.autocompleteSchema as AutocompleteSchema;
-					key += additionalRequestKeys(key, 'autocomplete', autocompleteSchema);
-					appendResults(acc, key, 'autocompleteSchema', request);
-					break;
-				case 'categoryRender':
-				case 'categoryImpression':
-					const categorySchema = request.payload.categorySchema as CategorySchema;
-					key += additionalRequestKeys(key, 'category', categorySchema);
-					appendResults(acc, key, 'categorySchema', request);
-					break;
-				default:
-					// non-batched requests
-					acc.nonBatched.push(request);
-					break;
+				switch (request.endpoint) {
+					case 'recommendationsRender':
+					case 'recommendationsImpression':
+						const recommendationsSchema = request.payload.recommendationsSchema as RecommendationsSchema;
+						key += additionalRequestKeys(key, 'recommendation', recommendationsSchema);
+						appendResults(acc, key, 'recommendationsSchema', request);
+						break;
+					case 'searchRender':
+					case 'searchImpression':
+						const searchSchema = request.payload.searchSchema as SearchSchema;
+						key += additionalRequestKeys(key, 'search', searchSchema);
+						appendResults(acc, key, 'searchSchema', request);
+						break;
+					case 'autocompleteRender':
+					case 'autocompleteImpression':
+						const autocompleteSchema = request.payload.autocompleteSchema as AutocompleteSchema;
+						key += additionalRequestKeys(key, 'autocomplete', autocompleteSchema);
+						appendResults(acc, key, 'autocompleteSchema', request);
+						break;
+					case 'categoryRender':
+					case 'categoryImpression':
+						const categorySchema = request.payload.categorySchema as CategorySchema;
+						key += additionalRequestKeys(key, 'category', categorySchema);
+						appendResults(acc, key, 'categorySchema', request);
+						break;
+					default:
+						// non-batched requests
+						acc.nonBatched.push(request);
+						break;
+				}
+
+				return acc;
+			},
+			{
+				nonBatched: [],
+				batches: {},
 			}
-
-			return acc;
-		}, {
-			nonBatched: [],
-			batches: {}
-		});
+		);
 
 		// combine batches and non-batched requests
 		const requestsToSend = Object.values(data.batches).reduce<PayloadRequest[]>((acc, batch) => {
@@ -1098,10 +1096,15 @@ export function charsParams(params: ParameterObject): number {
 	return count;
 }
 
-function appendResults(acc: {
-	nonBatched: PayloadRequest[],
-	batches: Record<string, PayloadRequest>
-}, key: string, schemaName: 'searchSchema' | 'autocompleteSchema' | 'categorySchema' | 'recommendationsSchema', request: PayloadRequest) {
+function appendResults(
+	acc: {
+		nonBatched: PayloadRequest[];
+		batches: Record<string, PayloadRequest>;
+	},
+	key: string,
+	schemaName: 'searchSchema' | 'autocompleteSchema' | 'categorySchema' | 'recommendationsSchema',
+	request: PayloadRequest
+) {
 	if (!acc.batches[key]) {
 		// first request for this batch will contain context data
 		acc.batches[key] = request;
@@ -1114,7 +1117,11 @@ function appendResults(acc: {
 	}
 }
 
-function additionalRequestKeys(key: string, type: 'search' | 'autocomplete' | 'category' | 'recommendation', schema: SearchSchema | AutocompleteSchema | CategorySchema | RecommendationsSchema): string {
+function additionalRequestKeys(
+	key: string,
+	type: 'search' | 'autocomplete' | 'category' | 'recommendation',
+	schema: SearchSchema | AutocompleteSchema | CategorySchema | RecommendationsSchema
+): string {
 	let value = key;
 	value += `||${schema.context.pageLoadId}`;
 	value += `||${schema.context.sessionId}`;
