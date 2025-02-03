@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+		"target": "es2020",
+		"module": "es2020",
+		"declaration": true,
+		"declarationMap": true,
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"lib": [
+			"es2020",
+			"dom"
+		],
+		"resolveJsonModule": true,
+		"strict": true,
+        "outDir": "./dist/esm",
+	},
+	"exclude": [
+		"**/node_modules/*",
+		"**/coverage/*",
+		"**/dist/**",
+		"**/*.spec.ts",
+		"**/*.spec.tsx",
+		"**/*.test.ts",
+		"**/*.test.tsx",
+		"**/*.stories.tsx",
+		"**/__tests__/*",
+		"**/__mocks__/*",
+		"**/test/*",
+		"**/*.cy.tsx",
+	],
+	"include": [
+		"src"
+	],
+}

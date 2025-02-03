@@ -1,0 +1,31 @@
+{
+	"compilerOptions": {
+		"declaration": true,
+		"declarationMap": true,
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"lib": [
+			"es2020",
+			"dom"
+		],
+		"resolveJsonModule": true,
+		"strict": true,
+		"target": "es5",
+		"module": "CommonJS",
+		"outDir": "./dist/cjs"
+	},
+	"exclude": [
+		"**/node_modules/*",
+		"**/coverage/*",
+		"**/dist/**",
+		"**/*.spec.ts",
+		"**/*.spec.tsx",
+		"**/*.test.ts",
+		"**/*.test.tsx",
+		"**/*.stories.tsx",
+		"**/__tests__/*",
+		"**/__mocks__/*",
+		"**/test/*",
+		"**/*.cy.tsx",
+	]
+}

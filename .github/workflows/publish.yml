@@ -1,0 +1,60 @@
+name: Publish
+on:
+  push:
+    branches: [main]
+
+jobs:
+  Publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repositiory
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+
+      - name: Set Github credentials
+        run: |
+          git config user.name searchspring-machine
+          git config user.email machine@searchspring.com
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 20
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@searchspring'
+          # registry-url: 'https://registry.npmjs.org'
+
+      - name: Install packages
+        run: npm ci
+
+      - name: Test
+        run: npm run test
+
+      - name: Version
+        run: npm run version
+
+      - name: Publish packages
+        run: npm run publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.MACHINE_001 }}
+          GH_TOKEN: ${{ secrets.MACHINE_001 }}
+
+      # - name: Publish
+      #   run: npm publish --access public
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # TODO: add for code coverage metrics
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.SNAPFU_AWS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.SNAPFU_AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-east-1
+
+      # - name: Generate Metrics Files
+      #   run: npm run build:metrics
+
+      # - name: Upload Metrics Files to S3
+      #   run: aws s3 sync --region us-east-1 ./metrics/data s3://datawarehouse-stage/team-metrics-import/

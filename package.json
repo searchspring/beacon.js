@@ -1,28 +1,56 @@
 {
   "name": "@searchspring/beacon",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.1",
+  "author": "searchspring",
+  "license": "MIT",
+  "description": "Javascript library for utilizing Searchspring beacon tracking.",
+  "private": true,
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "repository": "https://github.com/searchspring/beacon.js",
+  "prettier": "@searchspring/prettier",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf ./dist && npm run generate && tsc && tsc -p tsconfig.cjs.json",
+    "dev": "tsc --watch",
+    "commit": "cz",
+    "test": "echo 'No tests yet'",
     "postinstall": "openapi-generator-cli version-manager set 7.9.0",
-		"generate": "openapi-generator-cli generate -i ./beacon.oas.yaml -g typescript-fetch -o ./src/client"
+    "generate": "openapi-generator-cli generate -i ./beacon.oas.yaml -g typescript-fetch -o ./src/client",
+    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
+    "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
+    "prepare": "husky",
+    "version": "standard-version -a",
+    "postversion": "git push && git push --tags"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/searchspring/beacon.js.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/searchspring/beacon.js/issues"
-  },
-  "homepage": "https://github.com/searchspring/beacon.js#readme",
   "dependencies": {
     "deepmerge": "4.3.1",
-		"uuid": "9.0.1"
+    "uuid": "9.0.1"
   },
   "devDependencies": {
-		"@openapitools/openapi-generator-cli": "^2.15.3"	
-	}
+    "@openapitools/openapi-generator-cli": "^2.15.3",
+    "@searchspring/prettier": "1.0.2",
+    "@types/uuid": "^10.0.0",
+    "cz-conventional-changelog": "3.3.0",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "husky": "7.0.4",
+    "jest": "29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jsdom": "20.0.0",
+    "lint-staged": "12.4.1",
+    "prettier": "2.6.2",
+    "typedoc": "0.25.9",
+    "typescript": "5.3.3"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "prettier --write",
+      "eslint"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }
