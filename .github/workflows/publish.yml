@@ -43,8 +43,8 @@ jobs:
       - name: Publish packages
         run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.MACHINE_001 }}
-          GH_TOKEN: ${{ secrets.MACHINE_001 }}
+          NODE_AUTH_TOKEN: ${{ secrets.SEARCHSPRING_PUBLISH }}
+          GH_TOKEN: ${{ secrets.SEARCHSPRING_PUBLISH }}
 
       # TODO: add for code coverage metrics
       # - name: Configure AWS credentials
