@@ -6,6 +6,10 @@
   "description": "Javascript library for utilizing Searchspring beacon tracking.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
+  "exports": {
+    "import": "./dist/esm/index.js",
+    "require": "./dist/cjs/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/searchspring/beacon.js.git"
