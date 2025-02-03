@@ -7,7 +7,10 @@
   "private": true,
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
-  "repository": "https://github.com/searchspring/beacon.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/searchspring/beacon.js.git"
+  },
   "prettier": "@searchspring/prettier",
   "scripts": {
     "build": "rm -rf ./dist && npm run generate && tsc && tsc -p tsconfig.cjs.json",
@@ -15,6 +18,7 @@
     "commit": "cz",
     "test": "echo 'No tests yet'",
     "postinstall": "openapi-generator-cli version-manager set 7.9.0",
+    "publish": "",
     "generate": "openapi-generator-cli generate -i ./beacon.oas.yaml -g typescript-fetch -o ./src/client",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
