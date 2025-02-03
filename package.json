@@ -4,7 +4,6 @@
   "author": "searchspring",
   "license": "MIT",
   "description": "Javascript library for utilizing Searchspring beacon tracking.",
-  "private": true,
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "repository": {
