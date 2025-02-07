@@ -150,7 +150,7 @@ export class Beacon {
 	};
 
 	private requests: PayloadRequest[] = [];
-	public initialized: boolean = false;
+	public initialized: Promise<boolean>;
 
 	constructor(globals: BeaconGlobals, config: BeaconConfig) {
 		if (typeof globals != 'object' || typeof globals.siteId != 'string') {
@@ -160,7 +160,7 @@ export class Beacon {
 		this.config = deepmerge(
 			{
 				id: 'track',
-				framework: 'snap/preact',
+				framework: 'beacon.js',
 				mode: 'production',
 			},
 			config || {}
@@ -184,22 +184,26 @@ export class Beacon {
 		};
 
 		this.globals = globals;
-		this.init();
+		this.initialized = this.init();
 	}
 
 	async init() {
-		this.pageLoadId = this.generateId();
-		this.userId = await this.getUserId();
-		this.sessionId = await this.getSessionId();
-		this.shopperId = await this.getShopperId();
-		this.attribution = await this.getAttribution();
-		if (this.globals.currency?.code) {
-			this.setCurrency(this.globals.currency);
+		try {
+			this.pageLoadId = this.generateId();
+			this.userId = await this.getUserId();
+			this.sessionId = await this.getSessionId();
+			this.shopperId = await this.getShopperId();
+			this.attribution = await this.getAttribution();
+			if (this.globals.currency?.code) {
+				await this.setCurrency(this.globals.currency);
+			}
+			// concat requests incase requests were queued while awaiting above
+			this.requests = [...this.requests, ...(await this.getRequests())];
+			this.processRequests();
+			return true;
+		} catch {
+			return false;
 		}
-		// concat requests incase requests were queued while awaiting above
-		this.requests = [...this.requests, ...(await this.getRequests())];
-		this.initialized = true;
-		this.processRequests();
 	}
 
 	private async getCookie(name: string): Promise<string> {
@@ -790,7 +794,12 @@ export class Beacon {
 		return `${product.childSku || product.childUid || product.sku || product.uid || ''}`.trim();
 	}
 
+	getUidFallback(product: Product | Item): string {
+		return `${product.uid || product.sku || product.childUid || product.childSku || ''}`.trim();
+	}
+
 	async getContext(): Promise<Context> {
+		await this.initialized;
 		const context: Context = {
 			userId: this.userId,
 			sessionId: this.sessionId,
