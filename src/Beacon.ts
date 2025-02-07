@@ -182,6 +182,7 @@ export class Beacon {
 		};
 
 		this.globals = globals;
+		this.pageLoadId = this.generateId();
 	}
 
 	private async getCookie(name: string): Promise<string> {
