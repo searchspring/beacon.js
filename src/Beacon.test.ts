@@ -1,5 +1,5 @@
-import { Beacon, CART_KEY, COOKIE_DOMAIN, COOKIE_SAMESITE, REQUEST_GROUPING_TIMEOUT } from './Beacon';
-import { ContextCurrency, Product } from './client';
+import { additionalRequestKeys, appendResults, Beacon, CART_KEY, COOKIE_DOMAIN, COOKIE_SAMESITE, PayloadRequest, PREFLIGHT_POST_THRESHOLD, REQUEST_GROUPING_TIMEOUT } from './Beacon';
+import { AutocompleteSchema, AutocompleteSchemaDataFilterInnerFromJSON, CategorySchema, ContextCurrency, Product, RecommendationsSchema, SearchSchema } from './client';
 
 jest.mock('./client/apis/ShopperApi', () => {
     return {
@@ -139,6 +139,8 @@ describe('Beacon', () => {
         value: localStorageMock,
     });
 
+    console.error = jest.fn();
+
     beforeEach(() => {
         jest.clearAllMocks();
         resetAllCookies();
@@ -184,9 +186,9 @@ describe('Beacon', () => {
                 const idToRemove = updatedCartData[updatedCartData.length - 1].uid;
                 expect(idToRemove).toBe('productUid2')
                 // @ts-ignore - legacy string array support
-                await beacon.storage.cart.remove([ idToRemove ]);
+                await beacon.storage.cart.remove([idToRemove]);
                 const removedCartData = await beacon.storage.cart.get();
-                
+
                 expect(removedCartData).toStrictEqual([
                     { uid: 'productUid1', sku: 'productUid1', qty: 1, price: 0 },
                 ]);
@@ -278,7 +280,7 @@ describe('Beacon', () => {
             const localStorageKey = 'test-local-storage';
             const localStorageValue = 'test-local-storage-value';
             const localStorageReturnValue = JSON.stringify({ [mockGlobals.siteId]: localStorageValue });
-            
+
             const apis = {
                 cookie: {
                     get: jest.fn().mockResolvedValue(cookieReturnValue),
@@ -317,6 +319,36 @@ describe('Beacon', () => {
                 expect(apis.localStorage.setItem).toHaveBeenCalledWith(localStorageKey, JSON.stringify({ [mockGlobals.siteId]: localStorageValue }));
             });
         });
+        describe('Methods', () => {
+            it('can getStoredID', async () => {
+                const id1 = await beacon['getStoredID']('key', 0);
+                expect(id1).toStrictEqual(expect.any(String));
+
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                const id2 = await beacon['getStoredID']('key', 0);
+                expect(id2).toStrictEqual(expect.any(String));
+                expect(id1).toBe(id2);
+            });
+
+            it('can getStoredID with expiration', async () => {
+                const expiration = 1000;
+                const id1 = await beacon['getStoredID']('key', expiration);
+                expect(id1).toStrictEqual(expect.any(String));
+
+                await new Promise(resolve => setTimeout(resolve, expiration / 2));
+
+                const id2 = await beacon['getStoredID']('key', expiration);
+                expect(id2).toStrictEqual(expect.any(String));
+                expect(id1).toBe(id2);
+
+                await new Promise(resolve => setTimeout(resolve, expiration));
+
+                const id3 = await beacon['getStoredID']('key', expiration);
+                expect(id3).toStrictEqual(expect.any(String));
+                expect(id3).not.toBe(id2);
+            });
+        });
     });
 
     describe('Beacon methods', () => {
@@ -333,6 +365,7 @@ describe('Beacon', () => {
                 attribution: undefined,
                 userAgent: expect.any(String),
                 currency: undefined,
+                dev: true,
             });
         });
 
@@ -345,7 +378,7 @@ describe('Beacon', () => {
 
             await beacon.setShopperId('test-shopper-id');
             await beacon.setCurrency({ code: 'EUR' });
-            
+
             const context1 = await beacon.getContext();
             await new Promise(resolve => setTimeout(resolve, 100));
             const context2 = await beacon.getContext();
@@ -422,6 +455,73 @@ describe('Beacon', () => {
             // should be on context
             const updatedContext = await beacon.getContext();
             expect(updatedContext.attribution).toStrictEqual([{ type, id }]);
+
+            // get persisted attribution
+            const beacon2 = new Beacon(mockGlobals, mockConfig);
+            const attribution2 = await beacon2['getAttribution']();
+            expect(attribution2).toStrictEqual([{ type, id }]);
+        });
+
+        it('can sendPreflight via GET', async () => {
+            // only add 1 product to be under threshold and still generate GET request
+            const items = ['abc123'];
+
+            // @ts-ignore - legacy string array support
+            beacon.storage.cart.add(items);
+
+            const sendPreflight = jest.spyOn(beacon, 'sendPreflight');
+            const xhrMock: Partial<XMLHttpRequest> = {
+                open: jest.fn(),
+                send: jest.fn(),
+                setRequestHeader: jest.fn(),
+                readyState: 4,
+                status: 200,
+                response: 'Hello World!',
+            };
+            const request = jest.spyOn(global.window, 'XMLHttpRequest').mockImplementation(() => xhrMock as XMLHttpRequest);
+
+            await beacon.sendPreflight();
+
+            const querystring = `?userId=${encodeURIComponent(beacon['userId'])}` +
+                `&siteId=${encodeURIComponent(mockGlobals.siteId)}` +
+                `&cart=${encodeURIComponent(items[0])}`;
+
+            expect(xhrMock.open).toHaveBeenCalledWith('GET', `https://${mockGlobals.siteId}.a.searchspring.io/api/personalization/preflightCache${querystring}`);
+
+            sendPreflight.mockRestore();
+            request.mockRestore();
+        });
+
+        it('can sendPreflight via POST', async () => {
+            // populate cart cookie so charsParams threshold is met for POST request
+            const items: string[] = [];
+            const minBytesThreshold = PREFLIGHT_POST_THRESHOLD;
+            const skuPrefix = 'a_very_long_product_sku_to_fill_charsParams_bytes_'; // 50 chars
+            for (let i = 0; i < Math.ceil(minBytesThreshold / skuPrefix.length); i++) {
+                items.push(`${skuPrefix}_${i}`);
+            }
+
+            // @ts-ignore - legacy string array support
+            beacon.storage.cart.add(items); // 51 * 20 = 1050 bytes
+            expect(items.join().length).toBeGreaterThanOrEqual(minBytesThreshold);
+
+            const sendPreflight = jest.spyOn(beacon, 'sendPreflight');
+            const xhrMock: Partial<XMLHttpRequest> = {
+                open: jest.fn(),
+                send: jest.fn(),
+                setRequestHeader: jest.fn(),
+                readyState: 4,
+                status: 200,
+                response: 'Hello World!',
+            };
+            const request = jest.spyOn(global.window, 'XMLHttpRequest').mockImplementation(() => xhrMock as XMLHttpRequest);
+
+            await beacon.sendPreflight();
+
+            expect(xhrMock.open).toHaveBeenCalledWith('POST', `https://${mockGlobals.siteId}.a.searchspring.io/api/personalization/preflightCache`);
+
+            sendPreflight.mockRestore();
+            request.mockRestore();
         });
     });
 
@@ -450,9 +550,18 @@ describe('Beacon', () => {
                 expect(beacon['shopperId']).toBe(shopperId);
                 expect(beacon['apis'].shopper.login).toHaveBeenCalled();
             });
+            it('logs error if shopperId is not provided', async () => {
+                const shopperId = '';
+                const data = {
+                    id: shopperId
+                }
+                await beacon.events.shopper.login({ data });
+                expect(console.error).toHaveBeenCalled();
+                expect(beacon['apis'].shopper.login).not.toHaveBeenCalled();
+            });
         });
         describe('Autocomplete', () => {
-            const data = {...baseSearchSchema};
+            const data = { ...baseSearchSchema };
             it('can process render event', async () => {
                 await beacon.events.autocomplete.render({ data });
                 await new Promise(resolve => setTimeout(resolve, REQUEST_GROUPING_TIMEOUT));
@@ -480,7 +589,7 @@ describe('Beacon', () => {
             });
         });
         describe('Search', () => {
-            const data = {...baseSearchSchema};
+            const data = { ...baseSearchSchema };
             it('can process render event', async () => {
                 await beacon.events.search.render({ data });
                 await new Promise(resolve => setTimeout(resolve, REQUEST_GROUPING_TIMEOUT));
@@ -508,7 +617,7 @@ describe('Beacon', () => {
             });
         });
         describe('Category', () => {
-            const data = {...baseSearchSchema};
+            const data = { ...baseSearchSchema };
             it('can process render event', async () => {
                 await beacon.events.category.render({ data });
                 await new Promise(resolve => setTimeout(resolve, REQUEST_GROUPING_TIMEOUT));
@@ -619,6 +728,266 @@ describe('Beacon', () => {
             it('can process snap event', async () => {
                 await beacon.events.error.snap({ data });
                 expect(beacon['apis'].error.logSnap).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('Functions', () => {
+        const mockContext = {
+            userId: 'userId',
+            sessionId: 'sessionId',
+            shopperId: 'sessionId',
+            pageLoadId: 'pageLoadId',
+            timestamp: 'timestamp',
+            pageUrl: 'pageUrl',
+            initiator: 'initiator',
+            attribution: [],
+            userAgent: 'userAgent',
+            currency: {
+                code: 'USD',
+            },
+            dev: true,
+        };
+        const mockData = {
+            q: 'shoes',
+            rq: 'rq',
+            correctedQuery: 'correctedQuery',
+            matchType: 'matchType',
+            results: [
+                { uid: 'product1', sku: 'sku1' },
+                { uid: 'product2', sku: 'sku2' }
+            ],
+            pagination: {
+                totalResults: 100,
+                page: 1,
+                resultsPerPage: 20,
+            }
+        };
+        describe('additionalRequestKeys', () => {
+            it('can handles unknown endpoint', async () => {
+                const schema = {
+                    context: mockContext,
+                    data: mockData,
+                };
+                const endpoint = 'unknown' as any;
+                const context = schema.context;
+                const { pageLoadId, sessionId } = context;
+
+                let baseKey = `${mockGlobals.siteId}||${endpoint}`;
+                const key = additionalRequestKeys(baseKey, endpoint, schema);
+                const expected = `${mockGlobals.siteId}||${endpoint}||${pageLoadId}||${sessionId}`;
+                expect(key).toStrictEqual(expected);
+            });
+            it('handles SearchSchema', async () => {
+                const schema = {
+                    context: mockContext,
+                    data: mockData,
+                };
+                const endpoint = 'search';
+                const context = schema.context;
+                const data = schema.data;
+                const { pageLoadId, sessionId } = context;
+                const { rq, pagination, q, correctedQuery, matchType } = data;
+
+                let baseKey = `${mockGlobals.siteId}||${endpoint}`;
+                const key = additionalRequestKeys(baseKey, endpoint, schema);
+                const expected = `${mockGlobals.siteId}||${endpoint}||${pageLoadId}||${sessionId}||rq=${rq}||page=${pagination.page}||resultsPerPage=${pagination.resultsPerPage}||totalResults=${pagination.totalResults}||q=${q}||correctedQuery=${correctedQuery}||matchType=${matchType}`;
+                expect(key).toStrictEqual(expected);
+            });
+            it('handles AutocompleteSchema', async () => {
+                const schema: AutocompleteSchema = {
+                    context: mockContext,
+                    data: mockData,
+                };
+                const endpoint = 'autocomplete';
+                const context = schema.context;
+                const data = schema.data;
+                const { pageLoadId, sessionId } = context;
+                const { rq, pagination, q, correctedQuery, matchType } = data;
+
+                let baseKey = `${mockGlobals.siteId}||${endpoint}`;
+                const key = additionalRequestKeys(baseKey, endpoint, schema);
+                const expected = `${mockGlobals.siteId}||${endpoint}||${pageLoadId}||${sessionId}||rq=${rq}||page=${pagination.page}||resultsPerPage=${pagination.resultsPerPage}||totalResults=${pagination.totalResults}||q=${q}||correctedQuery=${correctedQuery}||matchType=${matchType}`;
+                expect(key).toStrictEqual(expected);
+            });
+            it('handles CategorySchema', async () => {
+                const schema: CategorySchema = {
+                    context: mockContext,
+                    data: mockData,
+                };
+                const endpoint = 'category';
+                const context = schema.context;
+                const data = schema.data;
+                const { pageLoadId, sessionId } = context;
+                const { rq, pagination } = data;
+
+                let baseKey = `${mockGlobals.siteId}||${endpoint}`;
+                const key = additionalRequestKeys(baseKey, endpoint, schema);
+                const expected = `${mockGlobals.siteId}||${endpoint}||${pageLoadId}||${sessionId}||rq=${rq}||page=${pagination.page}||resultsPerPage=${pagination.resultsPerPage}||totalResults=${pagination.totalResults}`;
+                expect(key).toStrictEqual(expected);
+            });
+            it('handles RecommendationsSchema', async () => {
+                const schema: RecommendationsSchema = {
+                    context: mockContext,
+                    data: {
+                        tag: 'tag',
+                        results: mockData.results,
+                    }
+                };
+                const endpoint = 'recommendation';
+                const context = schema.context;
+                const data = schema.data;
+                const { pageLoadId, sessionId } = context;
+                const { tag } = data;
+
+                let baseKey = `${mockGlobals.siteId}||${endpoint}`;
+                const key = additionalRequestKeys(baseKey, endpoint, schema);
+                const expected = `${mockGlobals.siteId}||${endpoint}||${pageLoadId}||${sessionId}||tag=${tag}`;
+                expect(key).toStrictEqual(expected);
+            });
+        });
+
+        describe('appendResults', () => {
+            it('can appendResults', async () => {
+                const acc: {
+                    nonBatched: PayloadRequest[];
+                    batches: Record<string, PayloadRequest>;
+                } = {
+                    nonBatched: [],
+                    batches: {}
+                };
+
+                const schemaName = 'searchSchema';
+                const initialRequest = {
+                    apiType: 'search' as const,
+                    endpoint: 'searchRender',
+                    payload: {
+                        [schemaName]: {
+                            context: mockContext,
+                            data: mockData,
+                        }
+                    }
+                };
+                const context = initialRequest.payload[schemaName].context;
+                const data = initialRequest.payload[schemaName].data;
+
+                const { pageLoadId, sessionId } = context
+                const { rq, pagination, q, correctedQuery, matchType } = data;
+
+                const key = `${mockGlobals.siteId}||${initialRequest.endpoint}||${pageLoadId}||${sessionId}||rq=${rq}||page=${pagination.page}||resultsPerPage=${pagination.resultsPerPage}||totalResults=${pagination.totalResults}||q=${q}||correctedQuery=${correctedQuery}||matchType=${matchType}`;
+
+                // first request should initialize the key in batches
+                appendResults(acc, key, schemaName, initialRequest);
+                expect(acc.batches[key]).toBe(initialRequest);
+                expect(acc.batches[key].payload[schemaName].data.results.length).toBe(2);
+                expect(acc.nonBatched.length).toBe(0);
+
+                // additional request should append results to same key
+                const additionalRequest = {
+                    apiType: 'search' as const,
+                    endpoint: 'searchRender',
+                    payload: {
+                        [schemaName]: {
+                            context: mockContext,
+                            data: {
+                                ...mockData,
+                                results: [
+                                    { uid: 'product3', sku: 'sku3' },
+                                    { uid: 'product4', sku: 'sku4' }
+                                ],
+                            }
+                        }
+                    }
+                };
+
+                appendResults(acc, key, schemaName, additionalRequest);
+
+                // Should still be just one batched request
+                expect(Object.keys(acc.batches).length).toBe(1);
+
+                // The original request should be preserved (not replaced)
+                expect(acc.batches[key]).toBe(initialRequest);
+
+                // Results should be appended
+                expect(acc.batches[key].payload[schemaName].data.results.length).toBe(4);
+                expect(acc.batches[key].payload[schemaName].data.results[0].uid).toBe('product1');
+                expect(acc.batches[key].payload[schemaName].data.results[2].uid).toBe('product3');
+
+
+                // Test with different key - should create a new batch
+                // Simulate page load with different pageLoadId and pagination data
+                const differentRequest = {
+                    ...additionalRequest,
+                    payload: {
+                        [schemaName]: {
+                            ...additionalRequest.payload[schemaName],
+                            context: {
+                                ...additionalRequest.payload[schemaName].context,
+                                pageLoadId: 'differentPage'
+                            },
+                            data: {
+                                ...additionalRequest.payload[schemaName].data,
+                                pagination: {
+                                    page: 2,
+                                    resultsPerPage: 20,
+                                    totalResults: 100
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const context2 = differentRequest.payload[schemaName].context;
+                const data2 = differentRequest.payload[schemaName].data;
+                const key2 = `${mockGlobals.siteId}||${differentRequest.endpoint}||${context2.pageLoadId}||${context2.sessionId}||rq=${data2.rq}||page=${data2.pagination.page}||resultsPerPage=${data2.pagination.resultsPerPage}||totalResults=${data2.pagination.totalResults}||q=${data2.q}||correctedQuery=${data2.correctedQuery}||matchType=${data2.matchType}`;
+
+                appendResults(acc, key2, schemaName, differentRequest);
+
+                // Now should have two batched requests
+                expect(Object.keys(acc.batches).length).toBe(2);
+                expect(acc.batches[key2]).toBe(differentRequest);
+
+                // Original batch should be unchanged
+                expect(acc.batches[key].payload[schemaName].data.results.length).toBe(4);
+
+                // New batch should have its own results
+                expect(acc.batches[key2].payload[schemaName].data.results.length).toBe(2);
+
+                // Test different schema on same original pageLoadId
+                const recsSchemaName = 'recommendationsSchema';
+                const recommendationsRequest = {
+                    apiType: 'recommendations' as const,
+                    endpoint: 'recommendationsRender',
+                    payload: {
+                        [recsSchemaName]: {
+                            context: mockContext,
+                            data: {
+                                tag: 'tag',
+                                results: [
+                                    { uid: 'recProduct1', sku: 'recSku1' },
+                                    { uid: 'recProduct2', sku: 'recSku2' }
+                                ]
+                            }
+                        }
+                    }
+                };
+
+                const recs_context = recommendationsRequest.payload[recsSchemaName].context;
+                const recsKey = `${mockGlobals.siteId}||${recommendationsRequest.endpoint}||${recs_context.pageLoadId}||${recs_context.sessionId}`;
+
+                appendResults(acc, recsKey, recsSchemaName, recommendationsRequest);
+
+                // Now should have three batched requests
+                expect(Object.keys(acc.batches).length).toBe(3);
+
+                // Other batches should remain unchanged
+                expect(acc.batches[key].payload[schemaName].data.results.length).toBe(4);
+                expect(acc.batches[key2].payload[schemaName].data.results.length).toBe(2);
+
+                // New recommendations batch should have its results
+                expect(acc.batches[recsKey].payload[recsSchemaName].data.results.length).toBe(2);
+                expect(acc.batches[recsKey].payload[recsSchemaName].data.results[0].uid).toBe('recProduct1');
+                expect(acc.batches[recsKey].payload[recsSchemaName].data.results[1].uid).toBe('recProduct2');
             });
         });
     });

@@ -1,2 +1,2 @@
 export * from './client/models/index';
-export * from "./Beacon";
+export { Beacon } from "./Beacon";

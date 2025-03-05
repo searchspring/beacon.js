@@ -96,7 +96,7 @@ type BeaconGlobals = {
 	currency?: ContextCurrency;
 };
 
-type PayloadRequest = {
+export type PayloadRequest = {
 	apiType: 'shopper' | 'autocomplete' | 'search' | 'category' | 'recommendations' | 'product' | 'cart' | 'order' | 'error';
 	endpoint: string;
 	payload: any;
@@ -113,13 +113,13 @@ const SESSION_ID_KEY = 'ssSessionId';
 const SHOPPER_ID_KEY = 'ssShopperId';
 export const CART_KEY = 'ssCart';
 const VIEWED_KEY = 'ssViewed';
-const REQUESTS_KEY = 'ssRequests';
 export const COOKIE_SAMESITE = 'Lax';
 const ATTRIBUTION_QUERY_PARAM = 'ss_attribution';
 const ATTRIBUTION_KEY = 'ssAttribution';
 const MAX_EXPIRATION = 47304000000; // 18 months
 const THIRTY_MINUTES = 1800000; // 30 minutes
 const MAX_VIEWED_COUNT = 20;
+export const PREFLIGHT_POST_THRESHOLD = 1024;
 export const COOKIE_DOMAIN =
 	(typeof window !== 'undefined' && window.location.hostname && '.' + window.location.hostname.replace(/^www\./, '')) || undefined;
 
@@ -788,6 +788,7 @@ export class Beacon {
 			initiator: `searchspring/${this.config.framework}${this.config.version ? `/${this.config.version}` : ''}`,
 			attribution: this.attribution || await this.getAttribution(),
 			userAgent: (typeof navigator !== 'undefined' && navigator?.userAgent) || this.config.userAgent,
+			dev: this.mode === 'development' ? true : undefined,
 		};
 		if (this.currency.code) {
 			context.currency = this.currency;
@@ -898,15 +899,6 @@ export class Beacon {
 		}
 	}
 
-	private async getRequests(): Promise<PayloadRequest[]> {
-		const requests = await this.getCookie(REQUESTS_KEY);
-		return requests ? JSON.parse(requests) : [];
-	}
-
-	private async setRequests(requests: PayloadRequest[]): Promise<void> {
-		await this.setCookie(REQUESTS_KEY, JSON.stringify(requests), COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
-	}
-
 	generateId(): string {
 		return uuidv4();
 	}
@@ -950,13 +942,11 @@ export class Beacon {
 		for (const request of requests) {
 			const api = this.getApiClient(request.apiType);
 			const apiMethod = request.endpoint as keyof typeof api;
-			console.log('sending request', apiMethod, request.payload);
 			api[apiMethod](request.payload, { keepalive: true } as any); // TODO: fix typing
 		}
 	}
 	private async processRequests(): Promise<void> {
 		// TODO: remove async so if this is running other events cant get queues - move requests = [] to end of function
-		console.log('processRequests', this.requests);
 
 		// clone requests to process to allow more requests to be queued while processing
 		const requestToProcess = deepmerge([], this.requests);
@@ -1048,7 +1038,7 @@ export class Beacon {
 			const endpoint = `${origin}/api/personalization/preflightCache`;
 			const xhr = new XMLHttpRequest();
 
-			if (charsParams(preflightParams) > 1024) {
+			if (charsParams(preflightParams) > PREFLIGHT_POST_THRESHOLD) {
 				xhr.open('POST', endpoint);
 				xhr.setRequestHeader('Content-Type', 'application/json');
 				xhr.send(JSON.stringify(preflightParams));
@@ -1060,35 +1050,7 @@ export class Beacon {
 	}
 }
 
-export type ParameterObject = Record<string, boolean | string | string[] | number | number[] | unknown>;
-
-export function charsParams(params: ParameterObject): number {
-	if (typeof params != 'object') {
-		throw new Error('function requires an object');
-	}
-
-	const count = Object.keys(params).reduce((count, key) => {
-		const keyLength = key.length;
-		const value = params[key];
-		if (Array.isArray(value)) {
-			return (
-				count +
-				(value as string[]).reduce((length, val) => {
-					return length + keyLength + 1 + ('' + val).length;
-				}, 0)
-			);
-		} else if (typeof value == 'object') {
-			//recursive check
-			return count + keyLength + 1 + charsParams(value as any);
-		} else if (typeof value == 'string' || typeof value == 'number') {
-			return count + keyLength + 1 + ('' + value).length;
-		} else return count + keyLength;
-	}, 1);
-
-	return count;
-}
-
-function appendResults(
+export function appendResults(
 	acc: {
 		nonBatched: PayloadRequest[];
 		batches: Record<string, PayloadRequest>;
@@ -1109,7 +1071,7 @@ function appendResults(
 	}
 }
 
-function additionalRequestKeys(
+export function additionalRequestKeys(
 	key: string,
 	type: 'search' | 'autocomplete' | 'category' | 'recommendation',
 	schema: SearchSchema | AutocompleteSchema | CategorySchema | RecommendationsSchema
@@ -1154,4 +1116,33 @@ function additionalRequestKeys(
 	}
 
 	return value;
+}
+
+export type ParameterObject = Record<string, boolean | string | string[] | number | number[] | unknown>;
+
+/* istanbul ignore next - tested in @searchspring/snap-toolbox */
+export function charsParams(params: ParameterObject): number {
+	if (typeof params != 'object') {
+		throw new Error('function requires an object');
+	}
+
+	const count = Object.keys(params).reduce((count, key) => {
+		const keyLength = key.length;
+		const value = params[key];
+		if (Array.isArray(value)) {
+			return (
+				count +
+				(value as string[]).reduce((length, val) => {
+					return length + keyLength + 1 + ('' + val).length;
+				}, 0)
+			);
+		} else if (typeof value == 'object') {
+			//recursive check
+			return count + keyLength + 1 + charsParams(value as any);
+		} else if (typeof value == 'string' || typeof value == 'number') {
+			return count + keyLength + 1 + ('' + value).length;
+		} else return count + keyLength;
+	}, 1);
+
+	return count;
 }
