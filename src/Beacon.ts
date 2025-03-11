@@ -72,8 +72,7 @@ export type PreflightRequestModel = {
 };
 
 type BeaconConfig = {
-	id?: string;
-	mode?: 'development' | 'production';
+	mode?: 'production' | 'development';
 	framework?: string;
 	version?: string;
 	apis?: {
@@ -158,7 +157,6 @@ export class Beacon {
 
 		this.config = deepmerge(
 			{
-				id: 'track',
 				framework: 'beacon.js',
 				mode: 'production',
 			},
@@ -405,14 +403,8 @@ export class Beacon {
 	events = {
 		shopper: {
 			login: async (event: Payload<{ id: string }>): Promise<void> => {
-				const shopperId = await this.getShopperId();
-				if (!shopperId && !event.data?.id) {
-					console.error('beacon.events.shopper.login event: requires a valid shopper ID to exist');
-					return;
-				}
-
-				if (event.data?.id && event?.data?.id != shopperId) {
-					await this.setShopperId(event.data.id);
+				const setNewId = await this.setShopperId(event.data.id);
+				if(setNewId) {
 					const payload: LoginRequest = {
 						siteId: event?.siteId || this.globals.siteId,
 						shopperLoginSchema: {
@@ -661,11 +653,11 @@ export class Beacon {
 				const request = this.createRequest('product', 'productPageview', payload);
 				this.sendRequests([request]);
 
-				const item = payload.productPageviewSchema.data.result;
+				const item = event.data.result;
 				const sku = this.getSku(item);
 				if (sku) {
 					const lastViewedProducts = await this.storage.viewed.get();
-					const uniqueCartItems = Array.from(new Set([sku, ...lastViewedProducts])).map((item) => `${item}`.trim());
+					const uniqueCartItems = Array.from(new Set([sku, ...lastViewedProducts]));
 					await this.setCookie(VIEWED_KEY, uniqueCartItems.slice(0, MAX_VIEWED_COUNT).join(','), COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
 					await this.setLocalStorageItem(VIEWED_KEY, uniqueCartItems.slice(0, MAX_VIEWED_COUNT).join(','));
 					if (!lastViewedProducts.includes(sku)) {
@@ -768,13 +760,38 @@ export class Beacon {
 		}, REQUEST_GROUPING_TIMEOUT);
 	}
 
-	// TODO: should prioritize childUid / uid?
-	getSku(product: Product | Item): string {
-		return `${product.childSku || product.childUid || product.sku || product.uid || ''}`.trim();
+	updateContext(key: keyof Context, value: any): void {
+		if(value === undefined) {
+			return;
+		}
+		switch (key) {
+			case 'userId':
+			case 'sessionId':
+			case 'shopperId':
+			case 'pageLoadId':
+			case 'attribution':
+				this[key] = value;
+				break;
+			case 'pageUrl':
+				this.config.href = value;
+				break;
+			case 'userAgent':
+				this.config.userAgent = value;
+				break;
+			case 'dev':
+				if(['production', 'development'].includes(value))
+				this.mode = value;
+				break;
+			default:
+				break;
+		}
 	}
 
-	getUidFallback(product: Product | Item): string {
-		return `${product.uid || product.sku || product.childUid || product.childSku || ''}`.trim();
+
+	// TODO: TODO: is this correct order?
+	getSku(product: Product | Item): string {
+		// product page view event for setting last viewed products
+		return `${product.childSku || product.childUid || product.sku || product.uid || ''}`.trim();
 	}
 
 	async getContext(): Promise<Context> {
@@ -787,7 +804,7 @@ export class Beacon {
 			pageUrl: this.config.href || (typeof window !== 'undefined' && window.location.href) || '',
 			initiator: `searchspring/${this.config.framework}${this.config.version ? `/${this.config.version}` : ''}`,
 			attribution: this.attribution || await this.getAttribution(),
-			userAgent: (typeof navigator !== 'undefined' && navigator?.userAgent) || this.config.userAgent,
+			userAgent: this.config.userAgent || (typeof navigator !== 'undefined' && navigator?.userAgent) || '',
 			dev: this.mode === 'development' ? true : undefined,
 		};
 		if (this.currency.code) {
@@ -856,9 +873,8 @@ export class Beacon {
 		return this.shopperId || '';
 	}
 
-	public async setShopperId(shopperId: string): Promise<void> {
+	public async setShopperId(shopperId: string): Promise<string | void> {
 		if (!shopperId) {
-			console.error('Shopper ID is required when setShopperId is called');
 			return;
 		}
 		const exisitingShopperId = await this.getShopperId();
@@ -867,6 +883,7 @@ export class Beacon {
 			await this.setCookie(SHOPPER_ID_KEY, shopperId, COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
 			await this.setLocalStorageItem(SHOPPER_ID_KEY, shopperId);
 			await this.sendPreflight();
+			return this.shopperId;
 		}
 	}
 
@@ -918,7 +935,6 @@ export class Beacon {
 	// TODO: add helper methods:
 	// resetSession - clear cookies, local storage
 	// syncPersonalization
-	// updateContext
 	// pageLoad (for spa)
 
 	private createRequest(apiType: PayloadRequest['apiType'], endpoint: string, payload: any): PayloadRequest {
