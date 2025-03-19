@@ -55,6 +55,7 @@ import {
 	Log,
 	LogSnapRequest,
 	Configuration,
+	InitOverrideFunction,
 } from './client';
 
 declare global {
@@ -93,7 +94,7 @@ type BeaconConfig = {
 			beacon?: {
 				origin?: string;
 			};
-		}
+		};
 	};
 	href?: string;
 	userAgent?: string;
@@ -103,8 +104,19 @@ type BeaconGlobals = {
 	currency?: ContextCurrency;
 };
 
-export type PayloadRequest = {
-	apiType: 'shopper' | 'autocomplete' | 'search' | 'category' | 'recommendations' | 'product' | 'cart' | 'order' | 'error';
+interface ApiMethodMap {
+	shopper: ShopperApi;
+	autocomplete: AutocompleteApi;
+	search: SearchApi;
+	category: CategoryApi;
+	recommendations: RecommendationsApi;
+	product: ProductApi;
+	cart: CartApi;
+	order: OrderApi;
+	error: ErrorLogsApi;
+}
+export interface PayloadRequest {
+	apiType: keyof ApiMethodMap;
 	endpoint: string;
 	payload: any;
 };
@@ -143,17 +155,7 @@ export class Beacon {
 	};
 	queue: { eventFn: (...args: any[]) => void; payload: any }[] = [];
 	batchIntervalTimeout: number | NodeJS.Timeout = 0;
-	private apis: {
-		shopper: ShopperApi;
-		autocomplete: AutocompleteApi;
-		search: SearchApi;
-		category: CategoryApi;
-		recommendations: RecommendationsApi;
-		product: ProductApi;
-		cart: CartApi;
-		order: OrderApi;
-		error: ErrorLogsApi;
-	};
+	private apis: ApiMethodMap;
 
 	private requests: PayloadRequest[] = [];
 
@@ -387,7 +389,7 @@ export class Beacon {
 			set: (items: string[]): void => {
 				this.setCookie(VIEWED_KEY, items.join(','), COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
 				this.setLocalStorageItem(VIEWED_KEY, items.join(','));
-			}
+			},
 		},
 	};
 
@@ -649,8 +651,8 @@ export class Beacon {
 				if (sku) {
 					const lastViewedProducts = this.storage.viewed.get();
 					const uniqueCartItems = Array.from(new Set([sku, ...lastViewedProducts])).slice(0, MAX_VIEWED_COUNT);
-					
-					this.storage.viewed.set(uniqueCartItems)
+
+					this.storage.viewed.set(uniqueCartItems);
 
 					if (!lastViewedProducts.includes(sku)) {
 						this.sendPreflight();
@@ -944,28 +946,26 @@ export class Beacon {
 		return request;
 	}
 
-	private getApiClient(apiType: PayloadRequest['apiType']) {
-		if (this.apis[apiType]) {
-			return this.apis[apiType];
-		} else {
-			throw new Error(`Unknown API type: ${apiType}`);
-		}
+	private getApiClient(apiType: PayloadRequest['apiType']): ApiMethodMap[typeof apiType] {
+		return this.apis[apiType];
 	}
 
 	private sendRequests(requests: PayloadRequest[]): void {
 		for (const request of requests) {
 			const api = this.getApiClient(request.apiType);
-			const apiMethod = request.endpoint as keyof typeof api;
-			api[apiMethod](request.payload, (x) => {
-				// Since Content-Type is text/plain, need to stringify body in an override
-				return {
+			const apiMethod = request.endpoint;
+
+			const initOverrides: InitOverrideFunction = async ({ init }) => {
+				return Promise.resolve({
 					keepalive: true,
-					body: JSON.stringify(x.init.body),
-					url: '/test'
-				} as any; // TODO: fix typing
-			});
+					body: JSON.stringify(init.body),
+				});
+			};
+
+			(api as any)[apiMethod](request.payload, initOverrides);
 		}
 	}
+	
 	private processRequests(): void {
 		const data = this.requests.reduce<{
 			nonBatched: PayloadRequest[];
@@ -1024,7 +1024,7 @@ export class Beacon {
 		this.sendRequests(requestsToSend);
 	}
 
-	public sendPreflight(overrides?: { userId: string, siteId: string, shopper: string, cart: Product[], lastViewed: string[] }): void {
+	public sendPreflight(overrides?: { userId: string; siteId: string; shopper: string; cart: Product[]; lastViewed: string[] }): void {
 		const userId = overrides?.userId || this.getUserId();
 		const siteId = overrides?.siteId || this.globals.siteId;
 		const shopper = overrides?.shopper || this.getShopperId();
@@ -1054,11 +1054,11 @@ export class Beacon {
 				fetch(endpoint, {
 					method: 'POST',
 					headers: {
-						'Content-Type': 'application/json'
+						'Content-Type': 'application/json',
 					},
 					body: JSON.stringify(preflightParams),
-					keepalive: true
-				})
+					keepalive: true,
+				});
 			}
 		}
 	}
