@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.16](https://github.com/searchspring/beacon.js/compare/v0.0.15...v0.0.16) (2025-03-19)
+
+
+### Bug Fixes
+
+* typing ([4f25492](https://github.com/searchspring/beacon.js/commit/4f25492de96f08b394a9af3f017a715ed5898724))
+
 ### [0.0.15](https://github.com/searchspring/beacon.js/compare/v0.0.14...v0.0.15) (2025-03-13)
 
 ### [0.0.14](https://github.com/searchspring/beacon.js/compare/v0.0.13...v0.0.14) (2025-03-05)
