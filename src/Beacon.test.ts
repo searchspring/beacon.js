@@ -225,7 +225,7 @@ describe('Beacon', () => {
 				expect(id2).toStrictEqual(expect.any(String));
 				expect(id1).toBe(id2);
 
-				await new Promise((resolve) => setTimeout(resolve, expiration));
+				await new Promise((resolve) => setTimeout(resolve, expiration + 100));
 
 				const id3 = beacon['getStoredId']('key', expiration);
 				expect(id3).toStrictEqual(expect.any(String));
@@ -606,7 +606,7 @@ describe('Beacon', () => {
 					...payload.cartSchema,
 					data: {
 						...payload.cartSchema.data,
-						results: payload.cartSchema.data.results, // calls storage.cart.add which reverses the array
+						results: payload.cartSchema.data.results,
 					},
 				});
 				expect(mockFetchApi).toHaveBeenNthCalledWith(2, expect.any(String), { body, ...otherFetchParams });

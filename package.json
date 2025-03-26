@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/searchspring/beacon.js.git"
+    "url": "git+https://github.com/searchspring/beacon.js.git"
   },
   "prettier": "@searchspring/prettier",
   "scripts": {
@@ -20,7 +20,6 @@
     "dev": "tsc --watch",
     "commit": "cz",
     "test": "jest",
-    "publish": "",
     "generate": "openapi-generator-cli generate -i ./beacon.oas.yaml -g typescript-fetch -o ./src/client",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
