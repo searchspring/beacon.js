@@ -4,12 +4,8 @@
   "author": "searchspring",
   "license": "MIT",
   "description": "Javascript library for utilizing Searchspring beacon tracking.",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
-  "exports": {
-    "import": "./dist/esm/index.js",
-    "require": "./dist/cjs/index.js"
-  },
+  "main": "dist/cjs/src/index.js",
+  "module": "dist/esm/src/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/searchspring/beacon.js.git"
