@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/AutocompleteApi.ts
 apis/CartApi.ts
 apis/CategoryApi.ts
