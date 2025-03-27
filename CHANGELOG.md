@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.20](https://github.com/searchspring/beacon.js/compare/v0.0.19...v0.0.20) (2025-03-27)
+
+
+### Features
+
+* **events:** updating cart mutation events to properly update cart storage to ensure consistency ([c5e5152](https://github.com/searchspring/beacon.js/commit/c5e5152f4517d2c8234ed99125fdedebb8c2a43a))
+
 ### [0.0.19](https://github.com/searchspring/beacon.js/compare/v0.0.18...v0.0.19) (2025-03-26)
 
 

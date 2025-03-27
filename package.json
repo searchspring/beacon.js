@@ -1,6 +1,6 @@
 {
   "name": "@searchspring/beacon",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "author": "searchspring",
   "license": "MIT",
   "description": "Javascript library for utilizing Searchspring beacon tracking.",
@@ -16,7 +16,7 @@
     "dev": "tsc --watch",
     "commit": "cz",
     "test": "jest",
-		"test:watch": "jest --watch",
+    "test:watch": "jest --watch",
     "generate": "rm -fr ./src/client &&  openapi-generator-cli generate -i ./beacon.v2.oas.yaml -g typescript-fetch -o ./src/client",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
