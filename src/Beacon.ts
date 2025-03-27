@@ -152,8 +152,8 @@ export const COOKIE_DOMAIN =
 	(typeof window !== 'undefined' && window.location.hostname && '.' + window.location.hostname.replace(/^www\./, '')) || undefined;
 
 export class Beacon {
-	public config: BeaconConfig;
-	public globals: BeaconGlobals;
+	protected config: BeaconConfig;
+	protected globals: BeaconGlobals;
 	protected mode: 'production' | 'development' = 'production';
 	private pageLoadId: string = '';
 	private userId: string = '';
