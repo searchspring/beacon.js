@@ -239,14 +239,25 @@ export class Beacon {
 
 	private getLocalStorageItem(name: string): string {
 		if (typeof window !== 'undefined') {
-			return window.localStorage?.getItem(name) || '';
+			const rawData = window.localStorage?.getItem(name) || '';
+			try {
+				const data = JSON.parse(rawData);
+				if (data && data.value) {
+					return data.value;
+				} else {
+					// corrupted - reset
+					this.setLocalStorageItem(name, '');
+				}
+			} catch (e) {
+				// noop - failed to parse stored value
+			}
 		}
 		return '';
 	}
 
 	private setLocalStorageItem(name: string, value: string): void {
 		if (typeof window !== 'undefined') {
-			window.localStorage.setItem(name, value);
+			window.localStorage.setItem(name, JSON.stringify({ value }));
 		}
 	}
 
@@ -258,10 +269,10 @@ export class Beacon {
 				if (storedProducts) {
 					try {
 						const parsedProducts = JSON.parse(storedProducts);
-						return parsedProducts as Product[];
+						return parsedProducts.value as Product[];
 					} catch {
 						// corrupted - reset
-						this.setLocalStorageItem(CART_KEY, '');
+						this.setLocalStorageItem(CART_KEY, JSON.stringify({ value: [] }));
 						this.setCookie(CART_KEY, '', COOKIE_SAMESITE, 0, COOKIE_DOMAIN);
 					}
 				} else {
@@ -279,7 +290,7 @@ export class Beacon {
 				// store Product[] into storage + store mapped string[] into cookie (for legacy purposes)
 				const currentCartProducts = this.storage.cart.get();
 
-				const storedProducts = JSON.stringify(products);
+				const storedProducts = JSON.stringify({ value: products });
 				this.setLocalStorageItem(CART_KEY, storedProducts);
 
 				// also set cookie with re-mapping - favoring the more specific variant
@@ -301,7 +312,12 @@ export class Beacon {
 						.reverse()
 						.forEach((product) => {
 							// ensure objects have properties
-							const isSkuAlreadyInCart = cartProducts.find((cartProduct) => cartProduct.uid === product.uid);
+							const isSkuAlreadyInCart = cartProducts.find((cartProduct) => 
+								cartProduct.childUid === product.childUid && 
+								cartProduct.childSku === product.childSku && 
+								cartProduct.uid === product.uid && 
+								cartProduct.sku === product.sku
+							);
 							if (!isSkuAlreadyInCart) {
 								cartProducts.unshift(product);
 							} else {
@@ -319,7 +335,12 @@ export class Beacon {
 					const cartProducts = [...existingCartProducts];
 
 					products.forEach((product) => {
-						const isSkuAlreadyInCart = cartProducts.find((cartProduct) => cartProduct.uid === product.uid);
+						const isSkuAlreadyInCart = cartProducts.find((cartProduct) => 
+							cartProduct.childUid === product.childUid && 
+							cartProduct.childSku === product.childSku && 
+							cartProduct.uid === product.uid && 
+							cartProduct.sku === product.sku
+						);
 						if (isSkuAlreadyInCart) {
 							if (isSkuAlreadyInCart.qty > 0) {
 								isSkuAlreadyInCart.qty -= product.qty || 1;
@@ -343,7 +364,7 @@ export class Beacon {
 				if (storedItems) {
 					try {
 						const parsedItems = JSON.parse(storedItems);
-						return parsedItems as Item[];
+						return parsedItems.value as Item[];
 					} catch {
 						// corrupted - reset
 						this.setLocalStorageItem(VIEWED_KEY, '');
@@ -866,34 +887,32 @@ export class Beacon {
 	}
 
 	private getStoredId(key: string, expiration: number): string {
-		// try to get the value from the cookie
-		const storedCookieValue = this.getCookie(key);
-		if (storedCookieValue) {
-			this.setCookie(key, storedCookieValue, COOKIE_SAMESITE, expiration, COOKIE_DOMAIN);
-			return storedCookieValue;
-		}
+		let uuid: string = '';
+		let storedCookieValue: string = '';
 
-		// try to get the value from the local storage
-		const storedLocalStorageValue = this.getLocalStorageItem(key);
-		let uuid;
 		try {
+			// try to get the value from the cookie
+			storedCookieValue = this.getCookie(key);
+
+			// try to get the value from the local storage
+			const storedLocalStorageValue = this.getLocalStorageItem(key);
 			const data = JSON.parse(storedLocalStorageValue);
 			if (data.timestamp && new Date(data.timestamp).getTime() < Date.now() - expiration) {
 				uuid = this.generateId();
 				this.attribution = undefined;
 			} else {
-				uuid = data.id;
+				uuid = data.value;
 			}
 		} catch (_) {
 			// noop - Either no value or failed to parse stored, create new id
 		} finally {
 			const data = {
-				id: uuid || this.generateId(),
+				value: storedCookieValue || uuid || this.generateId(),
 				timestamp: this.getTimestamp(),
 			};
 			this.setLocalStorageItem(key, JSON.stringify(data));
-			this.setCookie(key, data.id, COOKIE_SAMESITE, expiration, COOKIE_DOMAIN); // attempt to store in cookie
-			return data.id;
+			this.setCookie(key, data.value, COOKIE_SAMESITE, expiration, COOKIE_DOMAIN); // attempt to store in cookie
+			return data.value;
 		}
 	}
 
