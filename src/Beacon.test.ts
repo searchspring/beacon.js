@@ -103,7 +103,7 @@ describe('Beacon', () => {
 				// localStorage contains cart data
 				expect(localStorageMock.setItem).toHaveBeenCalled();
 				const data = localStorageMock.getItem(CART_KEY)!;
-				expect(data).toBe(JSON.stringify(mockProducts));
+				expect(data).toBe(JSON.stringify({ value: mockProducts}));
 
 				// can add to exisiting cart data and should be at the front
 				const product = { uid: 'productUid5', childUid: 'productChildUid5', sku: 'productSku5', childSku: 'productChildSku5', qty: 1, price: 9.99 };
@@ -150,7 +150,7 @@ describe('Beacon', () => {
 				expect(clearedCartData).toEqual([]);
 				expect(global.document.cookie).toContain(`${CART_KEY}=;`);
 				const rawClearedItem = localStorageMock.getItem(CART_KEY)!;
-				expect(rawClearedItem).toBe('[]');
+				expect(rawClearedItem).toBe(JSON.stringify({ value: [] }));
 			});
 		});
 		describe('Methods', () => {
@@ -197,7 +197,7 @@ describe('Beacon', () => {
 				pageUrl: expect.any(String),
 				initiator: expect.any(String),
 				attribution: undefined,
-				userAgent: expect.any(String),
+				userAgent: undefined,
 				currency: undefined,
 				dev: true,
 			});

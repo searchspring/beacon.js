@@ -72,7 +72,7 @@ declare global {
 		searchspring?: any;
 	}
 }
-
+type LocalStorageItem = string | number | boolean | object | null;
 export type PreflightRequestModel = {
 	userId: string;
 	siteId: string;
@@ -237,7 +237,7 @@ export class Beacon {
 		}
 	}
 
-	private getLocalStorageItem(name: string): string {
+	private getLocalStorageItem(name: string): LocalStorageItem {
 		if (typeof window !== 'undefined') {
 			const rawData = window.localStorage?.getItem(name) || '';
 			try {
@@ -255,7 +255,7 @@ export class Beacon {
 		return '';
 	}
 
-	private setLocalStorageItem(name: string, value: string): void {
+	private setLocalStorageItem(name: string, value: LocalStorageItem): void {
 		if (typeof window !== 'undefined') {
 			window.localStorage.setItem(name, JSON.stringify({ value }));
 		}
@@ -265,14 +265,15 @@ export class Beacon {
 		cart: {
 			get: (): Product[] => {
 				// perhaps... always get from storage and return Product[] - storage always has Product[]
-				const storedProducts = this.getLocalStorageItem(CART_KEY);
+				const storedProducts = this.getLocalStorageItem(CART_KEY) as Product[];
 				if (storedProducts) {
 					try {
-						const parsedProducts = JSON.parse(storedProducts);
-						return parsedProducts.value as Product[];
+						if(Array.isArray(storedProducts)) {
+							return storedProducts as Product[];
+						}
 					} catch {
 						// corrupted - reset
-						this.setLocalStorageItem(CART_KEY, JSON.stringify({ value: [] }));
+						this.setLocalStorageItem(CART_KEY, []);
 						this.setCookie(CART_KEY, '', COOKIE_SAMESITE, 0, COOKIE_DOMAIN);
 					}
 				} else {
@@ -290,14 +291,13 @@ export class Beacon {
 				// store Product[] into storage + store mapped string[] into cookie (for legacy purposes)
 				const currentCartProducts = this.storage.cart.get();
 
-				const storedProducts = JSON.stringify({ value: products });
-				this.setLocalStorageItem(CART_KEY, storedProducts);
+				this.setLocalStorageItem(CART_KEY, products);
 
 				// also set cookie with re-mapping - favoring the more specific variant
 				const storedProductsCookie = products.map((product) => this.getProductId(product)).join(',');
 				this.setCookie(CART_KEY, storedProductsCookie, COOKIE_SAMESITE, 0, COOKIE_DOMAIN);
 
-				const productsHaveChanged = JSON.stringify(currentCartProducts) !== storedProducts;
+				const productsHaveChanged = JSON.stringify(currentCartProducts) !== JSON.stringify(products);
 				if (productsHaveChanged) {
 					this.sendPreflight();
 				}
@@ -360,11 +360,12 @@ export class Beacon {
 		},
 		viewed: {
 			get: (): Item[] => {
-				const storedItems = this.getLocalStorageItem(VIEWED_KEY);
+				const storedItems = this.getLocalStorageItem(VIEWED_KEY) as Item[];
 				if (storedItems) {
 					try {
-						const parsedItems = JSON.parse(storedItems);
-						return parsedItems.value as Item[];
+						if(Array.isArray(storedItems)) {
+							return storedItems as Item[];
+						}
 					} catch {
 						// corrupted - reset
 						this.setLocalStorageItem(VIEWED_KEY, '');
@@ -386,14 +387,13 @@ export class Beacon {
 				const normalizedItems: Item[] = products
 					.map((item) => ({ sku: item.sku, uid: item.uid, childUid: item.childUid, childSku: item.childSku }))
 					.slice(0, MAX_VIEWED_COUNT);
-				const storedItems = JSON.stringify(normalizedItems);
-				this.setLocalStorageItem(VIEWED_KEY, storedItems);
+				this.setLocalStorageItem(VIEWED_KEY, normalizedItems);
 
 				// also set cookie with re-mapping - favoring the more specific variant
 				const storedProductsCookie = normalizedItems.map((item) => this.getProductId(item)).join(',');
 				this.setCookie(VIEWED_KEY, storedProductsCookie, COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
 
-				const productsHaveChanged = JSON.stringify(currentViewedItems) !== storedItems;
+				const productsHaveChanged = JSON.stringify(currentViewedItems) !== JSON.stringify(normalizedItems);
 				if (productsHaveChanged) {
 					this.sendPreflight();
 				}
@@ -869,7 +869,7 @@ export class Beacon {
 
 	getContext(): Context {
 		const context: Context = {
-			userAgent: this.config.userAgent || (typeof navigator !== 'undefined' && navigator?.userAgent) || '',
+			userAgent: this.config.userAgent,
 			timestamp: this.getTimestamp(),
 			pageUrl: this.config.href || (typeof window !== 'undefined' && window.location.href) || '',
 			userId: this.userId || this.getUserId(),
@@ -895,8 +895,7 @@ export class Beacon {
 			storedCookieValue = this.getCookie(key);
 
 			// try to get the value from the local storage
-			const storedLocalStorageValue = this.getLocalStorageItem(key);
-			const data = JSON.parse(storedLocalStorageValue);
+			const data = this.getLocalStorageItem(key) as { timestamp: string; value: string };
 			if (data.timestamp && new Date(data.timestamp).getTime() < Date.now() - expiration) {
 				uuid = this.generateId();
 				this.attribution = undefined;
@@ -910,7 +909,7 @@ export class Beacon {
 				value: storedCookieValue || uuid || this.generateId(),
 				timestamp: this.getTimestamp(),
 			};
-			this.setLocalStorageItem(key, JSON.stringify(data));
+			this.setLocalStorageItem(key, data);
 			this.setCookie(key, data.value, COOKIE_SAMESITE, expiration, COOKIE_DOMAIN); // attempt to store in cookie
 			return data.value;
 		}
@@ -936,7 +935,7 @@ export class Beacon {
 	public getShopperId(): string {
 		let shopperId: string | null = null;
 		try {
-			shopperId = this.getCookie(SHOPPER_ID_KEY) || this.getLocalStorageItem(SHOPPER_ID_KEY);
+			shopperId = this.getCookie(SHOPPER_ID_KEY) || this.getLocalStorageItem(SHOPPER_ID_KEY) as string;
 			this.shopperId = shopperId;
 		} catch {
 			// noop
@@ -970,12 +969,14 @@ export class Beacon {
 			// noop - URL failed to parse empty url
 		}
 
-		const storedAttribution = this.getCookie(ATTRIBUTION_KEY) || this.getLocalStorageItem(ATTRIBUTION_KEY);
+		const storedAttribution = this.getCookie(ATTRIBUTION_KEY) || this.getLocalStorageItem(ATTRIBUTION_KEY) as ContextAttributionInner[];
 		if (storedAttribution) {
 			try {
-				const data = JSON.parse(storedAttribution);
-				if (Array.isArray(data)) {
-					attribution = data;
+				if(typeof storedAttribution === 'string') {
+					// from cookie
+					attribution = JSON.parse(storedAttribution) as ContextAttributionInner[];
+				} else if (Array.isArray(storedAttribution)) {
+					attribution = storedAttribution;
 				}
 			} catch (e) {
 				// noop - failed to parse stored attribution
@@ -995,7 +996,7 @@ export class Beacon {
 
 		if (attribution.length) {
 			this.setCookie(ATTRIBUTION_KEY, JSON.stringify(attribution), COOKIE_SAMESITE, THIRTY_MINUTES, COOKIE_DOMAIN);
-			this.setLocalStorageItem(ATTRIBUTION_KEY, JSON.stringify(attribution));
+			this.setLocalStorageItem(ATTRIBUTION_KEY, attribution);
 			this.attribution = attribution;
 			return [...attribution];
 		}
