@@ -898,6 +898,11 @@ export class Beacon {
 			const data = this.getLocalStorageItem(key) as { timestamp: string; value: string };
 			if (data.timestamp && new Date(data.timestamp).getTime() < Date.now() - expiration) {
 				uuid = this.generateId();
+				/**
+				 * TODO: move this expiration to setLocalStorageItem at value level instead of data.value level and 
+				 * then create a new return type getLocalStorageItem with Product[], Item[],
+				 *  ContextAttributionInner[], and { timestamp: string; value: string }
+				 */
 				this.attribution = undefined;
 			} else {
 				uuid = data.value;
