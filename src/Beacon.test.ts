@@ -4,8 +4,6 @@ import {
 	appendResults,
 	Beacon,
 	CART_KEY,
-	COOKIE_DOMAIN,
-	COOKIE_SAMESITE,
 	PayloadRequest,
 	REQUEST_GROUPING_TIMEOUT,
 } from './Beacon';
@@ -316,7 +314,6 @@ describe('Beacon', () => {
 			headers: {
 				'Content-Type': 'text/plain',
 			},
-			keepalive: true,
 			method: 'POST',
 		};
 		describe('Shopper Login', () => {
@@ -333,6 +330,22 @@ describe('Beacon', () => {
 				expect(spy).toHaveBeenCalled();
 				const body = JSON.stringify(payload.shopperLoginSchema);
 				expect(mockFetchApi).toHaveBeenCalledWith(expect.any(String), { body, ...otherFetchParams });
+			});
+
+			it('can process login event with keepalive when mode is production', async () => {
+				beacon = new Beacon(mockGlobals, { ...mockConfig, mode: 'production' });
+				const spy = jest.spyOn(beacon['apis'].shopper, 'login');
+				const shopperId = 'shopper123';
+				const data = {
+					id: shopperId,
+				};
+				const payload = beacon.events.shopper.login({ data })!;
+				await new Promise((resolve) => setTimeout(resolve, 0));
+				expect(beacon['shopperId']).toBe(shopperId);
+
+				expect(spy).toHaveBeenCalled();
+				const body = JSON.stringify(payload.shopperLoginSchema);
+				expect(mockFetchApi).toHaveBeenCalledWith(expect.any(String), { body, ...otherFetchParams, keepalive: true });
 			});
 		});
 		describe('Autocomplete', () => {
