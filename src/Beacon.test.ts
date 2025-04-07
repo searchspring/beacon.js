@@ -332,7 +332,7 @@ describe('Beacon', () => {
 				expect(mockFetchApi).toHaveBeenCalledWith(expect.any(String), { body, ...otherFetchParams });
 			});
 
-			it('can process login event with keepalive when mode is not development', async () => {
+			it('can process login event with keepalive when mode is production', async () => {
 				beacon = new Beacon(mockGlobals, { ...mockConfig, mode: 'production' });
 				const spy = jest.spyOn(beacon['apis'].shopper, 'login');
 				const shopperId = 'shopper123';

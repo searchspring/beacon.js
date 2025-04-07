@@ -1049,7 +1049,7 @@ export class Beacon {
 			const initOverrides: InitOverrideFunction = async ({ init }) => {
 				return {
 					// Cypress intecepts does not support keepalive
-					keepalive: this.mode !== 'development' ? true : undefined,
+					keepalive: this.mode === 'production' ? true : undefined,
 					body: JSON.stringify(init.body),
 				};
 			};
