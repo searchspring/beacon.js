@@ -303,10 +303,10 @@ describe('Beacon', () => {
 				resultsPerPage: 20,
 			},
 			results: [
-				{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1' },
-				{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2' },
-				{ uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3' },
-				{ uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4' },
+				{ position: 1, uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1' },
+				{ position: 2, uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2' },
+				{ position: 3, uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3' },
+				{ position: 4, uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4' },
 			],
 		};
 
@@ -597,7 +597,7 @@ describe('Beacon', () => {
 		});
 		describe('Product', () => {
 			const data = {
-				result: baseSearchSchema.results[0],
+				result: { uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1' },
 			};
 			it('can process pageView event', async () => {
 				const spy = jest.spyOn(beacon['apis'].product, 'productPageview');
@@ -612,13 +612,10 @@ describe('Beacon', () => {
 		describe('Cart', () => {
 			const data = {
 				results: [
-					...baseSearchSchema.results.map((item) => {
-						return {
-							...item,
-							qty: 1,
-							price: 10,
-						};
-					}),
+					{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10, },
+					{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10, },
+					{ uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3', qty: 1, price: 10, },
+					{ uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4', qty: 1, price: 10, },
 				],
 			};
 			it('can process add event', async () => {
@@ -736,16 +733,6 @@ describe('Beacon', () => {
 				const storedCartData = beacon.storage.cart.get();
 				expect(storedCartData).toEqual(cart);
 			});
-
-			it('can process view event', async () => {
-				const spy = jest.spyOn(beacon['apis'].translations, 'cartViewTranslation');
-				const payload = beacon.events.cart.view({ data });
-				await new Promise((resolve) => setTimeout(resolve, 0));
-
-				expect(spy).toHaveBeenCalled();
-				const body = JSON.stringify(payload.cartviewSchema);
-				expect(mockFetchApi).toHaveBeenCalledWith(expect.any(String), { body, ...otherFetchParams });
-			});
 		});
 		describe('Order', () => {
 			const data = {
@@ -756,13 +743,10 @@ describe('Beacon', () => {
 				state: 'test-state',
 				country: 'test-country',
 				results: [
-					...baseSearchSchema.results.map((item) => {
-						return {
-							...item,
-							qty: 1,
-							price: 10,
-						};
-					}),
+					{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10 },
+					{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10 },
+					{ uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3', qty: 1, price: 10 },
+					{ uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4', qty: 1, price: 10 },
 				],
 			};
 			it('can process transaction event', async () => {
@@ -824,8 +808,8 @@ describe('Beacon', () => {
 			correctedQuery: 'correctedQuery',
 			matchType: 'matchType',
 			results: [
-				{ uid: 'product1', sku: 'sku1' },
-				{ uid: 'product2', sku: 'sku2' },
+				{ position: 1, uid: 'product1', sku: 'sku1' },
+				{ position: 2, uid: 'product2', sku: 'sku2' },
 			],
 			pagination: {
 				totalResults: 100,

@@ -10764,7 +10764,23 @@ paths:
                     - result
                   properties:
                     result:
-                      $ref: '#/components/schemas/item'
+                      type: object
+                      description: Describes a tracked Searchspring result.
+                      required:
+                        - uid
+                      properties:
+                        uid:
+                          description: Unique product identifier of the Searchspring indexed product (also provide `sku`, `childSku`, and `childId` if available)
+                          type: string
+                        childUid:
+                          description: Unique product variant identifier
+                          type: string
+                        sku:
+                          description: Unique product identifier (also provide `childSku` if available)
+                          type: string
+                        childSku:
+                          description: Unique product variant identifier (also provide `sku` if available)
+                          type: string
             examples:
               example 1:
                 $ref: '#/components/examples/view-request-example-1'
@@ -17838,8 +17854,12 @@ components:
       type: object
       description: Describes a tracked Searchspring result.
       required:
+        - position
         - uid
       properties:
+        position:
+          description: Index of the result returned in the Searchspring results. The first result is 1, the second is 2, etc.
+          type: number
         uid:
           description: Unique product identifier of the Searchspring indexed product (also provide `sku`, `childSku`, and `childId` if available)
           type: string
@@ -18646,7 +18666,8 @@ components:
                 experimentId: '1234'
                 variationId: '1234'
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
@@ -18686,19 +18707,23 @@ components:
                 experimentId: '1234'
                 variationId: '1234'
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
-            - uid: '8128021070122'
+            - position: 2
+              uid: '8128021070122'
               childUid: '812802107012212345'
               sku: 2130066-STM-XX-XS
               childSku: 2130066-STM-XX-XS-M
-            - uid: '8127879741738'
+            - position: 3
+              uid: '8127879741738'
               childUid: '812787974173812345'
               sku: 2630014-VFB-XX-24
               childSku: 2630014-VFB-XX-24-M
-            - uid: '8128173736234'
+            - position: 4
+              uid: '8128173736234'
               childUid: '812817373623412345'
               sku: 1710033W-FDB-XX-28
               childSku: 1710033W-FDB-XX-28-M
@@ -18754,35 +18779,43 @@ components:
                 experimentId: '1234'
                 variationId: '1234'
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
-            - uid: '8128021070122'
+            - position: 2
+              uid: '8128021070122'
               childUid: '812802107012212345'
               sku: 2130066-STM-XX-XS
               childSku: 2130066-STM-XX-XS-M
-            - uid: '8127879741738'
+            - position: 3
+              uid: '8127879741738'
               childUid: '812787974173812345'
               sku: 2630014-VFB-XX-24
               childSku: 2630014-VFB-XX-24-M
-            - uid: '8128173736234'
+            - position: 4
+              uid: '8128173736234'
               childUid: '812817373623412345'
               sku: 1710033W-FDB-XX-28
               childSku: 1710033W-FDB-XX-28-M
-            - uid: '8128273711402'
+            - position: 5
+              uid: '8128273711402'
               childUid: '812827371140212345'
               sku: 2130105-DNY-XX-XS
               childSku: 2130105-DNY-XX-XS-M
-            - uid: '8128028737834'
+            - position: 6
+              uid: '8128028737834'
               childUid: '812802873783412345'
               sku: 2310030-MAB-XX-XS/S
               childSku: 2310030-MAB-XX-XS/S-M
-            - uid: '8128168755498'
+            - position: 7
+              uid: '8128168755498'
               childUid: '812816875549812345'
               sku: 1710033W-CLY-XX-28
               childSku: 1710033W-CLY-XX-28-M
-            - uid: '8128034177322'
+            - position: 8
+              uid: '8128034177322'
               childUid: '812803417732212345'
               sku: 2130066-PCH-XX-XS
               childSku: 2130066-PCH-XX-XS-M
@@ -18924,7 +18957,8 @@ components:
                 experimentId: '1234'
                 variationId: '1234'
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
@@ -18962,19 +18996,23 @@ components:
                 experimentId: '1234'
                 variationId: '1234'
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
-            - uid: '8128021070122'
+            - position: 2
+              uid: '8128021070122'
               childUid: '812802107012212345'
               sku: 2130066-STM-XX-XS
               childSku: 2130066-STM-XX-XS-M
-            - uid: '8127879741738'
+            - position: 3
+              uid: '8127879741738'
               childUid: '812787974173812345'
               sku: 2630014-VFB-XX-24
               childSku: 2630014-VFB-XX-24-M
-            - uid: '8128173736234'
+            - position: 4
+              uid: '8128173736234'
               childUid: '812817373623412345'
               sku: 1710033W-FDB-XX-28
               childSku: 1710033W-FDB-XX-28-M
@@ -19012,35 +19050,43 @@ components:
                 experimentId: '1234'
                 variationId: '1234'
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
-            - uid: '8128021070122'
+            - position: 2
+              uid: '8128021070122'
               childUid: '812802107012212345'
               sku: 2130066-STM-XX-XS
               childSku: 2130066-STM-XX-XS-M
-            - uid: '8127879741738'
+            - position: 3
+              uid: '8127879741738'
               childUid: '812787974173812345'
               sku: 2630014-VFB-XX-24
               childSku: 2630014-VFB-XX-24-M
-            - uid: '8128173736234'
+            - position: 4
+              uid: '8128173736234'
               childUid: '812817373623412345'
               sku: 1710033W-FDB-XX-28
               childSku: 1710033W-FDB-XX-28-M
-            - uid: '8128273711402'
+            - position: 5
+              uid: '8128273711402'
               childUid: '812827371140212345'
               sku: 2130105-DNY-XX-XS
               childSku: 2130105-DNY-XX-XS-M
-            - uid: '8128028737834'
+            - position: 6
+              uid: '8128028737834'
               childUid: '812802873783412345'
               sku: 2310030-MAB-XX-XS/S
               childSku: 2310030-MAB-XX-XS/S-M
-            - uid: '8128168755498'
+            - position: 7
+              uid: '8128168755498'
               childUid: '812816875549812345'
               sku: 1710033W-CLY-XX-28
               childSku: 1710033W-CLY-XX-28-M
-            - uid: '8128034177322'
+            - position: 8
+              uid: '8128034177322'
               childUid: '812803417732212345'
               sku: 2130066-PCH-XX-XS
               childSku: 2130066-PCH-XX-XS-M
@@ -19235,7 +19281,8 @@ components:
         data:
           tag: similar
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
@@ -19259,27 +19306,33 @@ components:
         data:
           tag: similar
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
-            - uid: '8128021070122'
+            - position: 2
+              uid: '8128021070122'
               childUid: '812802107012212345'
               sku: 2130066-STM-XX-XS
               childSku: 2130066-STM-XX-XS-M
-            - uid: '8127879741738'
+            - position: 3
+              uid: '8127879741738'
               childUid: '812787974173812345'
               sku: 2630014-VFB-XX-24
               childSku: 2630014-VFB-XX-24-M
-            - uid: '8128173736234'
+            - position: 4
+              uid: '8128173736234'
               childUid: '812817373623412345'
               sku: 1710033W-FDB-XX-28
               childSku: 1710033W-FDB-XX-28-M
-            - uid: '8128273711402'
+            - position: 5
+              uid: '8128273711402'
               childUid: '812827371140212345'
               sku: 2130105-DNY-XX-XS
               childSku: 2130105-DNY-XX-XS-M
-            - uid: '8128028737834'
+            - position: 6
+              uid: '8128028737834'
               childUid: '812802873783412345'
               sku: 2310030-MAB-XX-XS/S
               childSku: 2310030-MAB-XX-XS/S-M
@@ -19303,51 +19356,63 @@ components:
         data:
           tag: similar
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
-            - uid: '8128021070122'
+            - position: 2
+              uid: '8128021070122'
               childUid: '812802107012212345'
               sku: 2130066-STM-XX-XS
               childSku: 2130066-STM-XX-XS-M
-            - uid: '8127879741738'
+            - position: 3
+              uid: '8127879741738'
               childUid: '812787974173812345'
               sku: 2630014-VFB-XX-24
               childSku: 2630014-VFB-XX-24-M
-            - uid: '8128173736234'
+            - position: 4
+              uid: '8128173736234'
               childUid: '812817373623412345'
               sku: 1710033W-FDB-XX-28
               childSku: 1710033W-FDB-XX-28-M
-            - uid: '8128273711402'
+            - position: 5
+              uid: '8128273711402'
               childUid: '812827371140212345'
               sku: 2130105-DNY-XX-XS
               childSku: 2130105-DNY-XX-XS-M
-            - uid: '8128028737834'
+            - position: 6
+              uid: '8128028737834'
               childUid: '812802873783412345'
               sku: 2310030-MAB-XX-XS/S
               childSku: 2310030-MAB-XX-XS/S-M
-            - uid: '8128168755498'
+            - position: 7
+              uid: '8128168755498'
               childUid: '812816875549812345'
               sku: 1710033W-CLY-XX-28
               childSku: 1710033W-CLY-XX-28-M
-            - uid: '8128034177322'
+            - position: 8
+              uid: '8128034177322'
               childUid: '812803417732212345'
               sku: 2130066-PCH-XX-XS
               childSku: 2130066-PCH-XX-XS-M
-            - uid: '8127945179434'
+            - position: 9
+              uid: '8127945179434'
               childUid: '812794517943412345'
               sku: 1710035-ODR-XX-28
               childSku: 1710035-ODR-XX-28-M
-            - uid: '8128342720810'
+            - position: 10
+              uid: '8128342720810'
               childUid: '812834272081012345'
               sku: 1710033W-TGY-XX-28
               childSku: 1710033W-TGY-XX-28-M
-            - uid: '8128347963690'
+            - position: 11
+              uid: '8128347963690'
               childUid: '812834796369012345'
               sku: 2130074-AZP-XX-XS
               childSku: 2130074-AZP-XX-XS-M
-            - uid: '8128376602922'
+            - position: 12
+              uid: '8128376602922'
               childUid: '812837660292212345'
               sku: 2310057-AZU-XX-XS/S
               childSku: 2310057-AZU-XX-XS/S-M
@@ -19429,7 +19494,8 @@ components:
                 experimentId: '1234'
                 variationId: '1234'
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
@@ -19469,19 +19535,23 @@ components:
                 experimentId: '1234'
                 variationId: '1234'
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
-            - uid: '8128021070122'
+            - position: 2
+              uid: '8128021070122'
               childUid: '812802107012212345'
               sku: 2130066-STM-XX-XS
               childSku: 2130066-STM-XX-XS-M
-            - uid: '8127879741738'
+            - position: 3
+              uid: '8127879741738'
               childUid: '812787974173812345'
               sku: 2630014-VFB-XX-24
               childSku: 2630014-VFB-XX-24-M
-            - uid: '8128173736234'
+            - position: 4
+              uid: '8128173736234'
               childUid: '812817373623412345'
               sku: 1710033W-FDB-XX-28
               childSku: 1710033W-FDB-XX-28-M
@@ -19537,35 +19607,43 @@ components:
                 experimentId: '1234'
                 variationId: '1234'
           results:
-            - uid: '8128331907370'
+            - position: 1
+              uid: '8128331907370'
               childUid: '812833190737012345'
               sku: 2310057-MRN-XX-XS/S
               childSku: 2310057-MRN-XX-XS/S-M
-            - uid: '8128021070122'
+            - position: 2
+              uid: '8128021070122'
               childUid: '812802107012212345'
               sku: 2130066-STM-XX-XS
               childSku: 2130066-STM-XX-XS-M
-            - uid: '8127879741738'
+            - position: 3
+              uid: '8127879741738'
               childUid: '812787974173812345'
               sku: 2630014-VFB-XX-24
               childSku: 2630014-VFB-XX-24-M
-            - uid: '8128173736234'
+            - position: 4
+              uid: '8128173736234'
               childUid: '812817373623412345'
               sku: 1710033W-FDB-XX-28
               childSku: 1710033W-FDB-XX-28-M
-            - uid: '8128273711402'
+            - position: 5
+              uid: '8128273711402'
               childUid: '812827371140212345'
               sku: 2130105-DNY-XX-XS
               childSku: 2130105-DNY-XX-XS-M
-            - uid: '8128028737834'
+            - position: 6
+              uid: '8128028737834'
               childUid: '812802873783412345'
               sku: 2310030-MAB-XX-XS/S
               childSku: 2310030-MAB-XX-XS/S-M
-            - uid: '8128168755498'
+            - position: 7
+              uid: '8128168755498'
               childUid: '812816875549812345'
               sku: 1710033W-CLY-XX-28
               childSku: 1710033W-CLY-XX-28-M
-            - uid: '8128034177322'
+            - position: 8
+              uid: '8128034177322'
               childUid: '812803417732212345'
               sku: 2130066-PCH-XX-XS
               childSku: 2130066-PCH-XX-XS-M

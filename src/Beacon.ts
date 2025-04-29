@@ -1,6 +1,5 @@
-// import packageJSON from '../package.json';
-// export const { version } = packageJSON;
-const version = 'test';
+import packageJSON from '../package.json';
+export const { version } = packageJSON;
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -14,7 +13,6 @@ import {
 	AutocompleteSchemaData,
 	CartAddRequest,
 	CartRemoveRequest,
-	CartViewTranslationRequest,
 	CategoryAddtocartRequest,
 	CategoryClickthroughRequest,
 	CategoryImpressionRequest,
@@ -65,8 +63,7 @@ import {
 	SearchAddtocartSchemaData,
 	CategoryAddtocartSchemaData,
 	RecommendationsAddtocartSchemaData,
-	CartviewSchemaData,
-	TranslationsApi,
+	ProductPageviewSchemaDataResult,
 } from './client';
 
 declare global {
@@ -116,7 +113,6 @@ interface ApiMethodMap {
 	cart: CartApi;
 	order: OrderApi;
 	error: ErrorLogsApi;
-	translations: TranslationsApi;
 }
 export interface PayloadRequest {
 	apiType: keyof ApiMethodMap;
@@ -190,7 +186,6 @@ export class Beacon {
 			cart: new CartApi(apiConfig),
 			order: new OrderApi(apiConfig),
 			error: new ErrorLogsApi(apiConfig),
-			translations: new TranslationsApi(apiConfig),
 		};
 
 		this.globals = globals;
@@ -365,12 +360,12 @@ export class Beacon {
 			},
 		},
 		viewed: {
-			get: (): Item[] => {
-				const storedItems = this.getLocalStorageItem(VIEWED_KEY) as Item[];
+			get: (): ProductPageviewSchemaDataResult[] => {
+				const storedItems = this.getLocalStorageItem(VIEWED_KEY) as ProductPageviewSchemaDataResult[];
 				if (storedItems) {
 					try {
 						if(Array.isArray(storedItems)) {
-							return storedItems as Item[];
+							return storedItems as ProductPageviewSchemaDataResult[];
 						}
 					} catch {
 						// corrupted - reset
@@ -387,10 +382,10 @@ export class Beacon {
 				}
 				return [];
 			},
-			set: (products: (Item | Product)[]): void => {
+			set: (products: ProductPageviewSchemaDataResult[]): void => {
 				const currentViewedItems = this.storage.viewed.get();
 				// remove qty and price if product is provided
-				const normalizedItems: Item[] = products
+				const normalizedItems: ProductPageviewSchemaDataResult[] = products
 					.map((item) => ({ sku: item.sku, uid: item.uid, childUid: item.childUid, childSku: item.childSku }))
 					.slice(0, MAX_VIEWED_COUNT);
 				this.setLocalStorageItem(VIEWED_KEY, normalizedItems);
@@ -404,12 +399,12 @@ export class Beacon {
 					this.sendPreflight();
 				}
 			},
-			add: (products: (Item | Product)[]): void => {
+			add: (products: (ProductPageviewSchemaDataResult)[]): void => {
 				// the order of the stored items matters - most recently viewed should be in front of array?
 				if (products.length) {
 					const viewedProducts = this.storage.viewed.get();
 					products.forEach((product) => {
-						const item: Item = { sku: product.sku, uid: product.uid, childUid: product.childUid, childSku: product.childSku };
+						const item: ProductPageviewSchemaDataResult = { sku: product.sku, uid: product.uid, childUid: product.childUid, childSku: product.childSku };
 						const isItemAlreadyViewed = viewedProducts.find(
 							(viewedProduct) =>
 								viewedProduct.uid === item.uid &&
@@ -775,20 +770,6 @@ export class Beacon {
 				const request = this.createRequest('cart', 'cartRemove', payload);
 				this.sendRequests([request]);
 
-				return payload;
-			},
-			view: (event: Payload<CartviewSchemaData>): CartViewTranslationRequest => {
-				const payload: CartViewTranslationRequest = {
-					siteId: event?.siteId || this.globals.siteId,
-					cartviewSchema: {
-						context: this.getContext(),
-						data: event.data,
-					},
-				};
-
-				const request = this.createRequest('translations', 'cartViewTranslation', payload);
-				this.sendRequests([request]);
-				this.storage.cart.set(event.data.results);
 				return payload;
 			},
 		},
@@ -1196,7 +1177,7 @@ export class Beacon {
 		}
 	}
 
-	protected getProductId(product: Product | Item): string {
+	protected getProductId(product: Product | Item | ProductPageviewSchemaDataResult): string {
 		return `${product.childUid || product.childSku || product.uid || product.sku || ''}`.trim();
 	}
 }
