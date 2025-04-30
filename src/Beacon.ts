@@ -13,7 +13,6 @@ import {
 	AutocompleteSchemaData,
 	CartAddRequest,
 	CartRemoveRequest,
-	CartViewRequest,
 	CategoryAddtocartRequest,
 	CategoryClickthroughRequest,
 	CategoryImpressionRequest,
@@ -64,7 +63,7 @@ import {
 	SearchAddtocartSchemaData,
 	CategoryAddtocartSchemaData,
 	RecommendationsAddtocartSchemaData,
-	CartviewSchemaData,
+	ProductPageviewSchemaDataResult,
 } from './client';
 
 declare global {
@@ -73,6 +72,7 @@ declare global {
 	}
 }
 type LocalStorageItem = string | number | boolean | object | null;
+type PageLoadData = { href: string; value: string; timestamp: string };
 export type PreflightRequestModel = {
 	userId: string;
 	siteId: string;
@@ -127,6 +127,7 @@ export type Payload<T> = {
 
 export const REQUEST_GROUPING_TIMEOUT = 200;
 const USER_ID_KEY = 'ssUserId';
+export const PAGE_LOAD_ID_KEY = 'ssPageLoadId';
 const SESSION_ID_KEY = 'ssSessionId';
 const SHOPPER_ID_KEY = 'ssShopperId';
 export const CART_KEY = 'ssCartProducts';
@@ -136,6 +137,7 @@ const ATTRIBUTION_QUERY_PARAM = 'ss_attribution';
 const ATTRIBUTION_KEY = 'ssAttribution';
 const MAX_EXPIRATION = 47304000000; // 18 months
 const THIRTY_MINUTES = 1800000; // 30 minutes
+export const PAGE_LOAD_ID_EXPIRATION = 10000; // 10 seconds
 const MAX_VIEWED_COUNT = 20;
 const EXPIRED_COOKIE = -1;
 export const COOKIE_DOMAIN =
@@ -187,7 +189,7 @@ export class Beacon {
 		};
 
 		this.globals = globals;
-		this.pageLoadId = this.generateId();
+		this.pageLoadId = this.getPageLoadId();
 
 		if (this.globals.currency) {
 			this.setCurrency(this.globals.currency);
@@ -237,7 +239,7 @@ export class Beacon {
 		}
 	}
 
-	private getLocalStorageItem(name: string): LocalStorageItem {
+	private getLocalStorageItem<T = LocalStorageItem>(name: string): T | undefined {
 		if (typeof window !== 'undefined') {
 			const rawData = window.localStorage?.getItem(name) || '';
 			try {
@@ -252,7 +254,6 @@ export class Beacon {
 				// noop - failed to parse stored value
 			}
 		}
-		return '';
 	}
 
 	private setLocalStorageItem(name: string, value: LocalStorageItem): void {
@@ -359,12 +360,12 @@ export class Beacon {
 			},
 		},
 		viewed: {
-			get: (): Item[] => {
-				const storedItems = this.getLocalStorageItem(VIEWED_KEY) as Item[];
+			get: (): ProductPageviewSchemaDataResult[] => {
+				const storedItems = this.getLocalStorageItem(VIEWED_KEY) as ProductPageviewSchemaDataResult[];
 				if (storedItems) {
 					try {
 						if(Array.isArray(storedItems)) {
-							return storedItems as Item[];
+							return storedItems as ProductPageviewSchemaDataResult[];
 						}
 					} catch {
 						// corrupted - reset
@@ -381,10 +382,10 @@ export class Beacon {
 				}
 				return [];
 			},
-			set: (products: (Item | Product)[]): void => {
+			set: (products: ProductPageviewSchemaDataResult[]): void => {
 				const currentViewedItems = this.storage.viewed.get();
 				// remove qty and price if product is provided
-				const normalizedItems: Item[] = products
+				const normalizedItems: ProductPageviewSchemaDataResult[] = products
 					.map((item) => ({ sku: item.sku, uid: item.uid, childUid: item.childUid, childSku: item.childSku }))
 					.slice(0, MAX_VIEWED_COUNT);
 				this.setLocalStorageItem(VIEWED_KEY, normalizedItems);
@@ -398,12 +399,12 @@ export class Beacon {
 					this.sendPreflight();
 				}
 			},
-			add: (products: (Item | Product)[]): void => {
+			add: (products: (ProductPageviewSchemaDataResult)[]): void => {
 				// the order of the stored items matters - most recently viewed should be in front of array?
 				if (products.length) {
 					const viewedProducts = this.storage.viewed.get();
 					products.forEach((product) => {
-						const item: Item = { sku: product.sku, uid: product.uid, childUid: product.childUid, childSku: product.childSku };
+						const item: ProductPageviewSchemaDataResult = { sku: product.sku, uid: product.uid, childUid: product.childUid, childSku: product.childSku };
 						const isItemAlreadyViewed = viewedProducts.find(
 							(viewedProduct) =>
 								viewedProduct.uid === item.uid &&
@@ -771,20 +772,6 @@ export class Beacon {
 
 				return payload;
 			},
-			view: (event: Payload<CartviewSchemaData>): CartViewRequest => {
-				const payload: CartViewRequest = {
-					siteId: event?.siteId || this.globals.siteId,
-					cartviewSchema: {
-						context: this.getContext(),
-						data: event.data,
-					},
-				};
-
-				const request = this.createRequest('cart', 'cartView', payload);
-				this.sendRequests([request]);
-				this.storage.cart.set(event.data.results);
-				return payload;
-			},
 		},
 		order: {
 			transaction: (event: Payload<OrderTransactionSchemaData>): OrderTransactionRequest => {
@@ -918,6 +905,25 @@ export class Beacon {
 			this.setCookie(key, data.value, COOKIE_SAMESITE, expiration, COOKIE_DOMAIN); // attempt to store in cookie
 			return data.value;
 		}
+	}
+
+	public getPageLoadId(): string {
+		if(this.pageLoadId) {
+			return this.pageLoadId;
+		}
+
+		let pageLoadId = this.generateId();
+		const pageLoadData = this.getLocalStorageItem<PageLoadData>(PAGE_LOAD_ID_KEY);
+		const currentHref = this.config.href || (typeof window !== 'undefined' && window.location.href) || '';
+		if(pageLoadData) {
+			const { href, value, timestamp } = pageLoadData;
+			if(href === currentHref && value && timestamp && new Date(timestamp).getTime() > Date.now() - PAGE_LOAD_ID_EXPIRATION) {
+				pageLoadId = value;
+			}
+		}
+		this.setLocalStorageItem(PAGE_LOAD_ID_KEY, { href: currentHref, value: pageLoadId, timestamp: this.getTimestamp()});
+		this.pageLoadId = pageLoadId;
+		return pageLoadId;
 	}
 
 	public getUserId(): string {
@@ -1055,7 +1061,9 @@ export class Beacon {
 			};
 
 			// typing is difficult due to dynamic API and method call
-			(api as any)[apiMethod as keyof typeof api](request.payload, initOverrides);
+			(api as any)[apiMethod as keyof typeof api](request.payload, initOverrides).catch(() => {
+				// noop - do not throw errors
+			})
 		}
 	}
 
@@ -1156,7 +1164,7 @@ export class Beacon {
 		}
 	}
 
-	protected getProductId(product: Product | Item): string {
+	protected getProductId(product: Product | Item | ProductPageviewSchemaDataResult): string {
 		return `${product.childUid || product.childSku || product.uid || product.sku || ''}`.trim();
 	}
 }

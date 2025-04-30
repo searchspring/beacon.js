@@ -14,64 +14,50 @@
 
 import { mapValues } from '../runtime';
 /**
- * Product details
+ * Describes a tracked Searchspring result.
  * @export
- * @interface Product
+ * @interface ProductPageviewSchemaDataResult
  */
-export interface Product {
+export interface ProductPageviewSchemaDataResult {
     /**
      * Unique product identifier of the Searchspring indexed product (also provide `sku`, `childSku`, and `childId` if available)
      * @type {string}
-     * @memberof Product
+     * @memberof ProductPageviewSchemaDataResult
      */
     uid: string;
     /**
      * Unique product variant identifier
      * @type {string}
-     * @memberof Product
+     * @memberof ProductPageviewSchemaDataResult
      */
     childUid?: string;
     /**
      * Unique product identifier (also provide `childSku` if available)
      * @type {string}
-     * @memberof Product
+     * @memberof ProductPageviewSchemaDataResult
      */
     sku?: string;
     /**
      * Unique product variant identifier (also provide `sku` if available)
      * @type {string}
-     * @memberof Product
+     * @memberof ProductPageviewSchemaDataResult
      */
     childSku?: string;
-    /**
-     * Quantity of the item
-     * @type {number}
-     * @memberof Product
-     */
-    qty: number;
-    /**
-     * Price of individual item
-     * @type {number}
-     * @memberof Product
-     */
-    price: number;
 }
 
 /**
- * Check if a given object implements the Product interface.
+ * Check if a given object implements the ProductPageviewSchemaDataResult interface.
  */
-export function instanceOfProduct(value: object): value is Product {
+export function instanceOfProductPageviewSchemaDataResult(value: object): value is ProductPageviewSchemaDataResult {
     if (!('uid' in value) || value['uid'] === undefined) return false;
-    if (!('qty' in value) || value['qty'] === undefined) return false;
-    if (!('price' in value) || value['price'] === undefined) return false;
     return true;
 }
 
-export function ProductFromJSON(json: any): Product {
-    return ProductFromJSONTyped(json, false);
+export function ProductPageviewSchemaDataResultFromJSON(json: any): ProductPageviewSchemaDataResult {
+    return ProductPageviewSchemaDataResultFromJSONTyped(json, false);
 }
 
-export function ProductFromJSONTyped(json: any, ignoreDiscriminator: boolean): Product {
+export function ProductPageviewSchemaDataResultFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProductPageviewSchemaDataResult {
     if (json == null) {
         return json;
     }
@@ -81,16 +67,14 @@ export function ProductFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         'childUid': json['childUid'] == null ? undefined : json['childUid'],
         'sku': json['sku'] == null ? undefined : json['sku'],
         'childSku': json['childSku'] == null ? undefined : json['childSku'],
-        'qty': json['qty'],
-        'price': json['price'],
     };
 }
 
-  export function ProductToJSON(json: any): Product {
-      return ProductToJSONTyped(json, false);
+  export function ProductPageviewSchemaDataResultToJSON(json: any): ProductPageviewSchemaDataResult {
+      return ProductPageviewSchemaDataResultToJSONTyped(json, false);
   }
 
-  export function ProductToJSONTyped(value?: Product | null, ignoreDiscriminator: boolean = false): any {
+  export function ProductPageviewSchemaDataResultToJSONTyped(value?: ProductPageviewSchemaDataResult | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -101,8 +85,6 @@ export function ProductFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
         'childUid': value['childUid'],
         'sku': value['sku'],
         'childSku': value['childSku'],
-        'qty': value['qty'],
-        'price': value['price'],
     };
 }
 

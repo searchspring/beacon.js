@@ -4,6 +4,8 @@ import {
 	appendResults,
 	Beacon,
 	CART_KEY,
+	PAGE_LOAD_ID_EXPIRATION,
+	PAGE_LOAD_ID_KEY,
 	PayloadRequest,
 	REQUEST_GROUPING_TIMEOUT,
 } from './Beacon';
@@ -101,7 +103,7 @@ describe('Beacon', () => {
 				// localStorage contains cart data
 				expect(localStorageMock.setItem).toHaveBeenCalled();
 				const data = localStorageMock.getItem(CART_KEY)!;
-				expect(data).toBe(JSON.stringify({ value: mockProducts}));
+				expect(data).toBe(JSON.stringify({ value: mockProducts }));
 
 				// can add to exisiting cart data and should be at the front
 				const product = { uid: 'productUid5', childUid: 'productChildUid5', sku: 'productSku5', childSku: 'productChildSku5', qty: 1, price: 9.99 };
@@ -180,6 +182,88 @@ describe('Beacon', () => {
 				expect(id3).toStrictEqual(expect.any(String));
 				expect(id3).not.toBe(id2);
 			});
+
+			it('can getPageLoadId', async () => {
+				localStorageMock.clear(); // clear storage again due to reinstantiating beacon
+				const href = 'test-href';
+				beacon = new Beacon(mockGlobals, {
+					...mockConfig,
+					href,
+				});
+				const pageLoadId1 = beacon.getPageLoadId();
+				expect(pageLoadId1).toStrictEqual(expect.any(String));
+
+				await new Promise((resolve) => setTimeout(resolve, 100));
+
+				// should return the same id
+				const pageLoadId2 = beacon.getPageLoadId();
+				expect(pageLoadId2).toStrictEqual(pageLoadId1);
+
+				// should save generated id to storage
+				const stored = localStorageMock.getItem(PAGE_LOAD_ID_KEY)!;
+				expect(JSON.parse(stored)).toStrictEqual({
+					value: {
+						href,
+						value: pageLoadId1,
+						timestamp: expect.any(String),
+					}
+				});
+			});
+
+			it('can getPageLoadId from storage', async () => {
+				const stored = { href: 'test-href', value: 'test-value', timestamp: beacon.getTimestamp() };
+				localStorageMock.setItem(PAGE_LOAD_ID_KEY, JSON.stringify({ value: stored }));
+
+				await new Promise((resolve) => setTimeout(resolve, 100)); // wait for timestamp to change
+				// reconstruct beacon due to pageLoadId being created in constructor
+				beacon = new Beacon(mockGlobals, {
+					...mockConfig,
+					href: stored.href,
+				});
+				expect(beacon['config'].href).toStrictEqual(stored.href);
+				expect(beacon['pageLoadId']).toStrictEqual(stored.value);
+
+				// stored value shouldn't change - timestamp should be different
+				const stored2 = localStorageMock.getItem(PAGE_LOAD_ID_KEY)!;
+				expect(JSON.parse(stored2)).toStrictEqual({
+					value: {
+						href: stored.href,
+						value: stored.value,
+						timestamp: expect.any(String),
+					}
+				});
+				expect(JSON.parse(stored2).value.value).toBe(stored.value);
+				expect(JSON.parse(stored2).value.timestamp).not.toBe(stored.timestamp);
+			});
+
+			it('does not get expired pageLoadId from storage', async () => {
+				localStorageMock.clear();
+				const stored = { href: 'test-href', value: 'test-value', timestamp: beacon.getTimestamp() };
+				localStorageMock.setItem(PAGE_LOAD_ID_KEY, JSON.stringify({ value: stored }));
+
+				await new Promise((resolve) => setTimeout(resolve, PAGE_LOAD_ID_EXPIRATION + 10));
+
+				// reconstruct beacon due to pageLoadId being created in constructor
+				beacon = new Beacon(mockGlobals, {
+					...mockConfig,
+					href: stored.href,
+				});
+				expect(beacon['config'].href).toStrictEqual(stored.href);
+				expect(beacon['pageLoadId']).not.toBe(stored.value);
+				expect(beacon['pageLoadId']).toStrictEqual(expect.any(String));
+
+				// should save new id to storage
+				const stored2 = localStorageMock.getItem(PAGE_LOAD_ID_KEY)!;
+				expect(JSON.parse(stored2)).toStrictEqual({
+					value: {
+						href: stored.href,
+						value: expect.any(String),
+						timestamp: expect.any(String),
+					}
+				});
+				expect(JSON.parse(stored2).value.value).not.toBe(stored.value);
+				expect(JSON.parse(stored2).value.timestamp).not.toBe(stored.timestamp);
+			}, PAGE_LOAD_ID_EXPIRATION + 100); // increase timeout to wait for expiration
 		});
 	});
 
@@ -303,10 +387,10 @@ describe('Beacon', () => {
 				resultsPerPage: 20,
 			},
 			results: [
-				{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1' },
-				{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2' },
-				{ uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3' },
-				{ uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4' },
+				{ position: 1, uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1' },
+				{ position: 2, uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2' },
+				{ position: 3, uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3' },
+				{ position: 4, uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4' },
 			],
 		};
 
@@ -597,7 +681,7 @@ describe('Beacon', () => {
 		});
 		describe('Product', () => {
 			const data = {
-				result: baseSearchSchema.results[0],
+				result: { uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1' },
 			};
 			it('can process pageView event', async () => {
 				const spy = jest.spyOn(beacon['apis'].product, 'productPageview');
@@ -612,13 +696,10 @@ describe('Beacon', () => {
 		describe('Cart', () => {
 			const data = {
 				results: [
-					...baseSearchSchema.results.map((item) => {
-						return {
-							...item,
-							qty: 1,
-							price: 10,
-						};
-					}),
+					{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10, },
+					{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10, },
+					{ uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3', qty: 1, price: 10, },
+					{ uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4', qty: 1, price: 10, },
 				],
 			};
 			it('can process add event', async () => {
@@ -682,7 +763,7 @@ describe('Beacon', () => {
 				const storedCartData = beacon.storage.cart.get();
 				expect(storedCartData).toEqual(cart);
 			});
-			
+
 			it('can process remove event', async () => {
 				const cart = [
 					{ uid: 'prodUidA', childUid: 'prodChildUidA', sku: 'prodSkuA', childSku: 'prodChildSkuA', qty: 1, price: 10.99 },
@@ -710,7 +791,7 @@ describe('Beacon', () => {
 				const storedCartData = beacon.storage.cart.get();
 				expect(storedCartData).toEqual([cart[1]]);
 			});
-			
+
 			it('can process remove event with supplied cart', async () => {
 				const cart = [
 					{ uid: 'prodUidB', childUid: 'prodChildUidB', sku: 'prodSkuB', childSku: 'prodChildSkuB', qty: 1, price: 10.99 },
@@ -736,16 +817,6 @@ describe('Beacon', () => {
 				const storedCartData = beacon.storage.cart.get();
 				expect(storedCartData).toEqual(cart);
 			});
-
-			it('can process view event', async () => {
-				const spy = jest.spyOn(beacon['apis'].cart, 'cartView');
-				const payload = beacon.events.cart.view({ data });
-				await new Promise((resolve) => setTimeout(resolve, 0));
-
-				expect(spy).toHaveBeenCalled();
-				const body = JSON.stringify(payload.cartviewSchema);
-				expect(mockFetchApi).toHaveBeenCalledWith(expect.any(String), { body, ...otherFetchParams });
-			});
 		});
 		describe('Order', () => {
 			const data = {
@@ -756,13 +827,10 @@ describe('Beacon', () => {
 				state: 'test-state',
 				country: 'test-country',
 				results: [
-					...baseSearchSchema.results.map((item) => {
-						return {
-							...item,
-							qty: 1,
-							price: 10,
-						};
-					}),
+					{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10 },
+					{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10 },
+					{ uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3', qty: 1, price: 10 },
+					{ uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4', qty: 1, price: 10 },
 				],
 			};
 			it('can process transaction event', async () => {
@@ -824,8 +892,8 @@ describe('Beacon', () => {
 			correctedQuery: 'correctedQuery',
 			matchType: 'matchType',
 			results: [
-				{ uid: 'product1', sku: 'sku1' },
-				{ uid: 'product2', sku: 'sku2' },
+				{ position: 1, uid: 'product1', sku: 'sku1' },
+				{ position: 2, uid: 'product2', sku: 'sku2' },
 			],
 			pagination: {
 				totalResults: 100,
