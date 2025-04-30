@@ -1061,7 +1061,9 @@ export class Beacon {
 			};
 
 			// typing is difficult due to dynamic API and method call
-			(api as any)[apiMethod as keyof typeof api](request.payload, initOverrides);
+			(api as any)[apiMethod as keyof typeof api](request.payload, initOverrides).catch(() => {
+				// noop - do not throw errors
+			})
 		}
 	}
 

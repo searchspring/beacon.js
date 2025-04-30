@@ -214,6 +214,7 @@ describe('Beacon', () => {
 				const stored = { href: 'test-href', value: 'test-value', timestamp: beacon.getTimestamp() };
 				localStorageMock.setItem(PAGE_LOAD_ID_KEY, JSON.stringify({ value: stored }));
 
+				await new Promise((resolve) => setTimeout(resolve, 100)); // wait for timestamp to change
 				// reconstruct beacon due to pageLoadId being created in constructor
 				beacon = new Beacon(mockGlobals, {
 					...mockConfig,
@@ -222,16 +223,25 @@ describe('Beacon', () => {
 				expect(beacon['config'].href).toStrictEqual(stored.href);
 				expect(beacon['pageLoadId']).toStrictEqual(stored.value);
 
-				// should be cleared from storage
-				const raw = localStorageMock.getItem(PAGE_LOAD_ID_KEY)!;
-				expect(raw).toStrictEqual(JSON.stringify({ value: '' }));
+				// stored value shouldn't change - timestamp should be different
+				const stored2 = localStorageMock.getItem(PAGE_LOAD_ID_KEY)!;
+				expect(JSON.parse(stored2)).toStrictEqual({
+					value: {
+						href: stored.href,
+						value: stored.value,
+						timestamp: expect.any(String),
+					}
+				});
+				expect(JSON.parse(stored2).value.value).toBe(stored.value);
+				expect(JSON.parse(stored2).value.timestamp).not.toBe(stored.timestamp);
 			});
 
 			it('does not get expired pageLoadId from storage', async () => {
+				localStorageMock.clear();
 				const stored = { href: 'test-href', value: 'test-value', timestamp: beacon.getTimestamp() };
 				localStorageMock.setItem(PAGE_LOAD_ID_KEY, JSON.stringify({ value: stored }));
 
-				await new Promise((resolve) => setTimeout(resolve, PAGE_LOAD_ID_EXPIRATION + 100));
+				await new Promise((resolve) => setTimeout(resolve, PAGE_LOAD_ID_EXPIRATION + 10));
 
 				// reconstruct beacon due to pageLoadId being created in constructor
 				beacon = new Beacon(mockGlobals, {
@@ -242,10 +252,18 @@ describe('Beacon', () => {
 				expect(beacon['pageLoadId']).not.toBe(stored.value);
 				expect(beacon['pageLoadId']).toStrictEqual(expect.any(String));
 
-				// should be cleared from storage
+				// should save new id to storage
 				const stored2 = localStorageMock.getItem(PAGE_LOAD_ID_KEY)!;
-				expect(JSON.parse(stored2)).toStrictEqual({ value: '' });
-			}, PAGE_LOAD_ID_EXPIRATION + 1000);
+				expect(JSON.parse(stored2)).toStrictEqual({
+					value: {
+						href: stored.href,
+						value: expect.any(String),
+						timestamp: expect.any(String),
+					}
+				});
+				expect(JSON.parse(stored2).value.value).not.toBe(stored.value);
+				expect(JSON.parse(stored2).value.timestamp).not.toBe(stored.timestamp);
+			}, PAGE_LOAD_ID_EXPIRATION + 100); // increase timeout to wait for expiration
 		});
 	});
 
