@@ -920,10 +920,8 @@ export class Beacon {
 			if(href === currentHref && value && timestamp && new Date(timestamp).getTime() > Date.now() - PAGE_LOAD_ID_EXPIRATION) {
 				pageLoadId = value;
 			}
-			this.setLocalStorageItem(PAGE_LOAD_ID_KEY, '');
-		} else {
-			this.setLocalStorageItem(PAGE_LOAD_ID_KEY, { href: currentHref, value: pageLoadId, timestamp: this.getTimestamp()});
 		}
+		this.setLocalStorageItem(PAGE_LOAD_ID_KEY, { href: currentHref, value: pageLoadId, timestamp: this.getTimestamp()});
 		this.pageLoadId = pageLoadId;
 		return pageLoadId;
 	}
