@@ -84,15 +84,15 @@ export type PreflightRequestModel = {
 export type BeaconConfig = {
 	mode?: 'production' | 'development';
 	initiator?: string;
-	apis?: {
-		requesters?: {
-			personalization?: {
-				origin?: string;
-			};
-			beacon?: {
-				origin?: string;
-			};
+	requesters?: {
+		personalization?: {
+			origin?: string;
 		};
+		beacon?: {
+			origin?: string;
+		};
+	};
+	apis?: {
 		fetch?: FetchAPI;
 	};
 	href?: string;
@@ -176,7 +176,7 @@ export class Beacon {
 		this.initiator = this.config.initiator || `beaconjs/${version}`;
 
 		const fetchApi = this.config.apis?.fetch;
-		const apiConfig = new Configuration({ fetchApi, basePath: this.config.apis?.requesters?.beacon?.origin });
+		const apiConfig = new Configuration({ fetchApi, basePath: this.config.requesters?.beacon?.origin });
 		this.apis = {
 			shopper: new ShopperApi(apiConfig),
 			autocomplete: new AutocompleteApi(apiConfig),
@@ -209,7 +209,6 @@ export class Beacon {
 
 			const storedCart = this.storage.cart.get();
 			if(!storedCart?.length && currentCart.length) {
-				console.log("Got heree")
 				// no stored cart, add all items
 				this.events.cart.add({
 					data: {
@@ -1232,7 +1231,7 @@ export class Beacon {
 				preflightParams.lastViewed = lastViewed.map((item) => this.getProductId(item));
 			}
 
-			const origin = this.config.apis?.requesters?.personalization?.origin || `https://${siteId}.a.searchspring.io`;
+			const origin = this.config.requesters?.personalization?.origin || `https://${siteId}.a.searchspring.io`;
 			const endpoint = `${origin}/api/personalization/preflightCache`;
 
 			if (this.config.apis?.fetch || typeof fetch !== 'undefined') {

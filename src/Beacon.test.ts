@@ -77,7 +77,7 @@ describe('Beacon', () => {
 		});
 	});
 
-	describe.only('Globals', () => {
+	describe('Globals', () => {
 		it('empty cart should not trigger any requests', async () => {
 			// empty cart should not trigger any requests
 			const cart: Product[] = [];
