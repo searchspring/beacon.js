@@ -1133,7 +1133,7 @@ export class Beacon {
 		const cart = overrides?.cart || this.storage.cart.get();
 		const lastViewed = overrides?.lastViewed || this.storage.viewed.get();
 
-		if (userId && typeof userId == 'string' && siteId && (shopper || cart.length || lastViewed.length)) {
+		if (userId && typeof userId == 'string' && siteId) {
 			const preflightParams: PreflightRequestModel = {
 				userId,
 				siteId,

@@ -381,6 +381,7 @@ describe('Beacon', () => {
 	describe('Events', () => {
 		const baseSearchSchema = {
 			q: 'test',
+			matchType: 'exact',
 			pagination: {
 				totalResults: 100,
 				page: 1,
@@ -1134,10 +1135,7 @@ describe('Beacon', () => {
 			// only add 1 product to be under threshold and still generate GET request
 			const items = [{ uid: 'uid123', sku: 'sku123', childUid: 'childUid123', childSku: 'childSku123', qty: 1, price: 10.99 }];
 
-			// @ts-ignore - legacy string array support
 			beacon.storage.cart.add(items);
-
-			beacon.sendPreflight();
 
 			const body = {
 				userId: beacon.getUserId(),

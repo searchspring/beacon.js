@@ -46,7 +46,7 @@ export interface OrderTransactionSchemaData {
      */
     total: number;
     /**
-     * Value added tax(VAT) rate
+     * Value added tax(VAT) rate as a decimal value (e.g. 0.20 for 20%)
      * @type {number}
      * @memberof OrderTransactionSchemaData
      */

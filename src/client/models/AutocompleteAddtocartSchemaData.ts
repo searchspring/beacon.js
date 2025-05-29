@@ -91,7 +91,7 @@ export interface AutocompleteAddtocartSchemaData {
      * @type {string}
      * @memberof AutocompleteAddtocartSchemaData
      */
-    matchType?: string;
+    matchType: string;
     /**
      * List of active background filters passed to the Autocomplete API
      * @type {Array<AutocompleteAddtocartSchemaDataBgfilterInner>}
@@ -135,6 +135,7 @@ export interface AutocompleteAddtocartSchemaData {
  */
 export function instanceOfAutocompleteAddtocartSchemaData(value: object): value is AutocompleteAddtocartSchemaData {
     if (!('q' in value) || value['q'] === undefined) return false;
+    if (!('matchType' in value) || value['matchType'] === undefined) return false;
     if (!('pagination' in value) || value['pagination'] === undefined) return false;
     if (!('results' in value) || value['results'] === undefined) return false;
     return true;
@@ -154,7 +155,7 @@ export function AutocompleteAddtocartSchemaDataFromJSONTyped(json: any, ignoreDi
         'correctedQuery': json['correctedQuery'] == null ? undefined : json['correctedQuery'],
         'didYouMean': json['didYouMean'] == null ? undefined : json['didYouMean'],
         'rq': json['rq'] == null ? undefined : json['rq'],
-        'matchType': json['matchType'] == null ? undefined : json['matchType'],
+        'matchType': json['matchType'],
         'bgfilter': json['bgfilter'] == null ? undefined : ((json['bgfilter'] as Array<any>).map(AutocompleteAddtocartSchemaDataBgfilterInnerFromJSON)),
         'filter': json['filter'] == null ? undefined : ((json['filter'] as Array<any>).map(AutocompleteAddtocartSchemaDataFilterInnerFromJSON)),
         'sort': json['sort'] == null ? undefined : ((json['sort'] as Array<any>).map(AutocompleteAddtocartSchemaDataSortInnerFromJSON)),

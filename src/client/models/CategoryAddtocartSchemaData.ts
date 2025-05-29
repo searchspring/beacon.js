@@ -69,6 +69,12 @@ export interface CategoryAddtocartSchemaData {
      */
     rq?: string;
     /**
+     * Indicates the type of search matching that was required for this search, returned as `query.matchType` from Autocomplete API
+     * @type {string}
+     * @memberof CategoryAddtocartSchemaData
+     */
+    matchType: string;
+    /**
      * List of active background filters passed to the Search API
      * @type {Array<AutocompleteAddtocartSchemaDataBgfilterInner>}
      * @memberof CategoryAddtocartSchemaData
@@ -110,6 +116,7 @@ export interface CategoryAddtocartSchemaData {
  * Check if a given object implements the CategoryAddtocartSchemaData interface.
  */
 export function instanceOfCategoryAddtocartSchemaData(value: object): value is CategoryAddtocartSchemaData {
+    if (!('matchType' in value) || value['matchType'] === undefined) return false;
     if (!('pagination' in value) || value['pagination'] === undefined) return false;
     if (!('results' in value) || value['results'] === undefined) return false;
     return true;
@@ -126,6 +133,7 @@ export function CategoryAddtocartSchemaDataFromJSONTyped(json: any, ignoreDiscri
     return {
         
         'rq': json['rq'] == null ? undefined : json['rq'],
+        'matchType': json['matchType'],
         'bgfilter': json['bgfilter'] == null ? undefined : ((json['bgfilter'] as Array<any>).map(AutocompleteAddtocartSchemaDataBgfilterInnerFromJSON)),
         'filter': json['filter'] == null ? undefined : ((json['filter'] as Array<any>).map(AutocompleteAddtocartSchemaDataFilterInnerFromJSON)),
         'sort': json['sort'] == null ? undefined : ((json['sort'] as Array<any>).map(AutocompleteAddtocartSchemaDataSortInnerFromJSON)),
@@ -147,6 +155,7 @@ export function CategoryAddtocartSchemaDataFromJSONTyped(json: any, ignoreDiscri
     return {
         
         'rq': value['rq'],
+        'matchType': value['matchType'],
         'bgfilter': value['bgfilter'] == null ? undefined : ((value['bgfilter'] as Array<any>).map(AutocompleteAddtocartSchemaDataBgfilterInnerToJSON)),
         'filter': value['filter'] == null ? undefined : ((value['filter'] as Array<any>).map(AutocompleteAddtocartSchemaDataFilterInnerToJSON)),
         'sort': value['sort'] == null ? undefined : ((value['sort'] as Array<any>).map(AutocompleteAddtocartSchemaDataSortInnerToJSON)),
