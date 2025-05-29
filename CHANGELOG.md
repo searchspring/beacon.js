@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.26](https://github.com/searchspring/beacon.js/compare/v0.0.25...v0.0.26) (2025-05-29)
+
+
+### Features
+
+* add cart globals and infer add and remove events ([1b5347b](https://github.com/searchspring/beacon.js/commit/1b5347b8d84de35c96bf6a5f2bdeaa396eb4b034))
+
+
+### Bug Fixes
+
+* preflightCache should send with empty cart and lastViewed ([a4b931d](https://github.com/searchspring/beacon.js/commit/a4b931dc6c9a19b306f87d997d5792eea00ebc59))
+
 ### [0.0.25](https://github.com/searchspring/beacon.js/compare/v0.0.24...v0.0.25) (2025-04-30)
 
 ### [0.0.24](https://github.com/searchspring/beacon.js/compare/v0.0.23...v0.0.24) (2025-04-07)
