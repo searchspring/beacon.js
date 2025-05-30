@@ -660,7 +660,7 @@ describe('Beacon', () => {
 				const spy = jest.spyOn(beacon['apis'].recommendations, 'recommendationsAddtocart');
 
 				const payload = beacon.events.recommendations.addToCart({ data });
-				await new Promise((resolve) => setTimeout(resolve, 0));
+				await new Promise((resolve) => setTimeout(resolve, REQUEST_GROUPING_TIMEOUT));
 
 				expect(spy).toHaveBeenCalled();
 				const body = JSON.stringify(payload.recommendationsAddtocartSchema);

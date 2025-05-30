@@ -64,6 +64,7 @@ import {
 	CategoryAddtocartSchemaData,
 	RecommendationsAddtocartSchemaData,
 	ProductPageviewSchemaDataResult,
+	RecommendationsAddtocartSchema,
 } from './client';
 
 declare global {
@@ -685,7 +686,7 @@ export class Beacon {
 				};
 
 				const request = this.createRequest('recommendations', 'recommendationsAddtocart', payload);
-				this.sendRequests([request]);
+				this.queueRequest(request);
 				return payload;
 			},
 			clickThrough: (event: Payload<RecommendationsSchemaData>): RecommendationsClickthroughRequest => {
@@ -1083,6 +1084,11 @@ export class Beacon {
 						key += additionalRequestKeys(key, 'recommendation', recommendationsSchema);
 						appendResults(acc, key, 'recommendationsSchema', request);
 						break;
+					case 'recommendationsAddtocart':
+						const recommendationsAddtocartSchema = request.payload.recommendationsAddtocartSchema as RecommendationsAddtocartSchema;
+						key += additionalRequestKeys(key, 'recommendation', recommendationsAddtocartSchema);
+						appendResults(acc, key, 'recommendationsAddtocartSchema', request);
+						break;
 					case 'searchRender':
 					case 'searchImpression':
 						const searchSchema = request.payload.searchSchema as SearchSchema;
@@ -1176,7 +1182,7 @@ export function appendResults(
 		batches: Record<string, PayloadRequest>;
 	},
 	key: string,
-	schemaName: 'searchSchema' | 'autocompleteSchema' | 'categorySchema' | 'recommendationsSchema',
+	schemaName: 'searchSchema' | 'autocompleteSchema' | 'categorySchema' | 'recommendationsSchema' | 'recommendationsAddtocartSchema',
 	request: PayloadRequest
 ) {
 	if (!acc.batches[key]) {
@@ -1186,7 +1192,7 @@ export function appendResults(
 		// append results
 		const results = acc.batches[key].payload[schemaName].data.results;
 		const resultsToAdd = request.payload[schemaName].data.results;
-		const newResults = [...results, ...resultsToAdd];
+		const newResults = [...results, ...resultsToAdd].sort((a, b) => a.position - b.position);
 		acc.batches[key].payload[schemaName].data.results = newResults;
 	}
 }
@@ -1194,7 +1200,7 @@ export function appendResults(
 export function additionalRequestKeys(
 	key: string,
 	type: 'search' | 'autocomplete' | 'category' | 'recommendation',
-	schema: SearchSchema | AutocompleteSchema | CategorySchema | RecommendationsSchema
+	schema: SearchSchema | AutocompleteSchema | CategorySchema | RecommendationsSchema | RecommendationsAddtocartSchema
 ): string {
 	let value = key;
 	value += `||${schema.context.pageLoadId}`;
