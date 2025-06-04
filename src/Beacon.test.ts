@@ -9,7 +9,7 @@ import {
 	PayloadRequest,
 	REQUEST_GROUPING_TIMEOUT,
 } from './Beacon';
-import { AutocompleteSchema, CategorySchema, ContextCurrency, Product, RecommendationsSchema } from './client';
+import { AutocompleteSchema, AutocompleteSchemaDataMatchTypeEnum, CategorySchema, ContextCurrency, Product, RecommendationsSchema } from './client';
 
 const resetAllCookies = () => {
 	const cookies = document.cookie.split(';');
@@ -381,7 +381,7 @@ describe('Beacon', () => {
 	describe('Events', () => {
 		const baseSearchSchema = {
 			q: 'test',
-			matchType: 'exact',
+			matchType: AutocompleteSchemaDataMatchTypeEnum.Primary,
 			pagination: {
 				totalResults: 100,
 				page: 1,
@@ -891,7 +891,7 @@ describe('Beacon', () => {
 			q: 'shoes',
 			rq: 'rq',
 			correctedQuery: 'correctedQuery',
-			matchType: 'matchType',
+			matchType: AutocompleteSchemaDataMatchTypeEnum.Primary,
 			results: [
 				{ position: 1, uid: 'product1', sku: 'sku1' },
 				{ position: 2, uid: 'product2', sku: 'sku2' },
@@ -1017,7 +1017,7 @@ describe('Beacon', () => {
 
 				// first request should initialize the key in batches
 				appendResults(acc, key, schemaName, initialRequest);
-				expect(acc.batches[key]).toBe(initialRequest);
+				expect(acc.batches[key]).toStrictEqual(initialRequest);
 				expect(acc.batches[key].payload[schemaName].data.results.length).toBe(2);
 				expect(acc.nonBatched.length).toBe(0);
 
@@ -1031,8 +1031,8 @@ describe('Beacon', () => {
 							data: {
 								...mockData,
 								results: [
-									{ uid: 'product3', sku: 'sku3' },
-									{ uid: 'product4', sku: 'sku4' },
+									{ position: 3, uid: 'product3', sku: 'sku3' },
+									{ position: 4, uid: 'product4', sku: 'sku4' },
 								],
 							},
 						},
@@ -1045,7 +1045,21 @@ describe('Beacon', () => {
 				expect(Object.keys(acc.batches).length).toBe(1);
 
 				// The original request should be preserved (not replaced)
-				expect(acc.batches[key]).toBe(initialRequest);
+				expect(acc.batches[key]).toStrictEqual({
+					...initialRequest,
+					payload: {
+						[schemaName]: {
+							...initialRequest.payload[schemaName],
+							data: {
+								...initialRequest.payload[schemaName].data,
+								results: [
+									...initialRequest.payload[schemaName].data.results,
+									...additionalRequest.payload[schemaName].data.results,
+								],
+							},
+						},
+					},
+				});
 
 				// Results should be appended
 				expect(acc.batches[key].payload[schemaName].data.results.length).toBe(4);
@@ -1083,7 +1097,7 @@ describe('Beacon', () => {
 
 				// Now should have two batched requests
 				expect(Object.keys(acc.batches).length).toBe(2);
-				expect(acc.batches[key2]).toBe(differentRequest);
+				expect(acc.batches[key2]).toStrictEqual(differentRequest);
 
 				// Original batch should be unchanged
 				expect(acc.batches[key].payload[schemaName].data.results.length).toBe(4);

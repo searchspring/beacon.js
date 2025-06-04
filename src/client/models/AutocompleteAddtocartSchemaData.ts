@@ -91,7 +91,7 @@ export interface AutocompleteAddtocartSchemaData {
      * @type {string}
      * @memberof AutocompleteAddtocartSchemaData
      */
-    matchType: string;
+    matchType: AutocompleteAddtocartSchemaDataMatchTypeEnum;
     /**
      * List of active background filters passed to the Autocomplete API
      * @type {Array<AutocompleteAddtocartSchemaDataBgfilterInner>}
@@ -129,6 +129,17 @@ export interface AutocompleteAddtocartSchemaData {
      */
     results: Array<Product>;
 }
+
+
+/**
+ * @export
+ */
+export const AutocompleteAddtocartSchemaDataMatchTypeEnum = {
+    Primary: 'primary',
+    Expanded: 'expanded'
+} as const;
+export type AutocompleteAddtocartSchemaDataMatchTypeEnum = typeof AutocompleteAddtocartSchemaDataMatchTypeEnum[keyof typeof AutocompleteAddtocartSchemaDataMatchTypeEnum];
+
 
 /**
  * Check if a given object implements the AutocompleteAddtocartSchemaData interface.

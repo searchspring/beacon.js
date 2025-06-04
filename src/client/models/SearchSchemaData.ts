@@ -91,7 +91,7 @@ export interface SearchSchemaData {
      * @type {string}
      * @memberof SearchSchemaData
      */
-    matchType: string;
+    matchType: SearchSchemaDataMatchTypeEnum;
     /**
      * List of active background filters passed to the Search API
      * @type {Array<AutocompleteAddtocartSchemaDataBgfilterInner>}
@@ -129,6 +129,17 @@ export interface SearchSchemaData {
      */
     results: Array<Item>;
 }
+
+
+/**
+ * @export
+ */
+export const SearchSchemaDataMatchTypeEnum = {
+    Primary: 'primary',
+    Expanded: 'expanded'
+} as const;
+export type SearchSchemaDataMatchTypeEnum = typeof SearchSchemaDataMatchTypeEnum[keyof typeof SearchSchemaDataMatchTypeEnum];
+
 
 /**
  * Check if a given object implements the SearchSchemaData interface.

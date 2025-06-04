@@ -1187,7 +1187,7 @@ export function appendResults(
 ) {
 	if (!acc.batches[key]) {
 		// first request for this batch will contain context data
-		acc.batches[key] = request;
+		acc.batches[key] = JSON.parse(JSON.stringify(request));
 	} else {
 		// append results
 		const results = acc.batches[key].payload[schemaName].data.results;

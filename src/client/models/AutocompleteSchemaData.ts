@@ -91,7 +91,7 @@ export interface AutocompleteSchemaData {
      * @type {string}
      * @memberof AutocompleteSchemaData
      */
-    matchType: string;
+    matchType: AutocompleteSchemaDataMatchTypeEnum;
     /**
      * List of active background filters passed to the Autocomplete API
      * @type {Array<AutocompleteAddtocartSchemaDataBgfilterInner>}
@@ -129,6 +129,17 @@ export interface AutocompleteSchemaData {
      */
     results: Array<Item>;
 }
+
+
+/**
+ * @export
+ */
+export const AutocompleteSchemaDataMatchTypeEnum = {
+    Primary: 'primary',
+    Expanded: 'expanded'
+} as const;
+export type AutocompleteSchemaDataMatchTypeEnum = typeof AutocompleteSchemaDataMatchTypeEnum[keyof typeof AutocompleteSchemaDataMatchTypeEnum];
+
 
 /**
  * Check if a given object implements the AutocompleteSchemaData interface.
