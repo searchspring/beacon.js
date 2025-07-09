@@ -263,6 +263,7 @@ export class Beacon {
 			try {
 				window.localStorage.setItem(name, JSON.stringify({ value }));
 			} catch(e: any) {
+				console.warn(`something went wrong setting ${name} to local storage`);
 				if(e.name === 'QuotaExceededError') {
 					this.events.error.snap({
 						data: {
