@@ -9,7 +9,7 @@ import {
 	PayloadRequest,
 	REQUEST_GROUPING_TIMEOUT,
 } from './Beacon';
-import { AutocompleteSchema, AutocompleteSchemaDataMatchTypeEnum, CategorySchema, ContextCurrency, Product, RecommendationsSchema } from './client';
+import { AutocompleteSchema, AutocompleteSchemaDataMatchTypeEnum, CategorySchema, ContextCurrency, ItemTypeEnum, Product, RecommendationsSchema } from './client';
 
 const resetAllCookies = () => {
 	const cookies = document.cookie.split(';');
@@ -388,11 +388,12 @@ describe('Beacon', () => {
 				resultsPerPage: 20,
 			},
 			results: [
-				{ position: 1, uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1' },
-				{ position: 2, uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2' },
-				{ position: 3, uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3' },
-				{ position: 4, uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4' },
+				{ type: ItemTypeEnum.Product, position: 1, uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1' },
+				{ type: ItemTypeEnum.Product, position: 2, uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2' },
+				{ type: ItemTypeEnum.Product, position: 3, uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3' },
+				{ type: ItemTypeEnum.Product, position: 4, uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4' },
 			],
+			banners: [],
 		};
 
 		const otherFetchParams = {
@@ -460,6 +461,7 @@ describe('Beacon', () => {
 
 				const data = {
 					...baseSearchSchema,
+					banners: undefined,
 					results: [
 						{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10.99 },
 						{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10.99 },
@@ -526,6 +528,7 @@ describe('Beacon', () => {
 
 				const data = {
 					...baseSearchSchema,
+					banners: undefined,
 					results: [
 						{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10.99 },
 						{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10.99 },
@@ -594,10 +597,11 @@ describe('Beacon', () => {
 				const data = {
 					...baseSearchSchema,
 					q: undefined,
+					banners: undefined,
 					results: [
 						{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10.99 },
 						{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10.99 },
-					]
+					],
 				};
 
 				const spy = jest.spyOn(beacon['apis'].category, 'categoryAddtocart');
@@ -627,6 +631,7 @@ describe('Beacon', () => {
 			const data = {
 				tag: 'test-tag',
 				results: [...baseSearchSchema.results],
+				banners: [],
 			};
 			it('can process render event', async () => {
 				const spy = jest.spyOn(beacon['apis'].recommendations, 'recommendationsRender');
@@ -654,7 +659,7 @@ describe('Beacon', () => {
 					results: [
 						{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10.99 },
 						{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10.99 },
-					]
+					],
 				};
 
 				const spy = jest.spyOn(beacon['apis'].recommendations, 'recommendationsAddtocart');
@@ -892,9 +897,10 @@ describe('Beacon', () => {
 			rq: 'rq',
 			correctedQuery: 'correctedQuery',
 			matchType: AutocompleteSchemaDataMatchTypeEnum.Primary,
+			banners: [],
 			results: [
-				{ position: 1, uid: 'product1', sku: 'sku1' },
-				{ position: 2, uid: 'product2', sku: 'sku2' },
+				{ type: ItemTypeEnum.Product, position: 1, uid: 'product1', sku: 'sku1' },
+				{ type: ItemTypeEnum.Product, position: 2, uid: 'product2', sku: 'sku2' },
 			],
 			pagination: {
 				totalResults: 100,
@@ -970,6 +976,7 @@ describe('Beacon', () => {
 					context: mockContext,
 					data: {
 						tag: 'tag',
+						banners: [],
 						results: mockData.results,
 					},
 				};
