@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.30](https://github.com/searchspring/beacon.js/compare/v0.0.29...v0.0.30) (2025-07-09)
+
+
+### Bug Fixes
+
+* catch if localStorage throws QuotaExceededError ([040be9f](https://github.com/searchspring/beacon.js/commit/040be9f0340f4353922f0a8084fcb659e020eea4))
+
 ### [0.0.29](https://github.com/searchspring/beacon.js/compare/v0.0.28...v0.0.29) (2025-06-11)
 
 ### [0.0.28](https://github.com/searchspring/beacon.js/compare/v0.0.27...v0.0.28) (2025-06-04)
