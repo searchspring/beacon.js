@@ -20,7 +20,7 @@ import { mapValues } from '../runtime';
  */
 export interface SearchRedirectSchemaData {
     /**
-     * Redirect URL returned as `merchandising.redirect` from Search API if a Searchspring configured redirect is triggered.
+     * Value returned as `merchandising.redirect` from Search API if a Searchspring configured redirect is triggered.
      * @type {string}
      * @memberof SearchRedirectSchemaData
      */

@@ -20,7 +20,7 @@ import { mapValues } from '../runtime';
  */
 export interface AutocompleteRedirectSchemaData {
     /**
-     * Redirect URL returned as `merchandising.redirect` from Autocomplete API if a Searchspring configured redirect is triggered.
+     * Value returned as `merchandising.redirect` from Autocomplete API if a Searchspring configured redirect is triggered.
      * @type {string}
      * @memberof AutocompleteRedirectSchemaData
      */

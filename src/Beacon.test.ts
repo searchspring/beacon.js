@@ -631,7 +631,6 @@ describe('Beacon', () => {
 			const data = {
 				tag: 'test-tag',
 				results: [...baseSearchSchema.results],
-				banners: [],
 			};
 			it('can process render event', async () => {
 				const spy = jest.spyOn(beacon['apis'].recommendations, 'recommendationsRender');
@@ -976,7 +975,6 @@ describe('Beacon', () => {
 					context: mockContext,
 					data: {
 						tag: 'tag',
-						banners: [],
 						results: mockData.results,
 					},
 				};
