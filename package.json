@@ -1,6 +1,6 @@
 {
   "name": "@searchspring/beacon",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "author": "searchspring",
   "license": "MIT",
   "description": "Javascript library for utilizing Searchspring beacon tracking.",

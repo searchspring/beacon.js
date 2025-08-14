@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.32](https://github.com/searchspring/beacon.js/compare/v0.0.31...v0.0.32) (2025-08-14)
+
+
+### Bug Fixes
+
+* undo productId order, add merge workflow file ([e944aef](https://github.com/searchspring/beacon.js/commit/e944aef773eff5e393479f45482a2e0e6419c8c4))
+
 ### [0.0.31](https://github.com/searchspring/beacon.js/compare/v0.0.30...v0.0.31) (2025-07-12)
 
 ### [0.0.30](https://github.com/searchspring/beacon.js/compare/v0.0.29...v0.0.30) (2025-07-09)
