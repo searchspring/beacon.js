@@ -97,7 +97,7 @@ describe('Beacon', () => {
 
 				// cookie contains cart data
 				expect(global.document.cookie).toContain(
-					`${CART_KEY}=${encodeURIComponent(mockProducts.map((product) => product.childUid || product.childSku || product.uid || product.sku).join(','))}`
+					`${CART_KEY}=${encodeURIComponent(mockProducts.map((product) => product.childSku || product.childUid || product.sku || product.uid).join(','))}`
 				);
 
 				// localStorage contains cart data
@@ -1169,7 +1169,7 @@ describe('Beacon', () => {
 				},
 				body: JSON.stringify({
 					...body,
-					cart: items.map((item) => item.childUid || item.childSku || item.uid || item.sku),
+					cart: items.map((item) => item.childSku || item.childUid || item.sku || item.uid),
 				}),
 				keepalive: true,
 			});
