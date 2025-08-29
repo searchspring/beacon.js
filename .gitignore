@@ -3,4 +3,3 @@ node_modules
 dist
 coverage
 metrics/data
-beacon.v2.snap.types.oas.yaml

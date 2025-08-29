@@ -17,7 +17,6 @@
     "commit": "cz",
     "test": "jest",
     "test:watch": "jest --watch",
-    "pregenerate": "curl -O https://searchspring.github.io/beacon-oas/beacon.v2.snap.types.oas.yaml",
     "generate": "rm -fr ./src/client &&  openapi-generator-cli generate -i ./beacon.v2.snap.types.oas.yaml -g typescript-fetch -o ./src/client",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
