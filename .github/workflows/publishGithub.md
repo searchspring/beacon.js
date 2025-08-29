@@ -12,7 +12,7 @@ jobs:
       contents: write
       packages: write
     steps:
-      - name: Checkout repositiory
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: "0"
