@@ -39,7 +39,13 @@ jobs:
       - name: Version
         run: npm run version
 
-      - name: Publish packages
+      - name: Publish packages to npm
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Publish packages to github
+        run: npm publish --access public --registry=https://npm.pkg.github.com/@searchspring
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.SEARCHSPRING_PUBLISH }}
+          GH_TOKEN: ${{ secrets.SEARCHSPRING_PUBLISH }}
