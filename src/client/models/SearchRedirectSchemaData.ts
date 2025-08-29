@@ -20,12 +20,6 @@ import { mapValues } from '../runtime';
  */
 export interface SearchRedirectSchemaData {
     /**
-     * Unique ID of the Search API response, returned as `responseId` from the Search API. Used to join events together
-     * @type {string}
-     * @memberof SearchRedirectSchemaData
-     */
-    responseId?: string;
-    /**
      * Value returned as `merchandising.redirect` from Search API if a Searchspring configured redirect is triggered.
      * @type {string}
      * @memberof SearchRedirectSchemaData
@@ -51,7 +45,6 @@ export function SearchRedirectSchemaDataFromJSONTyped(json: any, ignoreDiscrimin
     }
     return {
         
-        'responseId': json['responseId'] == null ? undefined : json['responseId'],
         'redirect': json['redirect'],
     };
 }
@@ -67,7 +60,6 @@ export function SearchRedirectSchemaDataFromJSONTyped(json: any, ignoreDiscrimin
 
     return {
         
-        'responseId': value['responseId'],
         'redirect': value['redirect'],
     };
 }

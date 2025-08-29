@@ -24,25 +24,28 @@ export interface AutocompleteAddtocartSchemaDataPagination {
      * @type {number}
      * @memberof AutocompleteAddtocartSchemaDataPagination
      */
-    totalResults?: number;
+    totalResults: number;
     /**
      * Current page returned as `pagination.currentPage` from Autocomplete API
      * @type {number}
      * @memberof AutocompleteAddtocartSchemaDataPagination
      */
-    page?: number;
+    page: number;
     /**
      * Results per page returned as `pagination.resultsPerPage` from Autocomplete API
      * @type {number}
      * @memberof AutocompleteAddtocartSchemaDataPagination
      */
-    resultsPerPage?: number;
+    resultsPerPage: number;
 }
 
 /**
  * Check if a given object implements the AutocompleteAddtocartSchemaDataPagination interface.
  */
 export function instanceOfAutocompleteAddtocartSchemaDataPagination(value: object): value is AutocompleteAddtocartSchemaDataPagination {
+    if (!('totalResults' in value) || value['totalResults'] === undefined) return false;
+    if (!('page' in value) || value['page'] === undefined) return false;
+    if (!('resultsPerPage' in value) || value['resultsPerPage'] === undefined) return false;
     return true;
 }
 
@@ -56,9 +59,9 @@ export function AutocompleteAddtocartSchemaDataPaginationFromJSONTyped(json: any
     }
     return {
         
-        'totalResults': json['totalResults'] == null ? undefined : json['totalResults'],
-        'page': json['page'] == null ? undefined : json['page'],
-        'resultsPerPage': json['resultsPerPage'] == null ? undefined : json['resultsPerPage'],
+        'totalResults': json['totalResults'],
+        'page': json['page'],
+        'resultsPerPage': json['resultsPerPage'],
     };
 }
 

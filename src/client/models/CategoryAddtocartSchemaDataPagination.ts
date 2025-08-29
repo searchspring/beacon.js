@@ -24,25 +24,28 @@ export interface CategoryAddtocartSchemaDataPagination {
      * @type {number}
      * @memberof CategoryAddtocartSchemaDataPagination
      */
-    totalResults?: number;
+    totalResults: number;
     /**
      * Current page returned as `pagination.currentPage` from Search API
      * @type {number}
      * @memberof CategoryAddtocartSchemaDataPagination
      */
-    page?: number;
+    page: number;
     /**
      * Results per page returned as `pagination.resultsPerPage` from Search API
      * @type {number}
      * @memberof CategoryAddtocartSchemaDataPagination
      */
-    resultsPerPage?: number;
+    resultsPerPage: number;
 }
 
 /**
  * Check if a given object implements the CategoryAddtocartSchemaDataPagination interface.
  */
 export function instanceOfCategoryAddtocartSchemaDataPagination(value: object): value is CategoryAddtocartSchemaDataPagination {
+    if (!('totalResults' in value) || value['totalResults'] === undefined) return false;
+    if (!('page' in value) || value['page'] === undefined) return false;
+    if (!('resultsPerPage' in value) || value['resultsPerPage'] === undefined) return false;
     return true;
 }
 
@@ -56,9 +59,9 @@ export function CategoryAddtocartSchemaDataPaginationFromJSONTyped(json: any, ig
     }
     return {
         
-        'totalResults': json['totalResults'] == null ? undefined : json['totalResults'],
-        'page': json['page'] == null ? undefined : json['page'],
-        'resultsPerPage': json['resultsPerPage'] == null ? undefined : json['resultsPerPage'],
+        'totalResults': json['totalResults'],
+        'page': json['page'],
+        'resultsPerPage': json['resultsPerPage'],
     };
 }
 

@@ -20,12 +20,6 @@ import { mapValues } from '../runtime';
  */
 export interface AutocompleteRedirectSchemaData {
     /**
-     * Unique ID of the Autocomplete API response, returned as `responseId` from the Autocomplete API. Used to join events together
-     * @type {string}
-     * @memberof AutocompleteRedirectSchemaData
-     */
-    responseId?: string;
-    /**
      * Value returned as `merchandising.redirect` from Autocomplete API if a Searchspring configured redirect is triggered.
      * @type {string}
      * @memberof AutocompleteRedirectSchemaData
@@ -51,7 +45,6 @@ export function AutocompleteRedirectSchemaDataFromJSONTyped(json: any, ignoreDis
     }
     return {
         
-        'responseId': json['responseId'] == null ? undefined : json['responseId'],
         'redirect': json['redirect'],
     };
 }
@@ -67,7 +60,6 @@ export function AutocompleteRedirectSchemaDataFromJSONTyped(json: any, ignoreDis
 
     return {
         
-        'responseId': value['responseId'],
         'redirect': value['redirect'],
     };
 }

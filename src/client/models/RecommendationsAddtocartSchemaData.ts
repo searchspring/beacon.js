@@ -28,17 +28,11 @@ import {
  */
 export interface RecommendationsAddtocartSchemaData {
     /**
-     * Unique ID of the Search API response, returned as `responseId` from the Search API. Used to join events together
-     * @type {string}
-     * @memberof RecommendationsAddtocartSchemaData
-     */
-    responseId?: string;
-    /**
      * Tag of the personalized recommendation profile the shopper interacted with
      * @type {string}
      * @memberof RecommendationsAddtocartSchemaData
      */
-    tag?: string;
+    tag: string;
     /**
      * Products added to the cart
      * @type {Array<Product>}
@@ -51,6 +45,7 @@ export interface RecommendationsAddtocartSchemaData {
  * Check if a given object implements the RecommendationsAddtocartSchemaData interface.
  */
 export function instanceOfRecommendationsAddtocartSchemaData(value: object): value is RecommendationsAddtocartSchemaData {
+    if (!('tag' in value) || value['tag'] === undefined) return false;
     if (!('results' in value) || value['results'] === undefined) return false;
     return true;
 }
@@ -65,8 +60,7 @@ export function RecommendationsAddtocartSchemaDataFromJSONTyped(json: any, ignor
     }
     return {
         
-        'responseId': json['responseId'] == null ? undefined : json['responseId'],
-        'tag': json['tag'] == null ? undefined : json['tag'],
+        'tag': json['tag'],
         'results': ((json['results'] as Array<any>).map(ProductFromJSON)),
     };
 }
@@ -82,7 +76,6 @@ export function RecommendationsAddtocartSchemaDataFromJSONTyped(json: any, ignor
 
     return {
         
-        'responseId': value['responseId'],
         'tag': value['tag'],
         'results': ((value['results'] as Array<any>).map(ProductToJSON)),
     };

@@ -70,17 +70,11 @@ import {
  */
 export interface SearchSchemaData {
     /**
-     * Unique ID of the Search API response, returned as `responseId` from the Search API. Used to join events together
-     * @type {string}
-     * @memberof SearchSchemaData
-     */
-    responseId?: string;
-    /**
      * Search query passed as the `q` query string parameter to the Search API. **If an empty string is passed, will indicate a blank search was submitted.**
      * @type {string}
      * @memberof SearchSchemaData
      */
-    q?: string;
+    q: string;
     /**
      * If spell correction occurs, value will be `query.correctedQuery` from the Search API
      * @type {string}
@@ -104,7 +98,7 @@ export interface SearchSchemaData {
      * @type {string}
      * @memberof SearchSchemaData
      */
-    matchType?: SearchSchemaDataMatchTypeEnum;
+    matchType: SearchSchemaDataMatchTypeEnum;
     /**
      * List of active background filters passed to the Search API
      * @type {Array<AutocompleteAddtocartSchemaDataBgfilterInner>}
@@ -128,7 +122,7 @@ export interface SearchSchemaData {
      * @type {CategoryAddtocartSchemaDataPagination}
      * @memberof SearchSchemaData
      */
-    pagination?: CategoryAddtocartSchemaDataPagination;
+    pagination: CategoryAddtocartSchemaDataPagination;
     /**
      * 
      * @type {SearchAddtocartSchemaDataMerchandising}
@@ -146,7 +140,7 @@ export interface SearchSchemaData {
      * @type {Array<BannersInner>}
      * @memberof SearchSchemaData
      */
-    banners?: Array<BannersInner>;
+    banners: Array<BannersInner>;
 }
 
 
@@ -164,7 +158,11 @@ export type SearchSchemaDataMatchTypeEnum = typeof SearchSchemaDataMatchTypeEnum
  * Check if a given object implements the SearchSchemaData interface.
  */
 export function instanceOfSearchSchemaData(value: object): value is SearchSchemaData {
+    if (!('q' in value) || value['q'] === undefined) return false;
+    if (!('matchType' in value) || value['matchType'] === undefined) return false;
+    if (!('pagination' in value) || value['pagination'] === undefined) return false;
     if (!('results' in value) || value['results'] === undefined) return false;
+    if (!('banners' in value) || value['banners'] === undefined) return false;
     return true;
 }
 
@@ -178,19 +176,18 @@ export function SearchSchemaDataFromJSONTyped(json: any, ignoreDiscriminator: bo
     }
     return {
         
-        'responseId': json['responseId'] == null ? undefined : json['responseId'],
-        'q': json['q'] == null ? undefined : json['q'],
+        'q': json['q'],
         'correctedQuery': json['correctedQuery'] == null ? undefined : json['correctedQuery'],
         'didYouMean': json['didYouMean'] == null ? undefined : json['didYouMean'],
         'rq': json['rq'] == null ? undefined : json['rq'],
-        'matchType': json['matchType'] == null ? undefined : json['matchType'],
+        'matchType': json['matchType'],
         'bgfilter': json['bgfilter'] == null ? undefined : ((json['bgfilter'] as Array<any>).map(AutocompleteAddtocartSchemaDataBgfilterInnerFromJSON)),
         'filter': json['filter'] == null ? undefined : ((json['filter'] as Array<any>).map(AutocompleteAddtocartSchemaDataFilterInnerFromJSON)),
         'sort': json['sort'] == null ? undefined : ((json['sort'] as Array<any>).map(AutocompleteAddtocartSchemaDataSortInnerFromJSON)),
-        'pagination': json['pagination'] == null ? undefined : CategoryAddtocartSchemaDataPaginationFromJSON(json['pagination']),
+        'pagination': CategoryAddtocartSchemaDataPaginationFromJSON(json['pagination']),
         'merchandising': json['merchandising'] == null ? undefined : SearchAddtocartSchemaDataMerchandisingFromJSON(json['merchandising']),
         'results': ((json['results'] as Array<any>).map(ItemFromJSON)),
-        'banners': json['banners'] == null ? undefined : ((json['banners'] as Array<any>).map(BannersInnerFromJSON)),
+        'banners': ((json['banners'] as Array<any>).map(BannersInnerFromJSON)),
     };
 }
 
@@ -205,7 +202,6 @@ export function SearchSchemaDataFromJSONTyped(json: any, ignoreDiscriminator: bo
 
     return {
         
-        'responseId': value['responseId'],
         'q': value['q'],
         'correctedQuery': value['correctedQuery'],
         'didYouMean': value['didYouMean'],
@@ -217,7 +213,7 @@ export function SearchSchemaDataFromJSONTyped(json: any, ignoreDiscriminator: bo
         'pagination': CategoryAddtocartSchemaDataPaginationToJSON(value['pagination']),
         'merchandising': SearchAddtocartSchemaDataMerchandisingToJSON(value['merchandising']),
         'results': ((value['results'] as Array<any>).map(ItemToJSON)),
-        'banners': value['banners'] == null ? undefined : ((value['banners'] as Array<any>).map(BannersInnerToJSON)),
+        'banners': ((value['banners'] as Array<any>).map(BannersInnerToJSON)),
     };
 }
 

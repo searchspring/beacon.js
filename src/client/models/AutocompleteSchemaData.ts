@@ -70,17 +70,11 @@ import {
  */
 export interface AutocompleteSchemaData {
     /**
-     * Unique ID of the Autocomplete API response, returned as `responseId` from the Autocomplete API. Used to join events together
-     * @type {string}
-     * @memberof AutocompleteSchemaData
-     */
-    responseId?: string;
-    /**
      * Search query passed as the `q` query string parameter to the Autocomplete API
      * @type {string}
      * @memberof AutocompleteSchemaData
      */
-    q?: string;
+    q: string;
     /**
      * If spell correction occurs, value will be `query.correctedQuery` from the Autocomplete API
      * @type {string}
@@ -104,7 +98,7 @@ export interface AutocompleteSchemaData {
      * @type {string}
      * @memberof AutocompleteSchemaData
      */
-    matchType?: AutocompleteSchemaDataMatchTypeEnum;
+    matchType: AutocompleteSchemaDataMatchTypeEnum;
     /**
      * List of active background filters passed to the Autocomplete API
      * @type {Array<AutocompleteAddtocartSchemaDataBgfilterInner>}
@@ -128,7 +122,7 @@ export interface AutocompleteSchemaData {
      * @type {AutocompleteAddtocartSchemaDataPagination}
      * @memberof AutocompleteSchemaData
      */
-    pagination?: AutocompleteAddtocartSchemaDataPagination;
+    pagination: AutocompleteAddtocartSchemaDataPagination;
     /**
      * 
      * @type {AutocompleteAddtocartSchemaDataMerchandising}
@@ -146,7 +140,7 @@ export interface AutocompleteSchemaData {
      * @type {Array<BannersInner>}
      * @memberof AutocompleteSchemaData
      */
-    banners?: Array<BannersInner>;
+    banners: Array<BannersInner>;
 }
 
 
@@ -164,7 +158,11 @@ export type AutocompleteSchemaDataMatchTypeEnum = typeof AutocompleteSchemaDataM
  * Check if a given object implements the AutocompleteSchemaData interface.
  */
 export function instanceOfAutocompleteSchemaData(value: object): value is AutocompleteSchemaData {
+    if (!('q' in value) || value['q'] === undefined) return false;
+    if (!('matchType' in value) || value['matchType'] === undefined) return false;
+    if (!('pagination' in value) || value['pagination'] === undefined) return false;
     if (!('results' in value) || value['results'] === undefined) return false;
+    if (!('banners' in value) || value['banners'] === undefined) return false;
     return true;
 }
 
@@ -178,19 +176,18 @@ export function AutocompleteSchemaDataFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
-        'responseId': json['responseId'] == null ? undefined : json['responseId'],
-        'q': json['q'] == null ? undefined : json['q'],
+        'q': json['q'],
         'correctedQuery': json['correctedQuery'] == null ? undefined : json['correctedQuery'],
         'didYouMean': json['didYouMean'] == null ? undefined : json['didYouMean'],
         'rq': json['rq'] == null ? undefined : json['rq'],
-        'matchType': json['matchType'] == null ? undefined : json['matchType'],
+        'matchType': json['matchType'],
         'bgfilter': json['bgfilter'] == null ? undefined : ((json['bgfilter'] as Array<any>).map(AutocompleteAddtocartSchemaDataBgfilterInnerFromJSON)),
         'filter': json['filter'] == null ? undefined : ((json['filter'] as Array<any>).map(AutocompleteAddtocartSchemaDataFilterInnerFromJSON)),
         'sort': json['sort'] == null ? undefined : ((json['sort'] as Array<any>).map(AutocompleteAddtocartSchemaDataSortInnerFromJSON)),
-        'pagination': json['pagination'] == null ? undefined : AutocompleteAddtocartSchemaDataPaginationFromJSON(json['pagination']),
+        'pagination': AutocompleteAddtocartSchemaDataPaginationFromJSON(json['pagination']),
         'merchandising': json['merchandising'] == null ? undefined : AutocompleteAddtocartSchemaDataMerchandisingFromJSON(json['merchandising']),
         'results': ((json['results'] as Array<any>).map(ItemFromJSON)),
-        'banners': json['banners'] == null ? undefined : ((json['banners'] as Array<any>).map(BannersInnerFromJSON)),
+        'banners': ((json['banners'] as Array<any>).map(BannersInnerFromJSON)),
     };
 }
 
@@ -205,7 +202,6 @@ export function AutocompleteSchemaDataFromJSONTyped(json: any, ignoreDiscriminat
 
     return {
         
-        'responseId': value['responseId'],
         'q': value['q'],
         'correctedQuery': value['correctedQuery'],
         'didYouMean': value['didYouMean'],
@@ -217,7 +213,7 @@ export function AutocompleteSchemaDataFromJSONTyped(json: any, ignoreDiscriminat
         'pagination': AutocompleteAddtocartSchemaDataPaginationToJSON(value['pagination']),
         'merchandising': AutocompleteAddtocartSchemaDataMerchandisingToJSON(value['merchandising']),
         'results': ((value['results'] as Array<any>).map(ItemToJSON)),
-        'banners': value['banners'] == null ? undefined : ((value['banners'] as Array<any>).map(BannersInnerToJSON)),
+        'banners': ((value['banners'] as Array<any>).map(BannersInnerToJSON)),
     };
 }
 
