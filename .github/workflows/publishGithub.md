@@ -1,16 +1,18 @@
-name: Publish
+name: PublishGithub
+
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["Publish"]
+    types: [completed]
 
 jobs:
-  Publish:
+  PublishGithub:
     runs-on: ubuntu-latest
     permissions:
       contents: write
       packages: write
     steps:
-      - name: Checkout repositiory
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: "0"
@@ -24,8 +26,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          registry-url: 'https://registry.npmjs.org'
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@searchspring'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install packages
         run: npm ci
@@ -35,16 +40,8 @@ jobs:
 
       - name: Test
         run: npm run test
-
-      - name: Version
-        run: npm run version
-
-      - name: Publish packages to npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
       - name: Publish packages to github
-        run: npm publish --access public --scope=@searchspring --registry=https://npm.pkg.github.com
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
