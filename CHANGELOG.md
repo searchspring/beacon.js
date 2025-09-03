@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.41](https://github.com/searchspring/beacon.js/compare/v0.0.40...v0.0.41) (2025-09-03)
+
+
+### Bug Fixes
+
+* **beacon:** fixing a bug where the pageLoadId would be missing and could get stuck in infinite loop ([950fb72](https://github.com/searchspring/beacon.js/commit/950fb72618f2af9ad5712662d948b15524db0a3b))
+
 ### [0.0.40](https://github.com/searchspring/beacon.js/compare/v0.0.39...v0.0.40) (2025-08-29)
 
 ### [0.0.39](https://github.com/searchspring/beacon.js/compare/v0.0.38...v0.0.39) (2025-08-29)
