@@ -18,7 +18,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "generate": "rm -fr ./src/client &&  openapi-generator-cli generate -i ./beacon.v2.snap.types.oas.yaml -g typescript-fetch -o ./src/client",
-    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
+    "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx}' '!src/client/**'",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "prepare": "husky",
     "version": "standard-version -a",

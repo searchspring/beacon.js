@@ -9,7 +9,15 @@ import {
 	PayloadRequest,
 	REQUEST_GROUPING_TIMEOUT,
 } from './Beacon';
-import { AutocompleteSchema, AutocompleteSchemaDataMatchTypeEnum, CategorySchema, ContextCurrency, ItemTypeEnum, Product, RecommendationsSchema } from './client';
+import {
+	AutocompleteSchema,
+	AutocompleteSchemaDataMatchTypeEnum,
+	CategorySchema,
+	ContextCurrency,
+	ItemTypeEnum,
+	Product,
+	RecommendationsSchema,
+} from './client';
 
 const resetAllCookies = () => {
 	const cookies = document.cookie.split(';');
@@ -155,30 +163,30 @@ describe('Beacon', () => {
 		});
 		describe('Methods', () => {
 			it('can getStoredId', async () => {
-				const id1 = beacon['getStoredId']('key', 0);
+				const id1 = beacon['getStoredId']('userId', 'storage-key', 0);
 				expect(id1).toStrictEqual(expect.any(String));
 
 				await new Promise((resolve) => setTimeout(resolve, 100));
 
-				const id2 = beacon['getStoredId']('key', 0);
+				const id2 = beacon['getStoredId']('userId', 'storage-key', 0);
 				expect(id2).toStrictEqual(expect.any(String));
 				expect(id1).toBe(id2);
 			});
 
-			it('can getStoredId with expiration', async () => {
+			it('can get new id with getStoredId when expired', async () => {
 				const expiration = 1000;
-				const id1 = beacon['getStoredId']('key', expiration);
+				const id1 = beacon['getStoredId']('userId', 'storage-key', expiration);
 				expect(id1).toStrictEqual(expect.any(String));
 
 				await new Promise((resolve) => setTimeout(resolve, expiration / 2));
 
-				const id2 = beacon['getStoredId']('key', expiration);
+				const id2 = beacon['getStoredId']('userId', 'storage-key', expiration);
 				expect(id2).toStrictEqual(expect.any(String));
 				expect(id1).toBe(id2);
 
 				await new Promise((resolve) => setTimeout(resolve, expiration + 100));
 
-				const id3 = beacon['getStoredId']('key', expiration);
+				const id3 = beacon['getStoredId']('userId', 'storage-key', expiration);
 				expect(id3).toStrictEqual(expect.any(String));
 				expect(id3).not.toBe(id2);
 			});
@@ -206,7 +214,7 @@ describe('Beacon', () => {
 						href,
 						value: pageLoadId1,
 						timestamp: expect.any(String),
-					}
+					},
 				});
 			});
 
@@ -230,40 +238,44 @@ describe('Beacon', () => {
 						href: stored.href,
 						value: stored.value,
 						timestamp: expect.any(String),
-					}
+					},
 				});
 				expect(JSON.parse(stored2).value.value).toBe(stored.value);
 				expect(JSON.parse(stored2).value.timestamp).not.toBe(stored.timestamp);
 			});
 
-			it('does not get expired pageLoadId from storage', async () => {
-				localStorageMock.clear();
-				const stored = { href: 'test-href', value: 'test-value', timestamp: beacon.getTimestamp() };
-				localStorageMock.setItem(PAGE_LOAD_ID_KEY, JSON.stringify({ value: stored }));
+			it(
+				'does not get expired pageLoadId from storage',
+				async () => {
+					localStorageMock.clear();
+					const stored = { href: 'test-href', value: 'test-value', timestamp: beacon.getTimestamp() };
+					localStorageMock.setItem(PAGE_LOAD_ID_KEY, JSON.stringify({ value: stored }));
 
-				await new Promise((resolve) => setTimeout(resolve, PAGE_LOAD_ID_EXPIRATION + 10));
+					await new Promise((resolve) => setTimeout(resolve, PAGE_LOAD_ID_EXPIRATION + 10));
 
-				// reconstruct beacon due to pageLoadId being created in constructor
-				beacon = new Beacon(mockGlobals, {
-					...mockConfig,
-					href: stored.href,
-				});
-				expect(beacon['config'].href).toStrictEqual(stored.href);
-				expect(beacon['pageLoadId']).not.toBe(stored.value);
-				expect(beacon['pageLoadId']).toStrictEqual(expect.any(String));
-
-				// should save new id to storage
-				const stored2 = localStorageMock.getItem(PAGE_LOAD_ID_KEY)!;
-				expect(JSON.parse(stored2)).toStrictEqual({
-					value: {
+					// reconstruct beacon due to pageLoadId being created in constructor
+					beacon = new Beacon(mockGlobals, {
+						...mockConfig,
 						href: stored.href,
-						value: expect.any(String),
-						timestamp: expect.any(String),
-					}
-				});
-				expect(JSON.parse(stored2).value.value).not.toBe(stored.value);
-				expect(JSON.parse(stored2).value.timestamp).not.toBe(stored.timestamp);
-			}, PAGE_LOAD_ID_EXPIRATION + 100); // increase timeout to wait for expiration
+					});
+					expect(beacon['config'].href).toStrictEqual(stored.href);
+					expect(beacon['pageLoadId']).not.toBe(stored.value);
+					expect(beacon['pageLoadId']).toStrictEqual(expect.any(String));
+
+					// should save new id to storage
+					const stored2 = localStorageMock.getItem(PAGE_LOAD_ID_KEY)!;
+					expect(JSON.parse(stored2)).toStrictEqual({
+						value: {
+							href: stored.href,
+							value: expect.any(String),
+							timestamp: expect.any(String),
+						},
+					});
+					expect(JSON.parse(stored2).value.value).not.toBe(stored.value);
+					expect(JSON.parse(stored2).value.timestamp).not.toBe(stored.timestamp);
+				},
+				PAGE_LOAD_ID_EXPIRATION + 100
+			); // increase timeout to wait for expiration
 		});
 	});
 
@@ -465,7 +477,7 @@ describe('Beacon', () => {
 					results: [
 						{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10.99 },
 						{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10.99 },
-					]
+					],
 				};
 
 				const spy = jest.spyOn(beacon['apis'].autocomplete, 'autocompleteAddtocart');
@@ -532,7 +544,7 @@ describe('Beacon', () => {
 					results: [
 						{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10.99 },
 						{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10.99 },
-					]
+					],
 				};
 
 				const spy = jest.spyOn(beacon['apis'].search, 'searchAddtocart');
@@ -701,10 +713,10 @@ describe('Beacon', () => {
 		describe('Cart', () => {
 			const data = {
 				results: [
-					{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10, },
-					{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10, },
-					{ uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3', qty: 1, price: 10, },
-					{ uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4', qty: 1, price: 10, },
+					{ uid: 'prodUid1', childUid: 'prodChildUid1', sku: 'prodSku1', childSku: 'prodChildSku1', qty: 1, price: 10 },
+					{ uid: 'prodUid2', childUid: 'prodChildUid2', sku: 'prodSku2', childSku: 'prodChildSku2', qty: 1, price: 10 },
+					{ uid: 'prodUid3', childUid: 'prodChildUid3', sku: 'prodSku3', childSku: 'prodChildSku3', qty: 1, price: 10 },
+					{ uid: 'prodUid4', childUid: 'prodChildUid4', sku: 'prodSku4', childSku: 'prodChildSku4', qty: 1, price: 10 },
 				],
 			};
 			it('can process add event', async () => {
@@ -740,13 +752,13 @@ describe('Beacon', () => {
 				const cart = [
 					{ uid: 'prodUidA', childUid: 'prodChildUidA', sku: 'prodSkuA', childSku: 'prodChildSkuA', qty: 1, price: 10.99 },
 					{ uid: 'prodUidB', childUid: 'prodChildUidB', sku: 'prodSkuB', childSku: 'prodChildSkuB', qty: 1, price: 10.99 },
-					...data.results
+					...data.results,
 				];
 
 				const cartData = {
 					...data,
-					cart
-				}
+					cart,
+				};
 
 				const spy = jest.spyOn(beacon['apis'].cart, 'cartAdd');
 				const payload = beacon.events.cart.add({ data: cartData });
@@ -777,10 +789,8 @@ describe('Beacon', () => {
 
 				const removeData = {
 					...data,
-					results: [
-						{ uid: 'prodUidA', childUid: 'prodChildUidA', sku: 'prodSkuA', childSku: 'prodChildSkuA', qty: 1, price: 10.99 },
-					],
-				}
+					results: [{ uid: 'prodUidA', childUid: 'prodChildUidA', sku: 'prodSkuA', childSku: 'prodChildSkuA', qty: 1, price: 10.99 }],
+				};
 
 				beacon.storage.cart.set(cart);
 
@@ -798,17 +808,13 @@ describe('Beacon', () => {
 			});
 
 			it('can process remove event with supplied cart', async () => {
-				const cart = [
-					{ uid: 'prodUidB', childUid: 'prodChildUidB', sku: 'prodSkuB', childSku: 'prodChildSkuB', qty: 1, price: 10.99 },
-				];
+				const cart = [{ uid: 'prodUidB', childUid: 'prodChildUidB', sku: 'prodSkuB', childSku: 'prodChildSkuB', qty: 1, price: 10.99 }];
 
 				const removeData = {
 					...data,
-					results: [
-						{ uid: 'prodUidA', childUid: 'prodChildUidA', sku: 'prodSkuA', childSku: 'prodChildSkuA', qty: 1, price: 10.99 },
-					],
-					cart
-				}
+					results: [{ uid: 'prodUidA', childUid: 'prodChildUidA', sku: 'prodSkuA', childSku: 'prodChildSkuA', qty: 1, price: 10.99 }],
+					cart,
+				};
 
 				const spy = jest.spyOn(beacon['apis'].cart, 'cartRemove');
 				const payload = beacon.events.cart.remove({ data: removeData });
@@ -1057,10 +1063,7 @@ describe('Beacon', () => {
 							...initialRequest.payload[schemaName],
 							data: {
 								...initialRequest.payload[schemaName].data,
-								results: [
-									...initialRequest.payload[schemaName].data.results,
-									...additionalRequest.payload[schemaName].data.results,
-								],
+								results: [...initialRequest.payload[schemaName].data.results, ...additionalRequest.payload[schemaName].data.results],
 							},
 						},
 					},
