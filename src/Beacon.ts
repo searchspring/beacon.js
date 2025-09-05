@@ -992,8 +992,8 @@ export class Beacon {
 	public getShopperId(): string {
 		let shopperId: string | null = null;
 		try {
-			shopperId = this.getCookie(SHOPPER_ID_KEY) || (this.getLocalStorageItem(SHOPPER_ID_KEY) as string);
-			this.shopperId = shopperId;
+			// cookie value is always a string, but localstorage could be a number
+			this.shopperId = this.getCookie(SHOPPER_ID_KEY) || ('' + this.getLocalStorageItem(SHOPPER_ID_KEY) as string);
 		} catch {
 			// noop
 		}
@@ -1007,12 +1007,12 @@ export class Beacon {
 		}
 		const exisitingShopperId = this.getShopperId();
 		if (exisitingShopperId !== shopperId) {
-			this.shopperId = shopperId;
-			this.setCookie(SHOPPER_ID_KEY, shopperId, COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
+			this.shopperId = '' + shopperId; // ensure string
+			this.setCookie(SHOPPER_ID_KEY, this.shopperId, COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
 			try {
-				this.setLocalStorageItem(SHOPPER_ID_KEY, shopperId);
+				this.setLocalStorageItem(SHOPPER_ID_KEY, this.shopperId);
 			} catch (e: any) {
-				sendStorageError(e, this, SHOPPER_ID_KEY, shopperId);
+				sendStorageError(e, this, SHOPPER_ID_KEY, this.shopperId);
 			}
 			this.sendPreflight();
 			return this.shopperId;
