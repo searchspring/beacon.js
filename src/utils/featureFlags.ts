@@ -24,6 +24,9 @@ export function getFlags(userAgent = ''): FeatureFlags {
 		},
 		storage: function () {
 			const test = 'ss-test';
+			if (typeof window == 'undefined'){
+				return false;
+			}
 
 			try {
 				window?.localStorage.setItem(test, test);

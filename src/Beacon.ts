@@ -165,7 +165,6 @@ export class Beacon {
 	private requests: PayloadRequest[] = [];
 
 	constructor(globals: BeaconGlobals, config?: BeaconConfig) {
-		console.log('we are linked up dude')
 		if (typeof globals != 'object' || typeof globals.siteId != 'string') {
 			throw new Error(`Invalid config passed to tracker. The "siteId" attribute must be provided.`);
 		}
