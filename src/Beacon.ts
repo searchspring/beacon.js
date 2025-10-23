@@ -1,5 +1,6 @@
 import packageJSON from '../package.json';
 export const { version } = packageJSON;
+import { featureFlags } from './utils/featureFlags';
 
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -199,7 +200,7 @@ export class Beacon {
 	}
 
 	private getCookie(name: string): string {
-		if (typeof window !== 'undefined') {
+		if (typeof window !== 'undefined' && featureFlags.cookies) {
 			const cookieName = name + '=';
 			const cookiesList = window.document.cookie.split(';');
 
@@ -220,33 +221,35 @@ export class Beacon {
 	}
 
 	private setCookie(name: string, value: string, samesite: string, expiration: number, domain?: string): void {
-		try {
-			let cookie = `${name}=${encodeURIComponent(value)};` + `SameSite=${samesite};` + 'path=/;';
-			if (!(typeof window !== 'undefined' && window.location.protocol == 'http:')) {
-				// adds secure by default and for shopify pixel - only omits secure if protocol is http and not shopify pixel
-				cookie += 'Secure;';
-			}
-			if (expiration === EXPIRED_COOKIE) {
-				cookie += 'expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-			} else if (expiration) {
-				const d = new Date();
-				d.setTime(d.getTime() + expiration);
-				cookie += `expires=${d['toUTCString']()};`;
-			}
-			if (domain) {
-				cookie += `domain=${domain};`;
-			}
+		if (featureFlags.cookies) {
+			try {
+				let cookie = `${name}=${encodeURIComponent(value)};` + `SameSite=${samesite};` + 'path=/;';
+				if (!(typeof window !== 'undefined' && window.location.protocol == 'http:')) {
+					// adds secure by default and for shopify pixel - only omits secure if protocol is http and not shopify pixel
+					cookie += 'Secure;';
+				}
+				if (expiration === EXPIRED_COOKIE) {
+					cookie += 'expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+				} else if (expiration) {
+					const d = new Date();
+					d.setTime(d.getTime() + expiration);
+					cookie += `expires=${d['toUTCString']()};`;
+				}
+				if (domain) {
+					cookie += `domain=${domain};`;
+				}
 
-			if (typeof window !== 'undefined') {
-				window.document.cookie = cookie;
+				if (typeof window !== 'undefined') {
+					window.document.cookie = cookie;
+				}
+			} catch (e: any) {
+				console.error(`Failed to set '${name}' cookie:`, e);
 			}
-		} catch (e: any) {
-			console.error(`Failed to set '${name}' cookie:`, e);
 		}
 	}
 
 	private getLocalStorageItem<T = LocalStorageItem>(name: string): T | undefined {
-		if (typeof window !== 'undefined') {
+		if (typeof window !== 'undefined' && featureFlags.storage) {
 			const rawData = window.localStorage?.getItem(name) || '';
 			try {
 				const data = JSON.parse(rawData);
@@ -263,7 +266,7 @@ export class Beacon {
 	}
 
 	private setLocalStorageItem(name: string, value: LocalStorageItem): void {
-		if (typeof window !== 'undefined') {
+		if (typeof window !== 'undefined' && featureFlags.storage) {
 			try {
 				window.localStorage.setItem(name, JSON.stringify({ value }));
 			} catch (e: any) {
