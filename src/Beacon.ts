@@ -223,24 +223,33 @@ export class Beacon {
 	private setCookie(name: string, value: string, samesite: string, expiration: number, domain?: string): void {
 		if (featureFlags.cookies) {
 			try {
-				let cookie = `${name}=${encodeURIComponent(value)};` + `SameSite=${samesite};` + 'path=/;';
-				if (!(typeof window !== 'undefined' && window.location.protocol == 'http:')) {
-					// adds secure by default and for shopify pixel - only omits secure if protocol is http and not shopify pixel
-					cookie += 'Secure;';
-				}
-				if (expiration === EXPIRED_COOKIE) {
-					cookie += 'expires=Thu, 01 Jan 1970 00:00:00 GMT;';
-				} else if (expiration) {
+				const secureString = window.location.protocol == 'https:' ? 'Secure;' : '';
+				const sameSiteString = 'SameSite=' + (samesite || 'Lax') + ';';
+				let expiresString = '';
+				if (expiration) {
 					const d = new Date();
 					d.setTime(d.getTime() + expiration);
-					cookie += `expires=${d['toUTCString']()};`;
+					expiresString = 'expires=' + d['toUTCString']() + ';';
 				}
-				if (domain) {
-					cookie += `domain=${domain};`;
-				}
-
-				if (typeof window !== 'undefined') {
-					window.document.cookie = cookie;
+				const valueString = encodeURIComponent(value) + ';';
+				if(domain) {
+					window.document.cookie = name+"="+valueString+expiresString+sameSiteString+secureString+"path=/; domain="+domain;
+				} else {
+					const host = window?.location?.hostname;
+					if (!host || host.split('.').length === 1) {
+						window.document.cookie = name+"="+valueString+expiresString+sameSiteString+secureString+"path=/";
+					} else {
+						const domainParts = host.split('.');
+						domainParts.shift();
+						domain = '.'+domainParts.join('.');
+		
+						window.document.cookie = name+"="+valueString+expiresString+sameSiteString+secureString+"path=/; domain="+domain;
+		
+						if (this.getCookie(name) == null || this.getCookie(name) != value) {
+							domain = '.'+host;
+							window.document.cookie = name+"="+valueString+expiresString+sameSiteString+secureString+"path=/; domain="+domain;
+						}
+					}
 				}
 			} catch (e: any) {
 				console.error(`Failed to set '${name}' cookie:`, e);
@@ -943,7 +952,8 @@ export class Beacon {
 			}
 
 			// set cookie
-			this.setCookie(storageKey, data.value, COOKIE_SAMESITE, expiration, COOKIE_DOMAIN); // attempt to store in cookie
+			this.setCookie(storageKey, data.value, COOKIE_SAMESITE, EXPIRED_COOKIE, COOKIE_DOMAIN); // clear old subdomain cookie
+			this.setCookie(storageKey, data.value, COOKIE_SAMESITE, expiration); // attempt to store in cookie
 
 			// set local storage
 			try {
