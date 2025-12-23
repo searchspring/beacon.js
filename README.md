@@ -267,3 +267,4 @@ const beacon = new Beacon({ siteId: 'abc123' });
 beacon.setCurrency({ code: 'EUR' })
 ```
 
+
