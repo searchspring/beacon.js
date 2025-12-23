@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.45](https://github.com/searchspring/beacon.js/compare/v0.0.44...v0.0.45) (2025-12-23)
+
+
+### Features
+
+* auto-beaconing changes ([5a8e015](https://github.com/searchspring/beacon.js/commit/5a8e01553d202c2a31426370d4cc4a66808cfd95))
+
+
+### Bug Fixes
+
+* remove shopper login return, update exisiting cart sku ([96c57b6](https://github.com/searchspring/beacon.js/commit/96c57b634286b6868756abb7be73ed940c197c92))
+* update cart product skus on cart&viewed add, update tests to include banners ([4f004f3](https://github.com/searchspring/beacon.js/commit/4f004f3e3cdc52099f61e06d6c3582e376328a1f))
+* use athos domain based on siteId ([c8b6e78](https://github.com/searchspring/beacon.js/commit/c8b6e780066e989dcf9c7672c000878dbb623b30))
+
 ### [0.0.44](https://github.com/searchspring/beacon.js/compare/v0.0.43...v0.0.44) (2025-11-03)
 
 ### [0.0.43](https://github.com/searchspring/beacon.js/compare/v0.0.42...v0.0.43) (2025-10-23)
