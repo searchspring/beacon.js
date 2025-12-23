@@ -354,6 +354,11 @@ export class Beacon {
 							} else {
 								isSkuAlreadyInCart.qty += product.qty;
 								isSkuAlreadyInCart.price = product.price || isSkuAlreadyInCart.price;
+								if(product.parentUid !== isSkuAlreadyInCart.parentUid || product.sku !== isSkuAlreadyInCart.sku) {
+									// parentUid or sku are set to the same values if fallback (due to localstorage disabled/full) to storing in cookie.
+									isSkuAlreadyInCart.parentUid = product.parentUid;
+									isSkuAlreadyInCart.sku = product.sku;
+								}
 							}
 						});
 
@@ -373,6 +378,11 @@ export class Beacon {
 						if (isSkuAlreadyInCart) {
 							if (isSkuAlreadyInCart.qty > 0) {
 								isSkuAlreadyInCart.qty -= product.qty || 1;
+								if(product.parentUid !== isSkuAlreadyInCart.parentUid || product.sku !== isSkuAlreadyInCart.sku) {
+									// parentUid or sku are set to the same values if fallback (due to localstorage disabled/full) to storing in cookie.
+									isSkuAlreadyInCart.parentUid = product.parentUid;
+									isSkuAlreadyInCart.sku = product.sku;
+								}
 							}
 						}
 					});
@@ -467,7 +477,7 @@ export class Beacon {
 
 	events = {
 		shopper: {
-			login: (event: Payload<{ id: string }>): LoginRequest | void => {
+			login: (event: Payload<{ id: string }>) => {
 				const setNewId = this.setShopperId(event.data.id);
 				if (setNewId) {
 					const payload: LoginRequest = {
@@ -478,7 +488,6 @@ export class Beacon {
 					};
 					const request = this.createRequest('shopper', 'login', payload);
 					this.sendRequests([request]);
-					return payload;
 				}
 			},
 		},
