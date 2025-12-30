@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.48](https://github.com/searchspring/beacon.js/compare/v0.0.47...v0.0.48) (2025-12-30)
+
+
+### Docs
+
+* remove childUid and childSku reference ([5687bbe](https://github.com/searchspring/beacon.js/commit/5687bbece45ca004179e4f3698af416bc78ab7ba))
+
 ### [0.0.47](https://github.com/searchspring/beacon.js/compare/v0.0.46...v0.0.47) (2025-12-30)
 
 ### [0.0.46](https://github.com/searchspring/beacon.js/compare/v0.0.44...v0.0.46) (2025-12-23)
