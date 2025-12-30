@@ -7,7 +7,7 @@ Describes a tracked Searchspring result.
 
 Name | Type
 ------------ | -------------
-`parentUid` | string
+`parentId` | string
 `uid` | string
 `sku` | string
 
@@ -18,7 +18,7 @@ import type { ProductPageviewSchemaDataResult } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "parentUid": null,
+  "parentId": null,
   "uid": null,
   "sku": null,
 } satisfies ProductPageviewSchemaDataResult

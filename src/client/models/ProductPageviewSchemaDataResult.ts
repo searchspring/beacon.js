@@ -24,7 +24,7 @@ export interface ProductPageviewSchemaDataResult {
      * @type {string}
      * @memberof ProductPageviewSchemaDataResult
      */
-    parentUid: string;
+    parentId: string;
     /**
      * Unique product identifier of the product interacted with
      * @type {string}
@@ -43,7 +43,7 @@ export interface ProductPageviewSchemaDataResult {
  * Check if a given object implements the ProductPageviewSchemaDataResult interface.
  */
 export function instanceOfProductPageviewSchemaDataResult(value: object): value is ProductPageviewSchemaDataResult {
-    if (!('parentUid' in value) || value['parentUid'] === undefined) return false;
+    if (!('parentId' in value) || value['parentId'] === undefined) return false;
     if (!('uid' in value) || value['uid'] === undefined) return false;
     return true;
 }
@@ -58,7 +58,7 @@ export function ProductPageviewSchemaDataResultFromJSONTyped(json: any, ignoreDi
     }
     return {
         
-        'parentUid': json['parentUid'],
+        'parentId': json['parentId'],
         'uid': json['uid'],
         'sku': json['sku'] == null ? undefined : json['sku'],
     };
@@ -75,7 +75,7 @@ export function ProductPageviewSchemaDataResultToJSONTyped(value?: ProductPagevi
 
     return {
         
-        'parentUid': value['parentUid'],
+        'parentId': value['parentId'],
         'uid': value['uid'],
         'sku': value['sku'],
     };

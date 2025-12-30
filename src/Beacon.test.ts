@@ -86,12 +86,12 @@ describe('Beacon', () => {
 
 	describe('Storage', () => {
 		describe('Cart', () => {
-			const multiQuantityTestProduct = { uid: 'multiQuantityText', parentUid: 'multiQuantityParentText', qty: 3, price: 10 };
+			const multiQuantityTestProduct = { uid: 'multiQuantityText', parentId: 'multiQuantityParentText', qty: 3, price: 10 };
 			const mockProducts: Product[] = [
-				{ uid: 'productUid1', parentUid: 'productParentUid1', sku: 'productSku1', qty: 1, price: 9.99 },
-				{ uid: 'productUid2', parentUid: 'productParentUid2', sku: 'productSku2', qty: 2, price: 10.99 },
-				{ uid: 'productUid3', parentUid: 'productParentUid3', sku: 'productSku3', qty: 3, price: 0 },
-				{ uid: 'productUid4', parentUid: 'productParentUid4', qty: 3, price: 0 },
+				{ uid: 'productUid1', parentId: 'productparentId1', sku: 'productSku1', qty: 1, price: 9.99 },
+				{ uid: 'productUid2', parentId: 'productparentId2', sku: 'productSku2', qty: 2, price: 10.99 },
+				{ uid: 'productUid3', parentId: 'productparentId3', sku: 'productSku3', qty: 3, price: 0 },
+				{ uid: 'productUid4', parentId: 'productparentId4', qty: 3, price: 0 },
 				multiQuantityTestProduct,
 			];
 
@@ -113,7 +113,7 @@ describe('Beacon', () => {
 				expect(data).toBe(JSON.stringify({ value: mockProducts }));
 
 				// can add to exisiting cart data and should be at the front
-				const product = { uid: 'productUid5', parentUid: 'productParentUid5', sku: 'productSku5', qty: 1, price: 9.99 };
+				const product = { uid: 'productUid5', parentId: 'productparentId5', sku: 'productSku5', qty: 1, price: 9.99 };
 				beacon.storage.cart.add([product]);
 
 				const updatedCartData = beacon.storage.cart.get();
@@ -139,7 +139,7 @@ describe('Beacon', () => {
 				]);
 
 				// can add to exisiting cart data and should be at the front
-				const product2 = { uid: 'productUid6', parentUid: 'productParentUid6', sku: 'productSku6', qty: 1, price: 9.99 };
+				const product2 = { uid: 'productUid6', parentId: 'productparentId6', sku: 'productSku6', qty: 1, price: 9.99 };
 				beacon.storage.cart.add([product2]);
 				const addedCartData = beacon.storage.cart.get();
 				expect(addedCartData).toEqual([product2, ...removedSingleQuantityCartData]);
@@ -484,10 +484,10 @@ describe('Beacon', () => {
 				const data = {
 					responseId: 'test-response-id',
 					results: [
-						{ type: ResultProductType.Product, parentUid: 'parentUid1', uid: 'prodUid1', sku: 'prodSku1' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid2', uid: 'prodUid2', sku: 'prodSku2' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid3', uid: 'prodUid3', sku: 'prodSku3' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid4', uid: 'prodUid4', sku: 'prodSku4' },
+						{ type: ResultProductType.Product, parentId: 'parentId1', uid: 'prodUid1', sku: 'prodSku1' },
+						{ type: ResultProductType.Product, parentId: 'parentId2', uid: 'prodUid2', sku: 'prodSku2' },
+						{ type: ResultProductType.Product, parentId: 'parentId3', uid: 'prodUid3', sku: 'prodSku3' },
+						{ type: ResultProductType.Product, parentId: 'parentId4', uid: 'prodUid4', sku: 'prodSku4' },
 						{ type: ResultProductType.Banner, uid: 'inlinebanneruid' },
 					],
 					banners: [
@@ -518,8 +518,8 @@ describe('Beacon', () => {
 				const data = {
 					responseId: 'test-response-id',
 					results: [
-						{ uid: 'prodUid1', parentUid: 'prodParentUid1', sku: 'prodSku1', qty: 1, price: 10.99 },
-						{ uid: 'prodUid2', parentUid: 'prodParentUid2', sku: 'prodSku2', qty: 1, price: 10.99 },
+						{ uid: 'prodUid1', parentId: 'prodparentId1', sku: 'prodSku1', qty: 1, price: 10.99 },
+						{ uid: 'prodUid2', parentId: 'prodparentId2', sku: 'prodSku2', qty: 1, price: 10.99 },
 					],
 				};
 
@@ -537,7 +537,7 @@ describe('Beacon', () => {
 				const spy = jest.spyOn(beacon['apis'].autocomplete, 'autocompleteAddtocart');
 
 				beacon.events.autocomplete.addToCart({ data });
-				await new Promise((resolve) => setTimeout(resolve, 0));
+				await new Promise((resolve) => setTimeout(resolve, REQUEST_GROUPING_TIMEOUT));
 
 				expect(spy).toHaveBeenCalled();
 				expect(mockFetchApi).toHaveBeenCalledWith(expect.any(String), fetchPayloadAssertion);
@@ -549,7 +549,7 @@ describe('Beacon', () => {
 			it('can process clickThrough event', async () => {
 				const data = {
 					responseId: 'test-response-id',
-					results: [{ type: ResultProductType.Product, parentUid: 'parentUid1', uid: 'prodUid1', sku: 'prodSku1' }],
+					results: [{ type: ResultProductType.Product, parentId: 'parentId1', uid: 'prodUid1', sku: 'prodSku1' }],
 				};
 
 				const fetchPayloadAssertion = {
@@ -626,10 +626,10 @@ describe('Beacon', () => {
 				const data = {
 					responseId: 'test-response-id',
 					results: [
-						{ type: ResultProductType.Product, parentUid: 'parentUid1', uid: 'prodUid1', sku: 'prodSku1' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid2', uid: 'prodUid2', sku: 'prodSku2' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid3', uid: 'prodUid3', sku: 'prodSku3' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid4', uid: 'prodUid4', sku: 'prodSku4' },
+						{ type: ResultProductType.Product, parentId: 'parentId1', uid: 'prodUid1', sku: 'prodSku1' },
+						{ type: ResultProductType.Product, parentId: 'parentId2', uid: 'prodUid2', sku: 'prodSku2' },
+						{ type: ResultProductType.Product, parentId: 'parentId3', uid: 'prodUid3', sku: 'prodSku3' },
+						{ type: ResultProductType.Product, parentId: 'parentId4', uid: 'prodUid4', sku: 'prodSku4' },
 						{ type: ResultProductType.Banner, uid: 'inlinebanneruid' },
 					],
 					banners: [
@@ -662,8 +662,8 @@ describe('Beacon', () => {
 				const data = {
 					responseId: 'test-response-id',
 					results: [
-						{ uid: 'prodUid1', parentUid: 'prodParentUid1', sku: 'prodSku1', qty: 1, price: 10.99 },
-						{ uid: 'prodUid2', parentUid: 'prodParentUid2', sku: 'prodSku2', qty: 1, price: 10.99 },
+						{ uid: 'prodUid1', parentId: 'prodparentId1', sku: 'prodSku1', qty: 1, price: 10.99 },
+						{ uid: 'prodUid2', parentId: 'prodparentId2', sku: 'prodSku2', qty: 1, price: 10.99 },
 					],
 				};
 
@@ -681,7 +681,7 @@ describe('Beacon', () => {
 				const spy = jest.spyOn(beacon['apis'].search, 'searchAddtocart');
 
 				beacon.events.search.addToCart({ data });
-				await new Promise((resolve) => setTimeout(resolve, 0));
+				await new Promise((resolve) => setTimeout(resolve, REQUEST_GROUPING_TIMEOUT));
 
 				expect(spy).toHaveBeenCalled();
 				expect(mockFetchApi).toHaveBeenCalledWith(expect.any(String), fetchPayloadAssertion);
@@ -693,7 +693,7 @@ describe('Beacon', () => {
 			it('can process clickThrough event', async () => {
 				const data = {
 					responseId: 'test-response-id',
-					results: [{ type: ResultProductType.Product, parentUid: 'parentUid1', uid: 'prodUid1', sku: 'prodSku1' }],
+					results: [{ type: ResultProductType.Product, parentId: 'parentId1', uid: 'prodUid1', sku: 'prodSku1' }],
 				};
 
 				const fetchPayloadAssertion = {
@@ -770,10 +770,10 @@ describe('Beacon', () => {
 				const data = {
 					responseId: 'test-response-id',
 					results: [
-						{ type: ResultProductType.Product, parentUid: 'parentUid1', uid: 'prodUid1', sku: 'prodSku1' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid2', uid: 'prodUid2', sku: 'prodSku2' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid3', uid: 'prodUid3', sku: 'prodSku3' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid4', uid: 'prodUid4', sku: 'prodSku4' },
+						{ type: ResultProductType.Product, parentId: 'parentId1', uid: 'prodUid1', sku: 'prodSku1' },
+						{ type: ResultProductType.Product, parentId: 'parentId2', uid: 'prodUid2', sku: 'prodSku2' },
+						{ type: ResultProductType.Product, parentId: 'parentId3', uid: 'prodUid3', sku: 'prodSku3' },
+						{ type: ResultProductType.Product, parentId: 'parentId4', uid: 'prodUid4', sku: 'prodSku4' },
 						{ type: ResultProductType.Banner, uid: 'inlinebanneruid' },
 					],
 					banners: [
@@ -806,8 +806,8 @@ describe('Beacon', () => {
 				const data = {
 					responseId: 'test-response-id',
 					results: [
-						{ uid: 'prodUid1', parentUid: 'prodParentUid1', sku: 'prodSku1', qty: 1, price: 10.99 },
-						{ uid: 'prodUid2', parentUid: 'prodParentUid2', sku: 'prodSku2', qty: 1, price: 10.99 },
+						{ uid: 'prodUid1', parentId: 'prodparentId1', sku: 'prodSku1', qty: 1, price: 10.99 },
+						{ uid: 'prodUid2', parentId: 'prodparentId2', sku: 'prodSku2', qty: 1, price: 10.99 },
 					],
 				};
 
@@ -825,7 +825,7 @@ describe('Beacon', () => {
 				const spy = jest.spyOn(beacon['apis'].category, 'categoryAddtocart');
 
 				beacon.events.category.addToCart({ data });
-				await new Promise((resolve) => setTimeout(resolve, 0));
+				await new Promise((resolve) => setTimeout(resolve, REQUEST_GROUPING_TIMEOUT));
 
 				expect(spy).toHaveBeenCalled();
 				expect(mockFetchApi).toHaveBeenCalledWith(expect.any(String), fetchPayloadAssertion);
@@ -837,7 +837,7 @@ describe('Beacon', () => {
 			it('can process clickThrough event', async () => {
 				const data = {
 					responseId: 'test-response-id',
-					results: [{ type: ResultProductType.Product, parentUid: 'parentUid1', uid: 'prodUid1', sku: 'prodSku1' }],
+					results: [{ type: ResultProductType.Product, parentId: 'parentId1', uid: 'prodUid1', sku: 'prodSku1' }],
 				};
 
 				const fetchPayloadAssertion = {
@@ -891,10 +891,10 @@ describe('Beacon', () => {
 					responseId: 'test-response-id',
 					tag: 'test-tag',
 					results: [
-						{ type: ResultProductType.Product, parentUid: 'parentUid1', uid: 'prodUid1', sku: 'prodSku1' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid2', uid: 'prodUid2', sku: 'prodSku2' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid3', uid: 'prodUid3', sku: 'prodSku3' },
-						{ type: ResultProductType.Product, parentUid: 'parentUid4', uid: 'prodUid4', sku: 'prodSku4' },
+						{ type: ResultProductType.Product, parentId: 'parentId1', uid: 'prodUid1', sku: 'prodSku1' },
+						{ type: ResultProductType.Product, parentId: 'parentId2', uid: 'prodUid2', sku: 'prodSku2' },
+						{ type: ResultProductType.Product, parentId: 'parentId3', uid: 'prodUid3', sku: 'prodSku3' },
+						{ type: ResultProductType.Product, parentId: 'parentId4', uid: 'prodUid4', sku: 'prodSku4' },
 						{ type: ResultProductType.Banner, uid: 'inlinebanneruid' },
 					],
 					banners: [
@@ -928,8 +928,8 @@ describe('Beacon', () => {
 					responseId: 'test-response-id',
 					tag: 'test-tag',
 					results: [
-						{ uid: 'prodUid1', parentUid: 'prodParentUid1', sku: 'prodSku1', qty: 1, price: 10.99 },
-						{ uid: 'prodUid2', parentUid: 'prodParentUid2', sku: 'prodSku2', qty: 1, price: 10.99 },
+						{ uid: 'prodUid1', parentId: 'prodparentId1', sku: 'prodSku1', qty: 1, price: 10.99 },
+						{ uid: 'prodUid2', parentId: 'prodparentId2', sku: 'prodSku2', qty: 1, price: 10.99 },
 					],
 				};
 
@@ -960,7 +960,7 @@ describe('Beacon', () => {
 				const data = {
 					responseId: 'test-response-id',
 					tag: 'test-tag',
-					results: [{ type: ResultProductType.Product, parentUid: 'parentUid1', uid: 'prodUid1', sku: 'prodSku1' }],
+					results: [{ type: ResultProductType.Product, parentId: 'parentId1', uid: 'prodUid1', sku: 'prodSku1' }],
 				};
 
 				const fetchPayloadAssertion = {
@@ -986,7 +986,7 @@ describe('Beacon', () => {
 		describe('Product', () => {
 			it('can process pageView event', async () => {
 				const data = {
-					result: { uid: 'prodUid1', parentUid: 'prodParentUid1', sku: 'prodSku1' },
+					result: { uid: 'prodUid1', parentId: 'prodparentId1', sku: 'prodSku1' },
 				};
 
 				const fetchPayloadAssertion = {
@@ -1012,17 +1012,17 @@ describe('Beacon', () => {
 		describe('Cart', () => {
 			it('can process add event', async () => {
 				const cart = [
-					{ uid: 'prodUidA', parentUid: 'prodParentUidA', sku: 'prodSkuA', qty: 1, price: 10.99 },
-					{ uid: 'prodUidB', parentUid: 'prodParentUidB', sku: 'prodSkuB', qty: 1, price: 10.99 },
+					{ uid: 'prodUidA', parentId: 'prodparentIdA', sku: 'prodSkuA', qty: 1, price: 10.99 },
+					{ uid: 'prodUidB', parentId: 'prodparentIdB', sku: 'prodSkuB', qty: 1, price: 10.99 },
 				];
 
 				beacon.storage.cart.set(cart);
 
 				const results = [
-					{ uid: 'prodUid1', parentUid: 'prodParentUid1', sku: 'prodSku1', qty: 1, price: 10 },
-					{ uid: 'prodUid2', parentUid: 'prodParentUid2', sku: 'prodSku2', qty: 1, price: 10 },
-					{ uid: 'prodUid3', parentUid: 'prodParentUid3', sku: 'prodSku3', qty: 1, price: 10 },
-					{ uid: 'prodUid4', parentUid: 'prodParentUid4', sku: 'prodSku4', qty: 1, price: 10 },
+					{ uid: 'prodUid1', parentId: 'prodparentId1', sku: 'prodSku1', qty: 1, price: 10 },
+					{ uid: 'prodUid2', parentId: 'prodparentId2', sku: 'prodSku2', qty: 1, price: 10 },
+					{ uid: 'prodUid3', parentId: 'prodparentId3', sku: 'prodSku3', qty: 1, price: 10 },
+					{ uid: 'prodUid4', parentId: 'prodparentId4', sku: 'prodSku4', qty: 1, price: 10 },
 				];
 				const data = {
 					results,
@@ -1057,27 +1057,27 @@ describe('Beacon', () => {
 
 			it('can process remove event', async () => {
 				const cart = [
-					{ uid: 'prodUidA', parentUid: 'prodParentUidA', sku: 'prodSkuA', qty: 1, price: 10.99 },
-					{ uid: 'prodUidB', parentUid: 'prodParentUidB', sku: 'prodSkuB', qty: 1, price: 10.99 },
-					{ uid: 'prodUid1', parentUid: 'prodParentUid1', sku: 'prodSku1', qty: 1, price: 10 },
-					{ uid: 'prodUid2', parentUid: 'prodParentUid2', sku: 'prodSku2', qty: 1, price: 10 },
-					{ uid: 'prodUid3', parentUid: 'prodParentUid3', sku: 'prodSku3', qty: 1, price: 10 },
-					{ uid: 'prodUid4', parentUid: 'prodParentUid4', sku: 'prodSku4', qty: 1, price: 10 },
+					{ uid: 'prodUidA', parentId: 'prodparentIdA', sku: 'prodSkuA', qty: 1, price: 10.99 },
+					{ uid: 'prodUidB', parentId: 'prodparentIdB', sku: 'prodSkuB', qty: 1, price: 10.99 },
+					{ uid: 'prodUid1', parentId: 'prodparentId1', sku: 'prodSku1', qty: 1, price: 10 },
+					{ uid: 'prodUid2', parentId: 'prodparentId2', sku: 'prodSku2', qty: 1, price: 10 },
+					{ uid: 'prodUid3', parentId: 'prodparentId3', sku: 'prodSku3', qty: 1, price: 10 },
+					{ uid: 'prodUid4', parentId: 'prodparentId4', sku: 'prodSku4', qty: 1, price: 10 },
 				];
 
 				beacon.storage.cart.set(cart);
 
 				const results = [
-					{ uid: 'prodUidA', parentUid: 'prodParentUidA', sku: 'prodSkuA', qty: 1, price: 10.99 },
-					{ uid: 'prodUid1', parentUid: 'prodParentUid1', sku: 'prodSku1', qty: 1, price: 10 },
+					{ uid: 'prodUidA', parentId: 'prodparentIdA', sku: 'prodSkuA', qty: 1, price: 10.99 },
+					{ uid: 'prodUid1', parentId: 'prodparentId1', sku: 'prodSku1', qty: 1, price: 10 },
 				];
 				const data = {
 					results,
 					cart: [
-						{ uid: 'prodUidB', parentUid: 'prodParentUidB', sku: 'prodSkuB', qty: 1, price: 10.99 },
-						{ uid: 'prodUid2', parentUid: 'prodParentUid2', sku: 'prodSku2', qty: 1, price: 10 },
-						{ uid: 'prodUid3', parentUid: 'prodParentUid3', sku: 'prodSku3', qty: 1, price: 10 },
-						{ uid: 'prodUid4', parentUid: 'prodParentUid4', sku: 'prodSku4', qty: 1, price: 10 },
+						{ uid: 'prodUidB', parentId: 'prodparentIdB', sku: 'prodSkuB', qty: 1, price: 10.99 },
+						{ uid: 'prodUid2', parentId: 'prodparentId2', sku: 'prodSku2', qty: 1, price: 10 },
+						{ uid: 'prodUid3', parentId: 'prodparentId3', sku: 'prodSku3', qty: 1, price: 10 },
+						{ uid: 'prodUid4', parentId: 'prodparentId4', sku: 'prodSku4', qty: 1, price: 10 },
 					],
 				};
 
@@ -1115,10 +1115,10 @@ describe('Beacon', () => {
 					state: 'test-state',
 					country: 'test-country',
 					results: [
-						{ uid: 'prodUid1', parentUid: 'prodParentUid1', sku: 'prodSku1', qty: 1, price: 10 },
-						{ uid: 'prodUid2', parentUid: 'prodParentUid2', sku: 'prodSku2', qty: 1, price: 10 },
-						{ uid: 'prodUid3', parentUid: 'prodParentUid3', sku: 'prodSku3', qty: 1, price: 10 },
-						{ uid: 'prodUid4', parentUid: 'prodParentUid4', sku: 'prodSku4', qty: 1, price: 10 },
+						{ uid: 'prodUid1', parentId: 'prodparentId1', sku: 'prodSku1', qty: 1, price: 10 },
+						{ uid: 'prodUid2', parentId: 'prodparentId2', sku: 'prodSku2', qty: 1, price: 10 },
+						{ uid: 'prodUid3', parentId: 'prodparentId3', sku: 'prodSku3', qty: 1, price: 10 },
+						{ uid: 'prodUid4', parentId: 'prodparentId4', sku: 'prodSku4', qty: 1, price: 10 },
 					],
 				};
 
@@ -1221,8 +1221,8 @@ describe('Beacon', () => {
 				{ uid: 'merchandisingBanner' },
 			],
 			results: [
-				{ type: ResultProductType.Product, parentUid: 'parentUid1', uid: 'product1', sku: 'sku1' },
-				{ type: ResultProductType.Product, parentUid: 'parentUid2', uid: 'product2', sku: 'sku2' },
+				{ type: ResultProductType.Product, parentId: 'parentId1', uid: 'product1', sku: 'sku1' },
+				{ type: ResultProductType.Product, parentId: 'parentId2', uid: 'product2', sku: 'sku2' },
 				{ type: ResultProductType.Banner, uid: 'inlineBanner' },
 			],
 			pagination: {
@@ -1311,8 +1311,8 @@ describe('Beacon', () => {
 							data: {
 								...mockData,
 								results: [
-									{ type: ResultProductType.Product, parentUid: 'parentUid3', uid: 'product3', sku: 'sku3' },
-									{ type: ResultProductType.Product, parentUid: 'parentUid4', uid: 'product4', sku: 'sku4' },
+									{ type: ResultProductType.Product, parentId: 'parentId3', uid: 'product3', sku: 'sku3' },
+									{ type: ResultProductType.Product, parentId: 'parentId4', uid: 'product4', sku: 'sku4' },
 									{ type: ResultProductType.Banner, uid: 'inlineBanner1' },
 								],
 								banners: [
@@ -1430,7 +1430,7 @@ describe('Beacon', () => {
 	describe('sendPreflight', () => {
 		it('can sendPreflight via POST', async () => {
 			// only add 1 product to be under threshold and still generate GET request
-			const items = [{ uid: 'uid123', sku: 'sku123', parentUid: 'parentUid123', qty: 1, price: 10.99 }];
+			const items = [{ uid: 'uid123', sku: 'sku123', parentId: 'parentId123', qty: 1, price: 10.99 }];
 
 			beacon.storage.cart.add(items);
 
@@ -1455,7 +1455,7 @@ describe('Beacon', () => {
 
 		it('can sendPreflight via POST to athoscommerce.io', async () => {
 			// only add 1 product to be under threshold and still generate GET request
-			const items = [{ uid: 'uid123', sku: 'sku123', parentUid: 'parentUid123', qty: 1, price: 10.99 }];
+			const items = [{ uid: 'uid123', sku: 'sku123', parentId: 'parentId123', qty: 1, price: 10.99 }];
 
 			const athosSiteId = 'athos-site-id';
 			beacon = new Beacon({...mockGlobals, siteId: athosSiteId}, mockConfig);

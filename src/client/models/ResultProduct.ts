@@ -38,7 +38,7 @@ export interface ResultProduct {
      * @type {string}
      * @memberof ResultProduct
      */
-    parentUid: string;
+    parentId: string;
     /**
      * Unique product identifier of the product interacted with
      * @type {string}
@@ -60,7 +60,7 @@ export interface ResultProduct {
  */
 export function instanceOfResultProduct(value: object): value is ResultProduct {
     if (!('type' in value) || value['type'] === undefined) return false;
-    if (!('parentUid' in value) || value['parentUid'] === undefined) return false;
+    if (!('parentId' in value) || value['parentId'] === undefined) return false;
     if (!('uid' in value) || value['uid'] === undefined) return false;
     return true;
 }
@@ -76,7 +76,7 @@ export function ResultProductFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'type': ResultProductTypeFromJSON(json['type']),
-        'parentUid': json['parentUid'],
+        'parentId': json['parentId'],
         'uid': json['uid'],
         'sku': json['sku'] == null ? undefined : json['sku'],
     };
@@ -94,7 +94,7 @@ export function ResultProductToJSONTyped(value?: ResultProduct | null, ignoreDis
     return {
         
         'type': ResultProductTypeToJSON(value['type']),
-        'parentUid': value['parentUid'],
+        'parentId': value['parentId'],
         'uid': value['uid'],
         'sku': value['sku'],
     };

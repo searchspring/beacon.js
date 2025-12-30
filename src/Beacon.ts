@@ -47,6 +47,8 @@ import {
 	LogSchemaData,
 	ShopperContext,
 	HTTPHeaders,
+	RecommendationsAddtocartSchema,
+	AddtocartSchema,
 } from './client';
 import type {
 	AutocompleteAddtocartRequest,
@@ -310,7 +312,7 @@ export class Beacon {
 					return storedSkus
 						.split(',')
 						.filter((sku) => sku)
-						.map((sku) => ({ parentUid: sku, uid: sku, sku: sku, qty: 1, price: 0 }));
+						.map((sku) => ({ parentId: sku, uid: sku, sku: sku, qty: 1, price: 0 }));
 				}
 
 				return [];
@@ -351,9 +353,9 @@ export class Beacon {
 							} else {
 								isSkuAlreadyInCart.qty += product.qty;
 								isSkuAlreadyInCart.price = product.price || isSkuAlreadyInCart.price;
-								if (product.parentUid !== isSkuAlreadyInCart.parentUid || product.sku !== isSkuAlreadyInCart.sku) {
-									// parentUid or sku are set to the same values if fallback (due to localstorage disabled/full) to storing in cookie.
-									isSkuAlreadyInCart.parentUid = product.parentUid;
+								if (product.parentId !== isSkuAlreadyInCart.parentId || product.sku !== isSkuAlreadyInCart.sku) {
+									// parentId or sku are set to the same values if fallback (due to localstorage disabled/full) to storing in cookie.
+									isSkuAlreadyInCart.parentId = product.parentId;
 									isSkuAlreadyInCart.sku = product.sku;
 								}
 							}
@@ -375,9 +377,9 @@ export class Beacon {
 						if (isSkuAlreadyInCart) {
 							if (isSkuAlreadyInCart.qty > 0) {
 								isSkuAlreadyInCart.qty -= product.qty || 1;
-								if (product.parentUid !== isSkuAlreadyInCart.parentUid || product.sku !== isSkuAlreadyInCart.sku) {
-									// parentUid or sku are set to the same values if fallback (due to localstorage disabled/full) to storing in cookie.
-									isSkuAlreadyInCart.parentUid = product.parentUid;
+								if (product.parentId !== isSkuAlreadyInCart.parentId || product.sku !== isSkuAlreadyInCart.sku) {
+									// parentId or sku are set to the same values if fallback (due to localstorage disabled/full) to storing in cookie.
+									isSkuAlreadyInCart.parentId = product.parentId;
 									isSkuAlreadyInCart.sku = product.sku;
 								}
 							}
@@ -414,7 +416,7 @@ export class Beacon {
 					return storedSkus
 						.split(',')
 						.filter((sku) => sku)
-						.map((sku) => ({ parentUid: sku, uid: sku, sku: sku }));
+						.map((sku) => ({ parentId: sku, uid: sku, sku: sku }));
 				}
 				return [];
 			},
@@ -422,7 +424,7 @@ export class Beacon {
 				const currentViewedItems = this.storage.viewed.get();
 				// remove qty and price if product is provided
 				const normalizedItems: ProductPageviewSchemaDataResult[] = products
-					.map((item) => ({ sku: item.sku, parentUid: item.parentUid, uid: item.uid }))
+					.map((item) => ({ sku: item.sku, parentId: item.parentId, uid: item.uid }))
 					.slice(0, MAX_VIEWED_COUNT);
 
 				const stringifiedNormalizedItems = JSON.stringify(normalizedItems);
@@ -449,7 +451,7 @@ export class Beacon {
 					products.forEach((product) => {
 						const item: ProductPageviewSchemaDataResult = {
 							sku: product.sku,
-							parentUid: product.parentUid,
+							parentId: product.parentId,
 							uid: product.uid,
 						};
 						const isItemAlreadyViewed = viewedProducts.find((viewedProduct) => viewedProduct.uid === item.uid);
@@ -522,7 +524,7 @@ export class Beacon {
 				};
 
 				const request = this.createRequest('autocomplete', 'autocompleteAddtocart', payload);
-				this.sendRequests([request]);
+				this.queueRequest(request);
 			},
 			clickThrough: (event: Payload<ClickthroughSchemaData>) => {
 				const payload: AutocompleteClickthroughRequest = {
@@ -588,7 +590,7 @@ export class Beacon {
 				};
 
 				const request = this.createRequest('search', 'searchAddtocart', payload);
-				this.sendRequests([request]);
+				this.queueRequest(request);
 			},
 			clickThrough: (event: Payload<ClickthroughSchemaData>) => {
 				const payload: SearchClickthroughRequest = {
@@ -654,7 +656,7 @@ export class Beacon {
 				};
 
 				const request = this.createRequest('category', 'categoryAddtocart', payload);
-				this.sendRequests([request]);
+				this.queueRequest(request);
 			},
 			clickThrough: (event: Payload<ClickthroughSchemaData>) => {
 				const payload: CategoryClickthroughRequest = {
@@ -1126,20 +1128,40 @@ export class Beacon {
 				let key = `${request.payload.siteId}||${request.endpoint}`;
 
 				switch (request.endpoint) {
+					case 'recommendationsAddtocart':
+						const recommendationsAddtocart = (request.payload as RecommendationsAddtocartRequest).recommendationsAddtocartSchema;
+						key += additionalRequestKeys(key, 'recommendation', recommendationsAddtocart);
+						appendResults(acc, key, 'recommendationsAddtocartSchema', request);
+						break;
 					case 'recommendationsImpression':
 						const recommendationsImpression = (request.payload as RecommendationsImpressionRequest).recommendationsImpressionSchema;
 						key += additionalRequestKeys(key, 'recommendation', recommendationsImpression);
 						appendResults(acc, key, 'recommendationsImpressionSchema', request);
+						break;
+					case 'searchAddtocart':
+						const searchAddtocart = (request.payload as SearchAddtocartRequest).addtocartSchema;
+						key += additionalRequestKeys(key, 'search', searchAddtocart);
+						appendResults(acc, key, 'addtocartSchema', request);
 						break;
 					case 'searchImpression':
 						const searchImpression = (request.payload as SearchImpressionRequest).impressionSchema;
 						key += additionalRequestKeys(key, 'search', searchImpression);
 						appendResults(acc, key, 'impressionSchema', request);
 						break;
+					case 'autocompleteAddtocart':
+						const autocompleteAddtocart = (request.payload as AutocompleteAddtocartRequest).addtocartSchema;
+						key += additionalRequestKeys(key, 'autocomplete', autocompleteAddtocart);
+						appendResults(acc, key, 'addtocartSchema', request);
+						break;
 					case 'autocompleteImpression':
 						const autocompleteImpression = (request.payload as AutocompleteImpressionRequest).impressionSchema;
 						key += additionalRequestKeys(key, 'autocomplete', autocompleteImpression);
 						appendResults(acc, key, 'impressionSchema', request);
+						break;
+					case 'categoryAddtocart':
+						const categoryAddtocart = (request.payload as CategoryAddtocartRequest).addtocartSchema;
+						key += additionalRequestKeys(key, 'category', categoryAddtocart);
+						appendResults(acc, key, 'addtocartSchema', request);
 						break;
 					case 'categoryImpression':
 						const categoryImpression = (request.payload as CategoryImpressionRequest).impressionSchema;
@@ -1254,7 +1276,7 @@ export function appendResults(
 export function additionalRequestKeys(
 	key: string,
 	type: 'search' | 'autocomplete' | 'category' | 'recommendation',
-	schema: ImpressionSchema | RecommendationsImpressionSchema
+	schema: ImpressionSchema | RecommendationsImpressionSchema | RecommendationsAddtocartSchema | AddtocartSchema
 ): string {
 	let value = key;
 	value += `||${schema.context.pageLoadId}`;

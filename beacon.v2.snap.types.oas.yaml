@@ -1025,11 +1025,11 @@ paths:
                       type: object
                       description: Describes a tracked Searchspring result.
                       required:
-                        - parentUid
+                        - parentId
                         - uid
                       properties:
-                        parentUid:
-                          $ref: '#/components/schemas/parentUid'
+                        parentId:
+                          $ref: '#/components/schemas/parentId'
                         uid:
                           $ref: '#/components/schemas/uid'
                         sku:
@@ -1057,11 +1057,11 @@ paths:
                       type: object
                       description: Describes a tracked Searchspring result.
                       required:
-                        - parentUid
+                        - parentId
                         - uid
                       properties:
-                        parentUid:
-                          $ref: '#/components/schemas/parentUid'
+                        parentId:
+                          $ref: '#/components/schemas/parentId'
                         uid:
                           $ref: '#/components/schemas/uid'
                         sku:
@@ -1810,7 +1810,7 @@ components:
     responseId:
       type: string
       description: Unique ID returned in each API response
-    parentUid:
+    parentId:
       description: Unique product identifier of the parent product interacted with
       type: string
     uid:
@@ -1831,13 +1831,13 @@ components:
       type: object
       description: Product details
       required:
-        - parentUid
+        - parentId
         - uid
         - qty
         - price
       properties:
-        parentUid:
-          $ref: '#/components/schemas/parentUid'
+        parentId:
+          $ref: '#/components/schemas/parentId'
         uid:
           $ref: '#/components/schemas/uid'
         sku:
@@ -1894,13 +1894,13 @@ components:
       description: Describes a tracked result.
       required:
         - type
-        - parentUid
+        - parentId
         - uid
       properties:
         type:
           $ref: '#/components/schemas/result.product.type'
-        parentUid:
-          $ref: '#/components/schemas/parentUid'
+        parentId:
+          $ref: '#/components/schemas/parentId'
         uid:
           $ref: '#/components/schemas/uid'
         sku:
@@ -2328,7 +2328,7 @@ components:
           responseId: a907d0ad-720a-4666-b046-00c0c28fb78d
           results:
             - uid: '8128331907370'
-              parentUid: '8128331900000'
+              parentId: '8128331900000'
               qty: 1
               price: 22
     results-clickthrough:
@@ -2349,7 +2349,7 @@ components:
           responseId: a907d0ad-720a-4666-b046-00c0c28fb78d
           results:
             - type: product
-              parentUid: '8128331900000'
+              parentId: '8128331900000'
               uid: '8128331907370'
     banners-clickthrough:
       value:
@@ -2387,16 +2387,16 @@ components:
           responseId: a907d0ad-720a-4666-b046-00c0c28fb78d
           results:
             - type: product
-              parentUid: '8128331911111'
+              parentId: '8128331911111'
               uid: '8128331907370'
             - type: product
-              parentUid: '8128331922222'
+              parentId: '8128331922222'
               uid: '8128021070122'
             - type: product
-              parentUid: '8128331933333'
+              parentId: '8128331933333'
               uid: '8127879741738'
             - type: product
-              parentUid: '8128331944444'
+              parentId: '8128331944444'
               uid: '8128173736234'
           banners:
             - uid: '8128168755498'
@@ -2418,16 +2418,16 @@ components:
           responseId: a907d0ad-720a-4666-b046-00c0c28fb78d
           results:
             - type: product
-              parentUid: '8128331911111'
+              parentId: '8128331911111'
               uid: '8128331907370'
             - type: product
-              parentUid: '8128331922222'
+              parentId: '8128331922222'
               uid: '8128021070122'
             - type: product
-              parentUid: '8128331933333'
+              parentId: '8128331933333'
               uid: '8127879741738'
             - type: product
-              parentUid: '8128331944444'
+              parentId: '8128331944444'
               uid: '8128173736234'
           banners: []
     banners-impression:
@@ -2498,16 +2498,16 @@ components:
             code: USD
         data:
           results:
-            - parentUid: '0987611111'
+            - parentId: '0987611111'
               uid: '0987654321'
               qty: 1
               price: 39
           cart:
-            - parentUid: '0987622222'
+            - parentId: '0987622222'
               uid: '0987654321'
               qty: 1
               price: 39
-            - parentUid: '0987633333'
+            - parentId: '0987633333'
               uid: '0987654321'
               qty: 1
               price: 39
@@ -2527,12 +2527,12 @@ components:
             code: USD
         data:
           results:
-            - parentUid: '0987633333'
+            - parentId: '0987633333'
               uid: '0987654321'
               qty: 1
               price: 39
           cart:
-            - parentUid: '0987622222'
+            - parentId: '0987622222'
               uid: '0987654321'
               qty: 1
               price: 39
@@ -2553,7 +2553,7 @@ components:
         data:
           responseId: 650f3e4e-1f4b-4c3a-8c3e-0d6f3e4e1f4b
           results:
-            - parentUid: '8128331911111'
+            - parentId: '8128331911111'
               uid: '8128331907370'
               qty: 1
               price: 22
@@ -2575,7 +2575,7 @@ components:
           responseId: a907d0ad-720a-4666-b046-00c0c28fb78d
           results:
             - type: product
-              parentUid: '8128331911111'
+              parentId: '8128331911111'
               uid: '8128331907370'
     examples-render:
       value:
@@ -2706,11 +2706,11 @@ components:
           country: United States
           state: Texas
           results:
-            - parentUid: '1234511111'
+            - parentId: '1234511111'
               uid: '1234567890'
               qty: 1
               price: 22
-            - parentUid: '1234522222'
+            - parentId: '1234522222'
               uid: '0987654321'
               qty: 2
               price: 39
@@ -2730,7 +2730,7 @@ components:
             code: USD
         data:
           result:
-            parentUid: '1234511111'
+            parentId: '1234511111'
             uid: '1234567890'
     components-examples-addtocart:
       value:
@@ -2753,7 +2753,7 @@ components:
           responseId: 42c2dc64-d203-4d74-8122-515f26afb253
           tag: similar
           results:
-            - parentUid: '8128331911111'
+            - parentId: '8128331911111'
               uid: '8128331907370'
               qty: 1
               price: 49.99
@@ -2776,7 +2776,7 @@ components:
           tag: similar
           results:
             - type: product
-              parentUid: '8128331911111'
+              parentId: '8128331911111'
               uid: '8128331907370'
     examples-banners-clickthrough:
       value:
@@ -2819,22 +2819,22 @@ components:
           tag: similar
           results:
             - type: product
-              parentUid: '8128331911111'
+              parentId: '8128331911111'
               uid: '8128331907370'
             - type: product
-              parentUid: '8128331922222'
+              parentId: '8128331922222'
               uid: '8128021070122'
             - type: product
-              parentUid: '8128331933333'
+              parentId: '8128331933333'
               uid: '8127879741738'
             - type: product
-              parentUid: '8128331944444'
+              parentId: '8128331944444'
               uid: '8128173736234'
             - type: product
-              parentUid: '8128331955555'
+              parentId: '8128331955555'
               uid: '8128273711402'
             - type: product
-              parentUid: '8128331966666'
+              parentId: '8128331966666'
               uid: '8128028737834'
           banners:
             - uid: '8128168755498'
@@ -2860,22 +2860,22 @@ components:
           tag: similar
           results:
             - type: product
-              parentUid: '8128331911111'
+              parentId: '8128331911111'
               uid: '8128331907370'
             - type: product
-              parentUid: '8128331922222'
+              parentId: '8128331922222'
               uid: '8128021070122'
             - type: product
-              parentUid: '8128331933333'
+              parentId: '8128331933333'
               uid: '8127879741738'
             - type: product
-              parentUid: '8128331944444'
+              parentId: '8128331944444'
               uid: '8128173736234'
             - type: product
-              parentUid: '8128331955555'
+              parentId: '8128331955555'
               uid: '8128273711402'
             - type: product
-              parentUid: '8128331966666'
+              parentId: '8128331966666'
               uid: '8128028737834'
           banners: []
     examples-banners-impression:
@@ -2938,7 +2938,7 @@ components:
         data:
           responseId: 0217acd9-540c-48f3-bd6d-e23128e99fa8
           results:
-            - parentUid: '8128331911111'
+            - parentId: '8128331911111'
               uid: '8128331907370'
               qty: 1
               price: 29.99

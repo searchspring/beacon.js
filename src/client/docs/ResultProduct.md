@@ -8,7 +8,7 @@ Describes a tracked result.
 Name | Type
 ------------ | -------------
 `type` | [ResultProductType](ResultProductType.md)
-`parentUid` | string
+`parentId` | string
 `uid` | string
 `sku` | string
 
@@ -20,7 +20,7 @@ import type { ResultProduct } from ''
 // TODO: Update the object below with actual values
 const example = {
   "type": null,
-  "parentUid": null,
+  "parentId": null,
   "uid": null,
   "sku": null,
 } satisfies ResultProduct

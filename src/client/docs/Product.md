@@ -7,7 +7,7 @@ Product details
 
 Name | Type
 ------------ | -------------
-`parentUid` | string
+`parentId` | string
 `uid` | string
 `sku` | string
 `qty` | number
@@ -20,7 +20,7 @@ import type { Product } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "parentUid": null,
+  "parentId": null,
   "uid": null,
   "sku": null,
   "qty": null,

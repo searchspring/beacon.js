@@ -24,7 +24,7 @@ export interface Product {
      * @type {string}
      * @memberof Product
      */
-    parentUid: string;
+    parentId: string;
     /**
      * Unique product identifier of the product interacted with
      * @type {string}
@@ -55,7 +55,7 @@ export interface Product {
  * Check if a given object implements the Product interface.
  */
 export function instanceOfProduct(value: object): value is Product {
-    if (!('parentUid' in value) || value['parentUid'] === undefined) return false;
+    if (!('parentId' in value) || value['parentId'] === undefined) return false;
     if (!('uid' in value) || value['uid'] === undefined) return false;
     if (!('qty' in value) || value['qty'] === undefined) return false;
     if (!('price' in value) || value['price'] === undefined) return false;
@@ -72,7 +72,7 @@ export function ProductFromJSONTyped(json: any, ignoreDiscriminator: boolean): P
     }
     return {
         
-        'parentUid': json['parentUid'],
+        'parentId': json['parentId'],
         'uid': json['uid'],
         'sku': json['sku'] == null ? undefined : json['sku'],
         'qty': json['qty'],
@@ -91,7 +91,7 @@ export function ProductToJSONTyped(value?: Product | null, ignoreDiscriminator: 
 
     return {
         
-        'parentUid': value['parentUid'],
+        'parentId': value['parentId'],
         'uid': value['uid'],
         'sku': value['sku'],
         'qty': value['qty'],
