@@ -54,7 +54,9 @@ const beacon = new Beacon(
 | apis | configure various api options |  |   |
 | apis.fetch | FetchAPI reference to use | window.fetch |   |
 | requesters.personalization.origin | alternative endpoint for personalization preflight api | https://{siteId}.a.searchspring.io |   |
+| requesters.personalization.headers | http headers for personalization preflight api | https://{siteId}.a.searchspring.io |   |
 | requesters.beacon.origin | alternative endpoint for beacon api | https://beacon.searchspring.io/beacon/v2 |   |
+| requesters.beacon.headers | http headers for beacon api | https://beacon.searchspring.io/beacon/v2 |   |
 | href | set href | window.location.href |   |
 | userAgent | set userAgent | navigator.userAgent |   |
 
@@ -67,7 +69,7 @@ An optional `siteId` can be provided to each event to override the siteId provid
 
 ```typescript
 beacon.events.autocomplete.render({
-    data: AutocompleteSchemaData,
+    data,
     siteId: 'abc123'
 });
 ```
@@ -81,177 +83,133 @@ beacon.events.shopper.login({ id: 'shopper-id' });
 ### Autocomplete Render
 
 ```typescript
-beacon.events.autocomplete.render({
-    data: AutocompleteSchemaData
-});
+beacon.events.autocomplete.render({ data });
 ```
 
 ### Autocomplete Impression
 
 ```typescript
-beacon.events.autocomplete.impression({
-    data: AutocompleteSchemaData
-});
+beacon.events.autocomplete.impression({ data });
 ```
 
 ### Autocomplete Add to Cart
 
 ```typescript
-beacon.events.autocomplete.addToCart({
-    data: AutocompleteAddToCartSchemaData
-});
+beacon.events.autocomplete.addToCart({ data });
 ```
 
 ### Autocomplete Click Through
 
 ```typescript
-beacon.events.autocomplete.clickThrough({
-    data: AutocompleteSchemaData
-});
+beacon.events.autocomplete.clickThrough({ data });
 ```
 
 ### Autocomplete Redirect
 
 ```typescript
-beacon.events.autocomplete.redirect({
-    data: AutocompleteRedirectSchemaData
-});
+beacon.events.autocomplete.redirect({ data });
 ```
 
 ### Search Render
 
 ```typescript
-beacon.events.search.render({
-    data: SearchSchemaData
-});
+beacon.events.search.render({ data });
 ```
 
 ### Search Impression
 
 ```typescript
-beacon.events.search.impression({
-    data: SearchSchemaData
-});
+beacon.events.search.impression({ data });
 ```
 
 ### Search Add to Cart
 
 ```typescript
-beacon.events.search.addToCart({
-    data: SearchAddToCartSchemaData
-});
+beacon.events.search.addToCart({ data });
 ```
 
 ### Search Click Through
 
 ```typescript
-beacon.events.search.clickThrough({
-    data: SearchSchemaData
-});
+beacon.events.search.clickThrough({ data });
 ```
 
 ### Search Redirect
 
 ```typescript
-beacon.events.search.redirect({
-    data: SearchRedirectSchemaData
-});
+beacon.events.search.redirect({ data });
 ```
 
 ### Category Render
 
 ```typescript
-beacon.events.category.render({
-    data: CategorySchemaData
-});
+beacon.events.category.render({ data });
 ```
 
 ### Category Impression
 
 ```typescript
-beacon.events.category.impression({
-    data: CategorySchemaData
-});
+beacon.events.category.impression({ data });
 ```
 
 ### Category Add to Cart
 
 ```typescript
-beacon.events.category.addToCart({
-    data: CategoryAddToCartSchemaData
-});
+beacon.events.category.addToCart({ data });
 ```
 
 ### Category Click Through
 
 ```typescript
-beacon.events.category.clickThrough({
-    data: CategorySchemaData
-});
+beacon.events.category.clickThrough({ data });
 ```
 
 ### Recommendations Render
 
 ```typescript
-beacon.events.recommendations.render({
-    data: RecommendationsSchemaData
-});
+beacon.events.recommendations.render({ data });
 ```
 
 ### Recommendations Impression
 
 ```typescript
-beacon.events.recommendations.impression({
-    data: RecommendationsSchemaData
-});
+beacon.events.recommendations.impression({ data });
 ```
 
 ### Recommendations Add to Cart
 
 ```typescript
-beacon.events.recommendations.addToCart({
-    data: RecommendationsAddToCartSchemaData
-});
+beacon.events.recommendations.addToCart({ data });
 ```
 
 ### Recommendations Click Through
 
 ```typescript
-beacon.events.recommendations.clickThrough({
-    data: RecommendationsSchemaData
-}); 
+beacon.events.recommendations.clickThrough({ data });
 ```
 
 ### Product Page View
 
 ```typescript
-beacon.events.product.pageView({
-    data: ProductPageViewSchemaData
-});
+beacon.events.product.pageView({ data });
 ```
 
 ### Cart Add
 
 ```typescript
-beacon.events.cart.add({
-    data: CartSchemaData
-});
+beacon.events.cart.add({ data });
 ``` 
 
 ### Cart Remove
 
 ```typescript
-beacon.events.cart.remove({
-    data: CartSchemaData
-});
+beacon.events.cart.remove({ data });
 ```
 
 ### Order Transaction
 
 ```typescript
-beacon.events.order.transaction({
-    data: OrderTransactionSchemaData
-});
+beacon.events.order.transaction({ data });
 ```
 
 

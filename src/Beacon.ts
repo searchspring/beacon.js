@@ -91,15 +91,16 @@ export type BeaconConfig = {
 	requesters?: {
 		personalization?: {
 			origin?: string;
+			headers?: HTTPHeaders;
 		};
 		beacon?: {
 			origin?: string;
+			headers?: HTTPHeaders;
 		};
 	};
 	apis?: {
 		fetch?: FetchAPI;
 	};
-	headers?: HTTPHeaders;
 	href?: string;
 	userAgent?: string;
 };
@@ -1097,15 +1098,14 @@ export class Beacon {
 		for (const request of requests) {
 			const api = this.getApiClient(request.apiType);
 			const apiMethod = request.endpoint;
-
-			const isJSON = this.config.headers && 'Content-Type' in this.config.headers && this.config.headers['Content-Type'] === 'application/json'
-
 			const initOverrides: InitOverrideFunction = async ({ init }) => {
+				const headers = { ...init.headers, ...this.config.requesters?.beacon?.headers || {} };
+				const isJSON = headers && 'Content-Type' in headers && headers['Content-Type'] === 'application/json';
 				return {
 					// Cypress intecepts does not support keepalive
 					keepalive: this.mode === 'production' ? true : undefined,
 					body: isJSON ? init.body : JSON.stringify(init.body),
-					headers: this.config.headers ? { ...init.headers, ...this.config.headers } : init.headers,
+					headers,
 				};
 			};
 
@@ -1225,6 +1225,7 @@ export class Beacon {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
+						...this.config.requesters?.personalization?.headers || {},
 					},
 					body: JSON.stringify(preflightParams),
 					keepalive: true,

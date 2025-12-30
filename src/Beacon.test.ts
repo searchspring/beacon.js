@@ -36,8 +36,12 @@ describe('Beacon', () => {
 		apis: {
 			fetch: mockFetchApi,
 		},
-		headers: {
-			'Content-Type': 'application/json',
+		requesters: {
+			beacon: {
+				headers: {
+					'Content-Type': 'application/json',
+				}
+			}
 		},
 		mode: 'development' as const,
 	};
