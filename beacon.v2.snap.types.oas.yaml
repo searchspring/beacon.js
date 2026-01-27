@@ -1,14 +1,14 @@
 openapi: 3.1.0
 info:
-  version: 2.2.45
-  title: beacon.searchspring.io
+  version: 2.2.48
+  title: analytics.searchspring.net
   x-logo:
-    url: ./images/searchspring_logo.svg
-    altText: Searchspring Snap
+    url: ./images/athos_commerce_logo.png
+    altText: Athos Commerce logo
   contact:
-    name: Searchspring
+    name: Athos Commerce
 servers:
-  - url: https://beacon.searchspring.io/beacon/v2
+  - url: https://analytics.searchspring.net/beacon/v2
     description: Beacon v2
 tags:
   - name: Autocomplete
@@ -16,7 +16,7 @@ tags:
   - name: Cart
     description: Cart tracking events
   - name: Category
-    description: Category results page tracking events. Payload data sourced from the [Search API](https://docs.searchspring.com/reference/get-search) request parameters and response body. **If you are not integrating Searchspring on category pages, omit the usage of these endpoints.**
+    description: Category results page tracking events. Payload data sourced from the [Search API](https://docs.searchspring.com/reference/get-search) request parameters and response body. **If you are not integrating Athos Commerce on category pages, omit the usage of these endpoints.**
   - name: Error Logs
     description: Error log events
   - name: Messaging Recommendations
@@ -37,7 +37,7 @@ paths:
       tags:
         - Autocomplete
       summary: addtocart
-      description: <i>/beacon/v2/{siteId}/autocomplete/addtocart</i><br><br>Shopper adds a Searchspring autocomplete result to the cart via a `Quick Add to Cart` button in the Autocomplete Module. **If frontend `Quick Add to Cart` is not implemented, omit usage of this endpoint.**
+      description: <i>/beacon/v2/{siteId}/autocomplete/addtocart</i><br><br>Shopper adds a Athos Commerce autocomplete result to the cart via a `Quick Add to Cart` button in the Autocomplete Module. **If frontend `Quick Add to Cart` is not implemented, omit usage of this endpoint.**
       operationId: autocomplete-addtocart
       security:
         - {}
@@ -48,7 +48,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -87,7 +87,7 @@ paths:
       tags:
         - Autocomplete
       summary: clickthrough
-      description: <i>/beacon/v2/{siteId}/autocomplete/clickthrough</i><br><br>Shopper clicks on a Searchspring autocomplete search result rendered in the Autocomplete Module, and is taken to the product detail page (PDP).
+      description: <i>/beacon/v2/{siteId}/autocomplete/clickthrough</i><br><br>Shopper clicks on a Athos Commerce autocomplete search result rendered in the Autocomplete Module, and is taken to the product detail page (PDP).
       operationId: autocomplete-clickthrough
       security:
         - {}
@@ -98,7 +98,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -141,7 +141,7 @@ paths:
       tags:
         - Autocomplete
       summary: impression
-      description: <i>/beacon/v2/{siteId}/autocomplete/impression</i><br><br>Shopper views the rendered Searchspring autocomplete results in the Autocomplete Module.
+      description: <i>/beacon/v2/{siteId}/autocomplete/impression</i><br><br>Shopper views the rendered Athos Commerce autocomplete results in the Autocomplete Module.
       operationId: autocomplete-impression
       security:
         - {}
@@ -152,7 +152,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -199,7 +199,7 @@ paths:
       tags:
         - Autocomplete
       summary: redirect
-      description: <i>/beacon/v2/{siteId}/autocomplete/redirect</i><br><br>Shopper types in the searchbar and an Autocomplete Module with Searchspring autocomplete search results are rendered, but a redirect URL is returned in the Autocomplete API response and the shopper is redirected to the returned redirect URL.
+      description: <i>/beacon/v2/{siteId}/autocomplete/redirect</i><br><br>Shopper types in the searchbar and an Autocomplete Module with Athos Commerce autocomplete search results are rendered, but a redirect URL is returned in the Autocomplete API response and the shopper is redirected to the returned redirect URL.
       operationId: autocomplete-redirect
       security:
         - {}
@@ -210,7 +210,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -249,7 +249,7 @@ paths:
       tags:
         - Autocomplete
       summary: render
-      description: <i>/beacon/v2/{siteId}/autocomplete/render</i><br><br>Shopper types in the searchbar and an Autocomplete Module with Searchspring autocomplete search results are rendered.
+      description: <i>/beacon/v2/{siteId}/autocomplete/render</i><br><br>Shopper types in the searchbar and an Autocomplete Module with Athos Commerce autocomplete search results are rendered.
       operationId: autocomplete-render
       security:
         - {}
@@ -260,7 +260,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -310,7 +310,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Cart update payload
         required: true
@@ -358,7 +358,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Cart update payload
         required: true
@@ -395,7 +395,7 @@ paths:
       tags:
         - Category
       summary: addtocart
-      description: <i>/beacon/v2/{siteId}/category/addtocart</i><br><br>Shopper lands on a category results page where Searchspring results are rendered, and adds a result to the cart via a `Quick Add to Cart` button. **If frontend `Quick Add to Cart` is not implemented, omit usage of this endpoint.**
+      description: <i>/beacon/v2/{siteId}/category/addtocart</i><br><br>Shopper lands on a category results page where Athos Commerce results are rendered, and adds a result to the cart via a `Quick Add to Cart` button. **If frontend `Quick Add to Cart` is not implemented, omit usage of this endpoint.**
       operationId: category-addtocart
       security:
         - {}
@@ -406,7 +406,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -445,7 +445,7 @@ paths:
       tags:
         - Category
       summary: clickthrough
-      description: <i>/beacon/v2/{siteId}/category/clickthrough</i><br><br>Shopper lands on a category results page, clicks on a Searchspring result, and will be taken to the product detail page (PDP).
+      description: <i>/beacon/v2/{siteId}/category/clickthrough</i><br><br>Shopper lands on a category results page, clicks on a Athos Commerce result, and will be taken to the product detail page (PDP).
       operationId: category-clickthrough
       security:
         - {}
@@ -456,7 +456,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -499,7 +499,7 @@ paths:
       tags:
         - Category
       summary: impression
-      description: <i>/beacon/v2/{siteId}/category/impression</i><br><br>Shopper lands on a category results page and Searchspring results receive an impression.
+      description: <i>/beacon/v2/{siteId}/category/impression</i><br><br>Shopper lands on a category results page and Athos Commerce results receive an impression.
       operationId: category-impression
       security:
         - {}
@@ -510,7 +510,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -557,7 +557,7 @@ paths:
       tags:
         - Category
       summary: render
-      description: <i>/beacon/v2/{siteId}/category/render</i><br><br>Shopper lands on a category results page and Searchspring results are rendered.
+      description: <i>/beacon/v2/{siteId}/category/render</i><br><br>Shopper lands on a category results page and Athos Commerce results are rendered.
       operationId: category-render
       security:
         - {}
@@ -568,7 +568,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -618,7 +618,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Messaging recommendations payload
         required: true
@@ -666,7 +666,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Messaging recommendations payload
         required: true
@@ -714,7 +714,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Personalization error log
         required: true
@@ -764,7 +764,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Shopify Pixel extension error log
         required: true
@@ -814,7 +814,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Snap error log
         required: true
@@ -864,7 +864,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Order transaction payload
         required: true
@@ -914,6 +914,7 @@ paths:
                       type: string
                     results:
                       type: array
+                      description: Describes tracked Athos Commerce results
                       items:
                         $ref: '#/components/schemas/product'
             examples:
@@ -964,6 +965,7 @@ paths:
                       type: string
                     results:
                       type: array
+                      description: Describes tracked Athos Commerce results
                       items:
                         $ref: '#/components/schemas/product'
             examples:
@@ -1000,7 +1002,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Product page view payload
         required: true
@@ -1023,7 +1025,7 @@ paths:
                   properties:
                     result:
                       type: object
-                      description: Describes a tracked Searchspring result.
+                      description: Describes a tracked Athos Commerce result.
                       required:
                         - parentId
                         - uid
@@ -1055,7 +1057,7 @@ paths:
                   properties:
                     result:
                       type: object
-                      description: Describes a tracked Searchspring result.
+                      description: Describes a tracked Athos Commerce result.
                       required:
                         - parentId
                         - uid
@@ -1089,7 +1091,7 @@ paths:
       tags:
         - Recommendations
       summary: addtocart
-      description: <i>/beacon/v2/{siteId}/recommendations/addtocart</i><br><br>Shopper adds a Searchspring personalized recommendation result to the cart via a `Quick Add to Cart` button in the rendered product card. **If frontend `Quick Add to Cart` is not implemented, omit usage of this endpoint.**
+      description: <i>/beacon/v2/{siteId}/recommendations/addtocart</i><br><br>Shopper adds a Athos Commerce personalized recommendation result to the cart via a `Quick Add to Cart` button in the rendered product card. **If frontend `Quick Add to Cart` is not implemented, omit usage of this endpoint.**
       operationId: recommendations-addtocart
       security:
         - {}
@@ -1100,7 +1102,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Recommendations payload
         required: true
@@ -1139,7 +1141,7 @@ paths:
       tags:
         - Recommendations
       summary: clickthrough
-      description: <i>/beacon/v2/{siteId}/recommendations/clickthrough</i><br><br>Shopper clicks on a rendered Searchspring personalized recommended result, and is taken to the product detail page (PDP).
+      description: <i>/beacon/v2/{siteId}/recommendations/clickthrough</i><br><br>Shopper clicks on a rendered Athos Commerce personalized recommended result, and is taken to the product detail page (PDP).
       operationId: recommendations-clickthrough
       security:
         - {}
@@ -1150,7 +1152,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Recommendations payload
         required: true
@@ -1193,7 +1195,7 @@ paths:
       tags:
         - Recommendations
       summary: impression
-      description: <i>/beacon/v2/{siteId}/recommendations/impression</i><br><br>Shopper scrolls into view rendered Searchspring personalized recommended results. Results sent ***must*** only be results in the shoppers view at the time of the event.
+      description: <i>/beacon/v2/{siteId}/recommendations/impression</i><br><br>Shopper scrolls into view rendered Athos Commerce personalized recommended results. Results sent ***must*** only be results in the shoppers view at the time of the event.
       operationId: recommendations-impression
       security:
         - {}
@@ -1204,7 +1206,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Recommendations payload
         required: true
@@ -1251,7 +1253,7 @@ paths:
       tags:
         - Recommendations
       summary: render
-      description: <i>/beacon/v2/{siteId}/recommendations/render</i><br><br>Shopper navigates to a page where Searchspring personalized recommendations are requested from the [Personalized Recommendations API endpoint](https://docs.searchspring.com/reference/get-recommendations) and rendered on the page.
+      description: <i>/beacon/v2/{siteId}/recommendations/render</i><br><br>Shopper navigates to a page where Athos Commerce personalized recommendations are requested from the [Personalized Recommendations API endpoint](https://docs.searchspring.com/reference/get-recommendations) and rendered on the page.
       operationId: recommendations-render
       security:
         - {}
@@ -1262,7 +1264,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Recommendations payload
         required: true
@@ -1301,7 +1303,7 @@ paths:
       tags:
         - Search
       summary: addtocart
-      description: <i>/beacon/v2/{siteId}/search/addtocart</i><br><br>This event should be triggered when a shopper lands on a search results page where Searchspring search results are rendered, and adds a result to the cart via a `Quick Add to Cart` button. **If frontend `Quick Add to Cart` is not implemented, omit usage of this endpoint.**
+      description: <i>/beacon/v2/{siteId}/search/addtocart</i><br><br>This event should be triggered when a shopper lands on a search results page where Athos Commerce search results are rendered, and adds a result to the cart via a `Quick Add to Cart` button. **If frontend `Quick Add to Cart` is not implemented, omit usage of this endpoint.**
       operationId: search-addtocart
       security:
         - {}
@@ -1312,7 +1314,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -1351,7 +1353,7 @@ paths:
       tags:
         - Search
       summary: clickthrough
-      description: <i>/beacon/v2/{siteId}/search/clickthrough</i><br><br>This event should be triggered when a shopper lands on a search results page, clicks on a Searchspring search result, and will be taken to the product detail page (PDP).
+      description: <i>/beacon/v2/{siteId}/search/clickthrough</i><br><br>This event should be triggered when a shopper lands on a search results page, clicks on a Athos Commerce search result, and will be taken to the product detail page (PDP).
       operationId: search-clickthrough
       security:
         - {}
@@ -1362,7 +1364,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -1405,7 +1407,7 @@ paths:
       tags:
         - Search
       summary: impression
-      description: <i>/beacon/v2/{siteId}/search/impression</i><br><br>This event should be triggered when a shopper lands on a search results page and Searchspring search results receive an impression.
+      description: <i>/beacon/v2/{siteId}/search/impression</i><br><br>This event should be triggered when a shopper lands on a search results page and Athos Commerce search results receive an impression.
       operationId: search-impression
       security:
         - {}
@@ -1416,7 +1418,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -1463,7 +1465,7 @@ paths:
       tags:
         - Search
       summary: redirect
-      description: <i>/beacon/v2/{siteId}/search/redirect</i><br><br>This event should be triggered after a shopper lands on a search results page where Searchspring search results are rendered, but a redirect URL is returned in the Search API response and the shopper is redirected to the returned redirect URL.
+      description: <i>/beacon/v2/{siteId}/search/redirect</i><br><br>This event should be triggered after a shopper lands on a search results page where Athos Commerce search results are rendered, but a redirect URL is returned in the Search API response and the shopper is redirected to the returned redirect URL.
       operationId: search-redirect
       security:
         - {}
@@ -1474,7 +1476,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -1513,7 +1515,7 @@ paths:
       tags:
         - Search
       summary: render
-      description: <i>/beacon/v2/{siteId}/search/render</i><br><br>This event should be triggered when a shopper lands on a search results page and Searchspring search results are rendered.
+      description: <i>/beacon/v2/{siteId}/search/render</i><br><br>This event should be triggered when a shopper lands on a search results page and Athos Commerce search results are rendered.
       operationId: search-render
       security:
         - {}
@@ -1524,7 +1526,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -1574,7 +1576,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Messaging recommendations payload
         required: true
@@ -1622,7 +1624,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Messaging recommendations payload
         required: true
@@ -1670,7 +1672,7 @@ paths:
             type: string
             pattern: '[a-z0-9]{6}'
           required: true
-          description: Customer siteId found in the SMC (Searchspring Management Console)
+          description: Customer siteId found in the Athos Console or Athos Management Console
       requestBody:
         description: Results payload
         required: true
@@ -2632,7 +2634,7 @@ components:
           sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
           pageLoadId: 41f87850-c33b-4222-952a-f17db729ea31
           shopperId: user123456
-          initiator: searchspring/snap/preact/0.49.1
+          initiator: athoscommerce/snap/preact/0.49.1
           attribution:
             - type: test
               id: '1234567890'
@@ -2663,7 +2665,7 @@ components:
           sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
           pageLoadId: 41f87850-c33b-4222-952a-f17db729ea31
           shopperId: user123456
-          initiator: searchspring/snap/preact/0.49.1
+          initiator: athoscommerce/snap/preact/0.49.1
           attribution:
             - type: test
               id: '1234567890'
@@ -2986,7 +2988,7 @@ components:
           sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
           pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
           shopperId: user123456
-          initiator: searchspring/snap/preact/0.49.1
+          initiator: athoscommerce/snap/preact/0.49.1
           currency:
             code: USD
   responses:

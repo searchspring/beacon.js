@@ -1,6 +1,6 @@
 # RecommendationsApi
 
-All URIs are relative to *https://beacon.searchspring.io/beacon/v2*
+All URIs are relative to *https://analytics.searchspring.net/beacon/v2*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
@@ -17,7 +17,7 @@ All URIs are relative to *https://beacon.searchspring.io/beacon/v2*
 
 addtocart
 
-&lt;i&gt;/beacon/v2/{siteId}/recommendations/addtocart&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper adds a Searchspring personalized recommendation result to the cart via a &#x60;Quick Add to Cart&#x60; button in the rendered product card. **If frontend &#x60;Quick Add to Cart&#x60; is not implemented, omit usage of this endpoint.**
+&lt;i&gt;/beacon/v2/{siteId}/recommendations/addtocart&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper adds a Athos Commerce personalized recommendation result to the cart via a &#x60;Quick Add to Cart&#x60; button in the rendered product card. **If frontend &#x60;Quick Add to Cart&#x60; is not implemented, omit usage of this endpoint.**
 
 ### Example
 
@@ -33,7 +33,7 @@ async function example() {
   const api = new RecommendationsApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // RecommendationsAddtocartSchema | Recommendations payload
     recommendationsAddtocartSchema: ...,
@@ -56,7 +56,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **recommendationsAddtocartSchema** | [RecommendationsAddtocartSchema](RecommendationsAddtocartSchema.md) | Recommendations payload | |
 
 ### Return type
@@ -93,7 +93,7 @@ No authorization required
 
 clickthrough
 
-&lt;i&gt;/beacon/v2/{siteId}/recommendations/clickthrough&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper clicks on a rendered Searchspring personalized recommended result, and is taken to the product detail page (PDP).
+&lt;i&gt;/beacon/v2/{siteId}/recommendations/clickthrough&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper clicks on a rendered Athos Commerce personalized recommended result, and is taken to the product detail page (PDP).
 
 ### Example
 
@@ -109,7 +109,7 @@ async function example() {
   const api = new RecommendationsApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // RecommendationsClickthroughSchema | Recommendations payload
     recommendationsClickthroughSchema: ...,
@@ -132,7 +132,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **recommendationsClickthroughSchema** | [RecommendationsClickthroughSchema](RecommendationsClickthroughSchema.md) | Recommendations payload | |
 
 ### Return type
@@ -169,7 +169,7 @@ No authorization required
 
 impression
 
-&lt;i&gt;/beacon/v2/{siteId}/recommendations/impression&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper scrolls into view rendered Searchspring personalized recommended results. Results sent ***must*** only be results in the shoppers view at the time of the event.
+&lt;i&gt;/beacon/v2/{siteId}/recommendations/impression&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper scrolls into view rendered Athos Commerce personalized recommended results. Results sent ***must*** only be results in the shoppers view at the time of the event.
 
 ### Example
 
@@ -185,7 +185,7 @@ async function example() {
   const api = new RecommendationsApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // RecommendationsImpressionSchema | Recommendations payload
     recommendationsImpressionSchema: ...,
@@ -208,7 +208,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **recommendationsImpressionSchema** | [RecommendationsImpressionSchema](RecommendationsImpressionSchema.md) | Recommendations payload | |
 
 ### Return type
@@ -245,7 +245,7 @@ No authorization required
 
 render
 
-&lt;i&gt;/beacon/v2/{siteId}/recommendations/render&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper navigates to a page where Searchspring personalized recommendations are requested from the [Personalized Recommendations API endpoint](https://docs.searchspring.com/reference/get-recommendations) and rendered on the page.
+&lt;i&gt;/beacon/v2/{siteId}/recommendations/render&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper navigates to a page where Athos Commerce personalized recommendations are requested from the [Personalized Recommendations API endpoint](https://docs.searchspring.com/reference/get-recommendations) and rendered on the page.
 
 ### Example
 
@@ -261,7 +261,7 @@ async function example() {
   const api = new RecommendationsApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // RecommendationsRenderSchema | Recommendations payload
     recommendationsRenderSchema: ...,
@@ -284,7 +284,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **recommendationsRenderSchema** | [RecommendationsRenderSchema](RecommendationsRenderSchema.md) | Recommendations payload | |
 
 ### Return type

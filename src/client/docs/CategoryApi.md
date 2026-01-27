@@ -1,6 +1,6 @@
 # CategoryApi
 
-All URIs are relative to *https://beacon.searchspring.io/beacon/v2*
+All URIs are relative to *https://analytics.searchspring.net/beacon/v2*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
@@ -17,7 +17,7 @@ All URIs are relative to *https://beacon.searchspring.io/beacon/v2*
 
 addtocart
 
-&lt;i&gt;/beacon/v2/{siteId}/category/addtocart&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper lands on a category results page where Searchspring results are rendered, and adds a result to the cart via a &#x60;Quick Add to Cart&#x60; button. **If frontend &#x60;Quick Add to Cart&#x60; is not implemented, omit usage of this endpoint.**
+&lt;i&gt;/beacon/v2/{siteId}/category/addtocart&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper lands on a category results page where Athos Commerce results are rendered, and adds a result to the cart via a &#x60;Quick Add to Cart&#x60; button. **If frontend &#x60;Quick Add to Cart&#x60; is not implemented, omit usage of this endpoint.**
 
 ### Example
 
@@ -33,7 +33,7 @@ async function example() {
   const api = new CategoryApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // AddtocartSchema | Results payload
     addtocartSchema: ...,
@@ -56,7 +56,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **addtocartSchema** | [AddtocartSchema](AddtocartSchema.md) | Results payload | |
 
 ### Return type
@@ -93,7 +93,7 @@ No authorization required
 
 clickthrough
 
-&lt;i&gt;/beacon/v2/{siteId}/category/clickthrough&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper lands on a category results page, clicks on a Searchspring result, and will be taken to the product detail page (PDP).
+&lt;i&gt;/beacon/v2/{siteId}/category/clickthrough&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper lands on a category results page, clicks on a Athos Commerce result, and will be taken to the product detail page (PDP).
 
 ### Example
 
@@ -109,7 +109,7 @@ async function example() {
   const api = new CategoryApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // ClickthroughSchema | Results payload
     clickthroughSchema: ...,
@@ -132,7 +132,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **clickthroughSchema** | [ClickthroughSchema](ClickthroughSchema.md) | Results payload | |
 
 ### Return type
@@ -169,7 +169,7 @@ No authorization required
 
 impression
 
-&lt;i&gt;/beacon/v2/{siteId}/category/impression&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper lands on a category results page and Searchspring results receive an impression.
+&lt;i&gt;/beacon/v2/{siteId}/category/impression&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper lands on a category results page and Athos Commerce results receive an impression.
 
 ### Example
 
@@ -185,7 +185,7 @@ async function example() {
   const api = new CategoryApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // ImpressionSchema | Results payload
     impressionSchema: ...,
@@ -208,7 +208,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **impressionSchema** | [ImpressionSchema](ImpressionSchema.md) | Results payload | |
 
 ### Return type
@@ -245,7 +245,7 @@ No authorization required
 
 render
 
-&lt;i&gt;/beacon/v2/{siteId}/category/render&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper lands on a category results page and Searchspring results are rendered.
+&lt;i&gt;/beacon/v2/{siteId}/category/render&lt;/i&gt;&lt;br&gt;&lt;br&gt;Shopper lands on a category results page and Athos Commerce results are rendered.
 
 ### Example
 
@@ -261,7 +261,7 @@ async function example() {
   const api = new CategoryApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // RenderSchema | Results payload
     renderSchema: ...,
@@ -284,7 +284,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **renderSchema** | [RenderSchema](RenderSchema.md) | Results payload | |
 
 ### Return type

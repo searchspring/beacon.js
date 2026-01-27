@@ -1,6 +1,6 @@
 # SearchApi
 
-All URIs are relative to *https://beacon.searchspring.io/beacon/v2*
+All URIs are relative to *https://analytics.searchspring.net/beacon/v2*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
@@ -18,7 +18,7 @@ All URIs are relative to *https://beacon.searchspring.io/beacon/v2*
 
 addtocart
 
-&lt;i&gt;/beacon/v2/{siteId}/search/addtocart&lt;/i&gt;&lt;br&gt;&lt;br&gt;This event should be triggered when a shopper lands on a search results page where Searchspring search results are rendered, and adds a result to the cart via a &#x60;Quick Add to Cart&#x60; button. **If frontend &#x60;Quick Add to Cart&#x60; is not implemented, omit usage of this endpoint.**
+&lt;i&gt;/beacon/v2/{siteId}/search/addtocart&lt;/i&gt;&lt;br&gt;&lt;br&gt;This event should be triggered when a shopper lands on a search results page where Athos Commerce search results are rendered, and adds a result to the cart via a &#x60;Quick Add to Cart&#x60; button. **If frontend &#x60;Quick Add to Cart&#x60; is not implemented, omit usage of this endpoint.**
 
 ### Example
 
@@ -34,7 +34,7 @@ async function example() {
   const api = new SearchApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // AddtocartSchema | Results payload
     addtocartSchema: ...,
@@ -57,7 +57,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **addtocartSchema** | [AddtocartSchema](AddtocartSchema.md) | Results payload | |
 
 ### Return type
@@ -94,7 +94,7 @@ No authorization required
 
 clickthrough
 
-&lt;i&gt;/beacon/v2/{siteId}/search/clickthrough&lt;/i&gt;&lt;br&gt;&lt;br&gt;This event should be triggered when a shopper lands on a search results page, clicks on a Searchspring search result, and will be taken to the product detail page (PDP).
+&lt;i&gt;/beacon/v2/{siteId}/search/clickthrough&lt;/i&gt;&lt;br&gt;&lt;br&gt;This event should be triggered when a shopper lands on a search results page, clicks on a Athos Commerce search result, and will be taken to the product detail page (PDP).
 
 ### Example
 
@@ -110,7 +110,7 @@ async function example() {
   const api = new SearchApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // ClickthroughSchema | Results payload
     clickthroughSchema: ...,
@@ -133,7 +133,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **clickthroughSchema** | [ClickthroughSchema](ClickthroughSchema.md) | Results payload | |
 
 ### Return type
@@ -170,7 +170,7 @@ No authorization required
 
 impression
 
-&lt;i&gt;/beacon/v2/{siteId}/search/impression&lt;/i&gt;&lt;br&gt;&lt;br&gt;This event should be triggered when a shopper lands on a search results page and Searchspring search results receive an impression.
+&lt;i&gt;/beacon/v2/{siteId}/search/impression&lt;/i&gt;&lt;br&gt;&lt;br&gt;This event should be triggered when a shopper lands on a search results page and Athos Commerce search results receive an impression.
 
 ### Example
 
@@ -186,7 +186,7 @@ async function example() {
   const api = new SearchApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // ImpressionSchema | Results payload
     impressionSchema: ...,
@@ -209,7 +209,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **impressionSchema** | [ImpressionSchema](ImpressionSchema.md) | Results payload | |
 
 ### Return type
@@ -246,7 +246,7 @@ No authorization required
 
 redirect
 
-&lt;i&gt;/beacon/v2/{siteId}/search/redirect&lt;/i&gt;&lt;br&gt;&lt;br&gt;This event should be triggered after a shopper lands on a search results page where Searchspring search results are rendered, but a redirect URL is returned in the Search API response and the shopper is redirected to the returned redirect URL.
+&lt;i&gt;/beacon/v2/{siteId}/search/redirect&lt;/i&gt;&lt;br&gt;&lt;br&gt;This event should be triggered after a shopper lands on a search results page where Athos Commerce search results are rendered, but a redirect URL is returned in the Search API response and the shopper is redirected to the returned redirect URL.
 
 ### Example
 
@@ -262,7 +262,7 @@ async function example() {
   const api = new SearchApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // RedirectSchema | Results payload
     redirectSchema: ...,
@@ -285,7 +285,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **redirectSchema** | [RedirectSchema](RedirectSchema.md) | Results payload | |
 
 ### Return type
@@ -322,7 +322,7 @@ No authorization required
 
 render
 
-&lt;i&gt;/beacon/v2/{siteId}/search/render&lt;/i&gt;&lt;br&gt;&lt;br&gt;This event should be triggered when a shopper lands on a search results page and Searchspring search results are rendered.
+&lt;i&gt;/beacon/v2/{siteId}/search/render&lt;/i&gt;&lt;br&gt;&lt;br&gt;This event should be triggered when a shopper lands on a search results page and Athos Commerce search results are rendered.
 
 ### Example
 
@@ -338,7 +338,7 @@ async function example() {
   const api = new SearchApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // RenderSchema | Results payload
     renderSchema: ...,
@@ -361,7 +361,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **renderSchema** | [RenderSchema](RenderSchema.md) | Results payload | |
 
 ### Return type

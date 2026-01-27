@@ -1,7 +1,7 @@
 
 # ProductPageviewSchemaDataResult
 
-Describes a tracked Searchspring result.
+Describes a tracked Athos Commerce result.
 
 ## Properties
 

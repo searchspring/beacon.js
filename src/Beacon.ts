@@ -72,7 +72,9 @@ import type {
 
 declare global {
 	interface Window {
+		Beacon?: typeof Beacon;
 		searchspring?: any;
+		athos?: any;
 	}
 }
 type LocalStorageItem = string | number | boolean | object | null;

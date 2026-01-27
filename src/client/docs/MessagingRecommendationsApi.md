@@ -1,6 +1,6 @@
 # MessagingRecommendationsApi
 
-All URIs are relative to *https://beacon.searchspring.io/beacon/v2*
+All URIs are relative to *https://analytics.searchspring.net/beacon/v2*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
@@ -33,7 +33,7 @@ async function example() {
   const api = new MessagingRecommendationsApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // MessagingSchema | Messaging recommendations payload
     messagingSchema: ...,
@@ -56,7 +56,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **messagingSchema** | [MessagingSchema](MessagingSchema.md) | Messaging recommendations payload | |
 
 ### Return type
@@ -109,7 +109,7 @@ async function example() {
   const api = new MessagingRecommendationsApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // MessagingSchema | Messaging recommendations payload
     messagingSchema: ...,
@@ -132,7 +132,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **messagingSchema** | [MessagingSchema](MessagingSchema.md) | Messaging recommendations payload | |
 
 ### Return type
@@ -185,7 +185,7 @@ async function example() {
   const api = new MessagingRecommendationsApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // MessagingSchema | Messaging recommendations payload
     messagingSchema: ...,
@@ -208,7 +208,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **messagingSchema** | [MessagingSchema](MessagingSchema.md) | Messaging recommendations payload | |
 
 ### Return type
@@ -261,7 +261,7 @@ async function example() {
   const api = new MessagingRecommendationsApi();
 
   const body = {
-    // string | Customer siteId found in the SMC (Searchspring Management Console)
+    // string | Customer siteId found in the Athos Console or Athos Management Console
     siteId: siteId_example,
     // MessagingSchema | Messaging recommendations payload
     messagingSchema: ...,
@@ -284,7 +284,7 @@ example().catch(console.error);
 
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
-| **siteId** | `string` | Customer siteId found in the SMC (Searchspring Management Console) | [Defaults to `undefined`] |
+| **siteId** | `string` | Customer siteId found in the Athos Console or Athos Management Console | [Defaults to `undefined`] |
 | **messagingSchema** | [MessagingSchema](MessagingSchema.md) | Messaging recommendations payload | |
 
 ### Return type
