@@ -135,6 +135,7 @@ export type Payload<T> = {
 };
 
 export const REQUEST_GROUPING_TIMEOUT = 300;
+export const PREFLIGHT_DEBOUNCE_TIMEOUT = 300;
 const USER_ID_KEY = 'ssUserId';
 export const PAGE_LOAD_ID_KEY = 'ssPageLoadId';
 const SESSION_ID_KEY = 'ssSessionId';
@@ -166,6 +167,7 @@ export class Beacon {
 	};
 	private initiator: string = '';
 	private batchIntervalTimeout: number | NodeJS.Timeout = 0;
+	private preflightTimeout: number | NodeJS.Timeout = 0;
 	private apis: ApiMethodMap;
 
 	private requests: PayloadRequest[] = [];
@@ -337,7 +339,7 @@ export class Beacon {
 
 				const productsHaveChanged = JSON.stringify(currentCartProducts) !== stringifiedProducts;
 				if (productsHaveChanged) {
-					this.sendPreflight();
+					this._sendPreflight();
 				}
 			},
 			add: (products: Product[]): void => {
@@ -444,7 +446,7 @@ export class Beacon {
 
 				const productsHaveChanged = JSON.stringify(currentViewedItems) !== stringifiedNormalizedItems;
 				if (productsHaveChanged) {
-					this.sendPreflight();
+					this._sendPreflight();
 				}
 			},
 			add: (products: ProductPageviewSchemaDataResult[]): void => {
@@ -1008,7 +1010,7 @@ export class Beacon {
 			} catch (e: any) {
 				sendStorageError(e, this, SHOPPER_ID_KEY, this.shopperId);
 			}
-			this.sendPreflight();
+			this._sendPreflight();
 			return this.shopperId;
 		}
 	}
@@ -1195,6 +1197,13 @@ export class Beacon {
 		this.sendRequests(requestsToSend);
 	}
 
+	private _sendPreflight(): void {
+		clearTimeout(this.preflightTimeout);
+		this.preflightTimeout = setTimeout(() => {
+			this._sendPreflight();
+		}, PREFLIGHT_DEBOUNCE_TIMEOUT);
+	}
+
 	public sendPreflight(overrides?: { userId: string; siteId: string; shopper: string; cart: Product[]; lastViewed: ProductPageviewSchemaDataResult[] }): void {
 		const userId = overrides?.userId || this.getUserId();
 		const siteId = overrides?.siteId || this.globals.siteId;
@@ -1226,7 +1235,7 @@ export class Beacon {
 				(this.config.apis?.fetch || fetch)(endpoint, {
 					method: 'POST',
 					headers: {
-						'Content-Type': 'application/json',
+						'Content-Type': 'text/plain',
 						...this.config.requesters?.personalization?.headers || {},
 					},
 					body: JSON.stringify(preflightParams),
