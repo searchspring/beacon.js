@@ -38,6 +38,7 @@ module.exports = {
 				],
 				include: [
 					/node_modules\/@searchspring/,
+					/node_modules\/@athoscommerce/,
 					path.resolve(__dirname, "src"),
 				],
 			},

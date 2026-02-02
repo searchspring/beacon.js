@@ -108,11 +108,6 @@ export type BeaconConfig = {
 };
 export type BeaconGlobals = {
 	siteId: string;
-	currency?: Currency;
-	shopper?: {
-		cart?: Product[];
-		id?: string;
-	}
 };
 
 interface ApiMethodMap {
@@ -209,13 +204,6 @@ export class Beacon {
 
 		if (this.globals.currency) {
 			this.setCurrency(this.globals.currency);
-		}
-
-		if (this.globals.shopper?.cart) {
-			this.storage.cart.set(this.globals.shopper.cart);
-		}
-		if (this.globals.shopper?.id) {
-			this.setShopperId(this.globals.shopper.id);
 		}
 	}
 

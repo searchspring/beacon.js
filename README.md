@@ -1,6 +1,8 @@
 # beacon.js
 
-A TypeScript library for tracking user interactions and analytics events to SearchSpring's Beacon API. This library enables real-time tracking of user behavior across search, recommendations, autocomplete, and e-commerce interactions.
+A TypeScript library for tracking user interactions and analytics events to Athos Commerce's Beacon API. This library enables real-time tracking of user behavior across search, recommendations, autocomplete, and e-commerce interactions.
+
+This package can be used by both Athos Commerce and Searchspring accounts.
 
 ## Features
 
@@ -19,7 +21,7 @@ A TypeScript library for tracking user interactions and analytics events to Sear
 To use the beacon via our CDN build, place the following script before the page's closing `</head>` tag:
 
 ```html
-<script siteId="[REPLACE WITH ATHOSCOMMERCE SITEID]" src="https://cdn.athoscommerce.net/beacon.js"></script>
+<script siteId="[REPLACE WITH ATHOS OR SEARCHSPRING SITEID]" src="https://cdn.athoscommerce.net/analytics/beacon.js"></script>
 ```
 
 The beacon will then be available for usage via `window.athos.tracker`
@@ -31,26 +33,25 @@ The beacon will then be available for usage via `window.athos.tracker`
 ```
 
 
-
 Utilizing this package via the CDN is preferred if you either:
 
-- plan on integrating AthosCommerce API and are not sending events directly to the beacon endpoint. 
+- plan on integrating Athos API and are not sending events directly to the beacon endpoint. 
 
 OR
 
-- You are actively developing an integration, however would like to start tracking events before going live with the integration. Note that after going live with a Snap integration, this beacon.js should be removed from the website, however the function calls can remain on the website. The Snap integration will publish an identical reference of this Beacon to the same path: `window.athos.tracker`. See Snap Tracking documentation: https://searchspring.github.io/snap/snap-tracking
+- You are actively developing an integration, however would like to start tracking events before going live with the integration. Note that after going live with a Snap integration, this beacon.js should be removed from the website, however the function calls can remain on the website. The Snap integration will publish an identical reference of this Beacon to the same path: `window.athos.tracker`.
 
 
 ### NPM
 
-If you are integrating Athos Commerce via API instead of utilizing Snap, the `@searchspring/beacon` package is available to use for your convenience. 
+If you are integrating Athos via API instead of utilizing Snap, the `@athoscommerce/beacon` package is available to use for your convenience. 
 
 ```bash
-npm install --save @searchspring/beacon
+npm install --save @athoscommerce/beacon
 ```
 
 ```typescript
-import { Beacon } from '@searchspring/beacon';
+import { Beacon } from '@athoscommerce/beacon';
 
 // Initialize Beacon with required siteId
 const beacon = new Beacon({ 
@@ -84,14 +85,14 @@ beacon.events.product.pageView({
 The first parameter to the `Beacon` constructor contains required and optional global configuration that applies to all tracking events.
 
 ```typescript
-import { Beacon } from '@searchspring/beacon';
+import { Beacon } from '@athoscommerce/beacon';
 
 const beacon = new Beacon({ siteId: 'abc123' });
 ```
 
 | Option | Type | Description | Required |
 |--------|------|-------------|----------|
-| `siteId` | `string` | Your SearchSpring site ID | ✔️ |
+| `siteId` | `string` | Your Athos site ID | ✔️ |
 
 ### Beacon Config
 
@@ -139,7 +140,7 @@ const beacon = new Beacon(
 
 ### responseId
 
-The Searchspring Search, Autocomplete, and Recommendations APIs will return a `responseId` property that is required on most beacon event's payload. It will only be returned if the `beacon=true` parameter is provided to each API. 
+The Athos Search, Autocomplete, and Recommendations APIs will return a `responseId` property that is required on most beacon event's payload. It will only be returned if the `beacon=true` parameter is provided to each API. 
 
 ```typescript
 // Search API Example Response
@@ -201,8 +202,6 @@ window.athos.tracker.events.search.impression({
 ## Tracking Events
 
 The Beacon class provides a comprehensive event tracking system organized by feature area. Each event method accepts a payload object containing the event data. An optional `siteId` can be provided to override the global siteId for a specific event.
-
-For detailed data payload specifications for each event, refer to the [full API reference](https://searchspring.github.io/beacon-oas/).
 
 ### Shopper Events
 
@@ -317,7 +316,7 @@ Search events track user interactions within search results pages.
 ```typescript
 window.athos.tracker.events.search.render({ 
   data: {
-    responseId: 'search-response-123'
+    responseId: '607bafd1-f624-4e58-afa5-b8b8e90929f5'
   }
 });
 ```
@@ -327,7 +326,7 @@ window.athos.tracker.events.search.render({
 ```typescript
 window.athos.tracker.events.search.impression({ 
   data: {
-    responseId: 'search-response-123',
+    responseId: '607bafd1-f624-4e58-afa5-b8b8e90929f5',
     results: [
       { type: 'product', uid: 'product-1', parentId: 'parent-1', sku: 'SKU-1' },
       { type: 'product', uid: 'product-2', parentId: 'parent-2', sku: 'SKU-2' }
@@ -342,7 +341,7 @@ window.athos.tracker.events.search.impression({
 ```typescript
 window.athos.tracker.events.search.addToCart({ 
   data: {
-    responseId: 'search-response-123',
+    responseId: '607bafd1-f624-4e58-afa5-b8b8e90929f5',
     results: [
       { 
         uid: 'product-1', 
@@ -361,7 +360,7 @@ window.athos.tracker.events.search.addToCart({
 ```typescript
 window.athos.tracker.events.search.clickThrough({ 
   data: {
-    responseId: 'search-response-123',
+    responseId: '607bafd1-f624-4e58-afa5-b8b8e90929f5',
     results: [
       {
         type: 'product',
@@ -380,7 +379,7 @@ window.athos.tracker.events.search.clickThrough({
 window.athos.tracker.events.search.redirect({ 
   data: {
     redirect: 'https://example.com/promo',
-    responseId: 'search-response-123'
+    responseId: '607bafd1-f624-4e58-afa5-b8b8e90929f5'
   }
 });
 ```
@@ -394,7 +393,7 @@ Category events track user interactions on category/listing pages.
 ```typescript
 window.athos.tracker.events.category.render({ 
   data: {
-    responseId: 'category-response-123'
+    responseId: '50c7aaf3-1909-43cd-8fff-a8e5c4452ddb'
   }
 });
 ```
@@ -404,7 +403,7 @@ window.athos.tracker.events.category.render({
 ```typescript
 window.athos.tracker.events.category.impression({ 
   data: {
-    responseId: 'category-response-123',
+    responseId: '50c7aaf3-1909-43cd-8fff-a8e5c4452ddb',
     results: [
       { type: 'product', uid: 'product-1', parentId: 'parent-1', sku: 'SKU-1' }
     ],
@@ -418,7 +417,7 @@ window.athos.tracker.events.category.impression({
 ```typescript
 window.athos.tracker.events.category.addToCart({ 
   data: {
-    responseId: 'category-response-123',
+    responseId: '50c7aaf3-1909-43cd-8fff-a8e5c4452ddb',
     results: [
       {
         uid: 'product-1',
@@ -437,7 +436,7 @@ window.athos.tracker.events.category.addToCart({
 ```typescript
 window.athos.tracker.events.category.clickThrough({ 
   data: {
-    responseId: 'category-response-123',
+    responseId: '50c7aaf3-1909-43cd-8fff-a8e5c4452ddb',
     results: [
       {
         type: 'product',
@@ -462,7 +461,7 @@ Track when a recommendation set is rendered to the user.
 window.athos.tracker.events.recommendations.render({ 
   data: {
     tag: 'homepage-recommendations',
-    responseId: 'rec-response-123'
+    responseId: '1a304980-27d4-4f4b-96cc-758b280dfa7a'
   }
 });
 ```
@@ -475,7 +474,7 @@ Track impressions of recommended products.
 window.athos.tracker.events.recommendations.impression({ 
   data: {
     tag: 'homepage-recommendations',
-    responseId: 'rec-response-123',
+    responseId: '1a304980-27d4-4f4b-96cc-758b280dfa7a',
     results: [
       { type: 'product', uid: 'product-1', parentId: 'parent-1', sku: 'SKU-1' },
       { type: 'product', uid: 'product-2', parentId: 'parent-2', sku: 'SKU-2' }
@@ -493,7 +492,7 @@ Track when a user adds a recommended product to cart.
 window.athos.tracker.events.recommendations.addToCart({ 
   data: {
     tag: 'homepage-recommendations',
-    responseId: 'rec-response-123',
+    responseId: '1a304980-27d4-4f4b-96cc-758b280dfa7a',
     results: [
       {
         uid: 'product-1',
@@ -515,7 +514,7 @@ Track clicks on recommended products.
 window.athos.tracker.events.recommendations.clickThrough({ 
   data: {
     tag: 'homepage-recommendations',
-    responseId: 'rec-response-123',
+    responseId: '1a304980-27d4-4f4b-96cc-758b280dfa7a',
     results: [
       {
         type: 'product',
@@ -812,7 +811,7 @@ const shopperId = beacon.getShopperId();
 
 #### `setShopperId(shopperId: string): string | void`
 
-Set the shopper ID and trigger a preflight request for personalization.
+Set the shopper ID and triggers both a login event to the beacon and preflight request for personalization.
 
 ```typescript
 const result = beacon.setShopperId('shopper-12345');
@@ -918,26 +917,6 @@ const beacon = new Beacon(
 );
 ```
 
-### Request Batching
-
-Beacon automatically batches requests for efficiency. Events are grouped and sent together based on:
-- Site ID
-- Endpoint type
-- Page load ID
-- Session ID
-- Response ID (for search/recommendations)
-- Tag (for recommendations)
-
-Batched requests are sent after 300ms or when an immediate request is made (certain event types send immediately rather than batching).
-
-```typescript
-// These events are batched
-window.athos.tracker.events.search.impression({ data: { /* ... */ } });
-window.athos.tracker.events.search.impression({ data: { /* ... */ } });
-
-// These events are sent immediately
-window.athos.tracker.events.search.clickThrough({ data: { /* ... */ } });
-```
 
 ### Single Page Application (SPA) Support
 
@@ -970,19 +949,12 @@ beacon.updateContext('pageUrl', window.location.href);
 
 Attribution is automatically captured from url parameters (ie. https://example.com/products?ss_attribution=email:campaign-123) and will be placed on the beacon context.
 
-## Cookie and Storage
-
-Beacon uses both cookies and localStorage to maintain persistent user state across sessions:
-
-- **Cookies**: Always set when available (with appropriate domain, SameSite and Secure flags)
-- **localStorage**: Used as primary storage with cookie fallback
-- **Expiration**: User IDs persist for 18 months, session IDs for rolling 30 minutes
 
 ## Error Handling
 
 ### Development Mode
 
-Enabling development mode will prevent beacon events from appearing in reports in the Athos Commerce console.
+Enabling development mode will prevent beacon events from appearing in reports in the Athos console.
 
 ```typescript
 const beacon = new Beacon(
@@ -994,9 +966,5 @@ const beacon = new Beacon(
 ## License
 
 MIT - See LICENSE file for details
-
-## Support
-
-For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/searchspring/beacon.js).
 
 
