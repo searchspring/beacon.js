@@ -1012,8 +1012,8 @@ export class Beacon {
 		if (!shopperId) {
 			return;
 		}
-		const exisitingShopperId = this.getShopperId();
-		if (exisitingShopperId !== shopperId) {
+		const existingShopperId = this.getShopperId();
+		if (existingShopperId !== shopperId) {
 			this.shopperId = '' + shopperId; // ensure string
 			this.setCookie(SHOPPER_ID_KEY, this.shopperId, COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
 			try {

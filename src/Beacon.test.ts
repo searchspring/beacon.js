@@ -117,7 +117,7 @@ describe('Beacon', () => {
 				const data = localStorageMock.getItem(CART_KEY)!;
 				expect(data).toBe(JSON.stringify({ value: mockProducts }));
 
-				// can add to exisiting cart data and should be at the front
+				// can add to existing cart data and should be at the front
 				const product = { uid: 'productUid5', parentId: 'productparentId5', sku: 'productSku5', qty: 1, price: 9.99 };
 				beacon.storage.cart.add([product]);
 
@@ -129,7 +129,7 @@ describe('Beacon', () => {
 				const removedCartData = beacon.storage.cart.get();
 				expect(removedCartData).toEqual(mockProducts);
 
-				// can decrease quantity from exisiting cart data
+				// can decrease quantity from existing cart data
 				const decreaseQuantityBy = 2;
 				expect(multiQuantityTestProduct.qty).toBeGreaterThan(decreaseQuantityBy);
 				beacon.storage.cart.remove([{ ...multiQuantityTestProduct, qty: decreaseQuantityBy }]);
@@ -143,13 +143,13 @@ describe('Beacon', () => {
 					},
 				]);
 
-				// can add to exisiting cart data and should be at the front
+				// can add to existing cart data and should be at the front
 				const product2 = { uid: 'productUid6', parentId: 'productparentId6', sku: 'productSku6', qty: 1, price: 9.99 };
 				beacon.storage.cart.add([product2]);
 				const addedCartData = beacon.storage.cart.get();
 				expect(addedCartData).toEqual([product2, ...removedSingleQuantityCartData]);
 
-				// can add quantity to exisiting sku in cart data
+				// can add quantity to existing sku in cart data
 				const increaseQuantityBy = 2;
 				const product3 = { ...product2, qty: increaseQuantityBy };
 				beacon.storage.cart.add([product3]);
