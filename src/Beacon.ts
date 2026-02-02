@@ -1211,7 +1211,7 @@ export class Beacon {
 	private _sendPreflight(): void {
 		clearTimeout(this.preflightTimeout);
 		this.preflightTimeout = setTimeout(() => {
-			this._sendPreflight();
+			this.sendPreflight();
 		}, PREFLIGHT_DEBOUNCE_TIMEOUT);
 	}
 

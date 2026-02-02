@@ -7,6 +7,7 @@ import {
 	PAGE_LOAD_ID_EXPIRATION,
 	PAGE_LOAD_ID_KEY,
 	PayloadRequest,
+	PREFLIGHT_DEBOUNCE_TIMEOUT,
 	REQUEST_GROUPING_TIMEOUT,
 } from './Beacon';
 import {
@@ -159,7 +160,7 @@ describe('Beacon', () => {
 				beacon.storage.cart.clear();
 				const clearedCartData = beacon.storage.cart.get();
 				expect(clearedCartData).toEqual([]);
-				expect(global.document.cookie).toContain(`${CART_KEY}=;`);
+				expect(global.document.cookie).toEqual(`${CART_KEY}=`);
 				const rawClearedItem = localStorageMock.getItem(CART_KEY)!;
 				expect(rawClearedItem).toBe(JSON.stringify({ value: [] }));
 			});
@@ -413,7 +414,7 @@ describe('Beacon', () => {
 		it('can switch siteIds to athoscommerce', async () => {
 			const athosSiteId = 'athos-site-id';
 			const beacon = new Beacon({ siteId: athosSiteId }, mockConfig);
-			const basePath = 'beacon.athoscommerce.io';
+			const basePath = 'analytics.athoscommerce.net';
 			expect(beacon['apis'].shopper['configuration'].basePath).toContain(basePath);
 			expect(beacon['apis'].autocomplete['configuration'].basePath).toContain(basePath);
 			expect(beacon['apis'].search['configuration'].basePath).toContain(basePath);
@@ -436,11 +437,8 @@ describe('Beacon', () => {
 		describe('Shopper Login', () => {
 			it('can process login event', async () => {
 				const shopperId = 'shopper123';
-				const data = {
-					id: shopperId,
-				};
 				const spy = jest.spyOn(beacon['apis'].shopper, 'login');
-				beacon.events.shopper.login({ data })!;
+				beacon.setShopperId(shopperId)!;
 
 				const fetchPayloadAssertion = {
 					...otherFetchParams,
@@ -452,12 +450,12 @@ describe('Beacon', () => {
 					}
 				}
 
-				await new Promise((resolve) => setTimeout(resolve, 0));
+				await new Promise((resolve) => setTimeout(resolve, PREFLIGHT_DEBOUNCE_TIMEOUT));
 				expect(beacon['shopperId']).toBe(shopperId);
 
 				expect(spy).toHaveBeenCalled();
-				expect(mockFetchApi).toHaveBeenNthCalledWith(1, expect.stringContaining('/preflightCache'), expect.any(Object));
-				expect(mockFetchApi).toHaveBeenNthCalledWith(2, expect.stringContaining('beacon.searchspring.io/beacon/v2'), fetchPayloadAssertion);
+				expect(mockFetchApi).toHaveBeenNthCalledWith(1, expect.stringContaining('beacon.searchspring.io/beacon/v2'), fetchPayloadAssertion);
+				expect(mockFetchApi).toHaveBeenNthCalledWith(2, expect.stringContaining('/preflightCache'), expect.any(Object));
 			});
 		});
 		describe('Autocomplete', () => {
@@ -1052,7 +1050,7 @@ describe('Beacon', () => {
 				expect(spy).toHaveBeenCalled();
 
 				// actual event is the third request due to storage changes sending preflights
-				expect(mockFetchApi).toHaveBeenNthCalledWith(3, expect.any(String), fetchPayloadAssertion);
+				expect(mockFetchApi).toHaveBeenNthCalledWith(1, expect.any(String), fetchPayloadAssertion);
 
 				// validate cart storage data
 				const cartData = beacon.storage.cart.get();
@@ -1444,10 +1442,11 @@ describe('Beacon', () => {
 				siteId: beacon.globals.siteId,
 				cart: items,
 			};
+			await new Promise((resolve) => setTimeout(resolve, PREFLIGHT_DEBOUNCE_TIMEOUT));
 			expect(mockFetchApi).toHaveBeenCalledWith(`https://${mockGlobals.siteId}.a.searchspring.io/api/personalization/preflightCache`, {
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json',
+					'Content-Type': 'text/plain',
 				},
 				body: JSON.stringify({
 					...body,
@@ -1471,10 +1470,11 @@ describe('Beacon', () => {
 				siteId: beacon.globals.siteId,
 				cart: items,
 			};
+			await new Promise((resolve) => setTimeout(resolve, PREFLIGHT_DEBOUNCE_TIMEOUT));
 			expect(mockFetchApi).toHaveBeenCalledWith(`https://${athosSiteId}.a.athoscommerce.io/api/personalization/preflightCache`, {
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json',
+					'Content-Type': 'text/plain',
 				},
 				body: JSON.stringify({
 					...body,
