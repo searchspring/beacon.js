@@ -25,7 +25,7 @@
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "prepare": "husky",
     "version": "standard-version -a",
-    "postversion": "git push && git push --tags"
+    "postpublish": "git push && git push --tags"
   },
   "dependencies": {
     "@searchspring/snap-toolbox": "0.73.7",
