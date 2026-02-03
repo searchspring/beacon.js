@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.1](https://github.com/searchspring/beacon.js/compare/v0.0.50...v0.1.1) (2026-02-03)
+
+
+### Bug Fixes
+
+* removing githubPublish and setting version number ([da6e368](https://github.com/searchspring/beacon.js/commit/da6e36814dac88de15845d9a7bb6ac4d6807996f))
+
 ### [0.0.50](https://github.com/searchspring/beacon.js/compare/v0.0.49...v0.0.50) (2026-02-02)
 
 
