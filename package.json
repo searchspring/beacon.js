@@ -1,14 +1,14 @@
 {
-  "name": "@searchspring/beacon",
-  "version": "0.2.0",
-  "author": "searchspring",
+  "name": "@athoscommerce/beacon",
+  "version": "1.0.0",
+  "author": "athoscommerce",
   "license": "MIT",
-  "description": "Javascript library for utilizing Searchspring beacon tracking.",
+  "description": "Javascript library for utilizing Athos Commerce beacon tracking.",
   "main": "dist/cjs/src/index.js",
   "module": "dist/esm/src/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/searchspring/beacon.js.git"
+    "url": "git+https://github.com/athoscommerce/beacon.js.git"
   },
   "prettier": "@searchspring/prettier",
   "scripts": {

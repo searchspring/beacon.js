@@ -32,7 +32,7 @@ jest.spyOn(global.window, 'fetch').mockImplementation(() => Promise.resolve({ st
 describe('Beacon', () => {
 	let beacon: Beacon;
 	const mockFetchApi = jest.fn().mockResolvedValue(Promise.resolve({ status: 200, json: () => Promise.resolve({}) }));
-	const mockGlobals = { siteId: 'test-site-id' };
+	const mockGlobals = { siteId: 'abc123' };
 	const mockConfig = {
 		apis: {
 			fetch: mockFetchApi,
@@ -397,7 +397,7 @@ describe('Beacon', () => {
 	describe('searchspring.io tests', () => {
 		it('can switch siteIds to searchspring', async () => {
 			const beacon = new Beacon(mockGlobals, mockConfig);
-			const basePath = 'beacon.searchspring.io';
+			const basePath = 'analytics.searchspring.net';
 			expect(beacon['apis'].shopper['configuration'].basePath).toContain(basePath);
 			expect(beacon['apis'].autocomplete['configuration'].basePath).toContain(basePath);
 			expect(beacon['apis'].search['configuration'].basePath).toContain(basePath);
@@ -454,7 +454,7 @@ describe('Beacon', () => {
 				expect(beacon['shopperId']).toBe(shopperId);
 
 				expect(spy).toHaveBeenCalled();
-				expect(mockFetchApi).toHaveBeenNthCalledWith(1, expect.stringContaining('beacon.searchspring.io/beacon/v2'), fetchPayloadAssertion);
+				expect(mockFetchApi).toHaveBeenNthCalledWith(1, expect.stringContaining('analytics.searchspring.net/beacon/v2'), fetchPayloadAssertion);
 				expect(mockFetchApi).toHaveBeenNthCalledWith(2, expect.stringContaining('/preflightCache'), expect.any(Object));
 			});
 		});

@@ -184,7 +184,7 @@ export class Beacon {
 		const fetchApi = this.config.apis?.fetch;
 
 		const domain = `${globals.siteId}`.trim().toLowerCase().startsWith('at') ? 'athos' : 'searchspring';
-		const basePath = domain === 'searchspring' ? "https://beacon.searchspring.io/beacon/v2".replace(/\/+$/, "") : "https://analytics.athoscommerce.net/beacon/v2".replace(/\/+$/, "");
+		const basePath = domain === 'searchspring' ? "https://analytics.searchspring.net/beacon/v2" : undefined;
 		const apiConfig = new Configuration({ fetchApi, basePath: this.config.requesters?.beacon?.origin || basePath, headers: { 'Content-Type': 'text/plain' } });
 		this.apis = {
 			shopper: new ShopperApi(apiConfig),
