@@ -49,6 +49,7 @@ import {
 	HTTPHeaders,
 	RecommendationsAddtocartSchema,
 	AddtocartSchema,
+	ShopperLoginSchema,
 } from './client';
 import type {
 	AutocompleteAddtocartRequest,
@@ -203,7 +204,7 @@ export class Beacon {
 		this.globals = globals;
 		this.pageLoadId = this.getPageLoadId();
 
-		if(!this.globals?.siteId) {
+		if (!this.globals?.siteId) {
 			throw new Error('Beacon: No siteId found in globals. Beacon will not initialize.');
 		} else {
 			this.globals.siteId = `${this.globals.siteId}`.trim().toLowerCase();
@@ -479,8 +480,13 @@ export class Beacon {
 		shopper: {
 			login: (event: Payload<{ id: string }>) => {
 				const context = this.getContext() as ShopperContext;
+				if (!context.shopperId) {
+					this.setShopperId(event.data.id);
+					return;
+				}
+
 				context.shopperId = event.data?.id;
-				if(event.data?.id) {
+				if (event.data?.id) {
 					const payload: LoginRequest = {
 						siteId: event?.siteId || this.globals.siteId,
 						shopperLoginSchema: {
@@ -488,7 +494,7 @@ export class Beacon {
 						},
 					};
 					const request = this.createRequest('shopper', 'login', payload);
-					this.sendRequests([request]);
+					this.queueRequest(request);
 				}
 			},
 		},
@@ -1012,7 +1018,7 @@ export class Beacon {
 			} catch (e: any) {
 				sendStorageError(e, this, SHOPPER_ID_KEY, this.shopperId);
 			}
-			this.events.shopper.login({ data: { id: this.shopperId }});
+			this.events.shopper.login({ data: { id: this.shopperId } });
 			this._sendPreflight();
 		}
 	}
@@ -1174,6 +1180,11 @@ export class Beacon {
 						key += additionalRequestKeys(key, 'category', categoryImpression);
 						appendResults(acc, key, 'impressionSchema', request);
 						break;
+					case 'login':
+						const shopperLogin = (request.payload as LoginRequest).shopperLoginSchema;
+						key += additionalRequestKeys(key, 'shopper', shopperLogin);
+						appendResults(acc, key, 'impressionSchema', request);
+						break;
 					default:
 						// non-batched requests
 						acc.nonBatched.push(request);
@@ -1289,15 +1300,17 @@ export function appendResults(
 
 export function additionalRequestKeys(
 	key: string,
-	type: 'search' | 'autocomplete' | 'category' | 'recommendation',
-	schema: ImpressionSchema | RecommendationsImpressionSchema | RecommendationsAddtocartSchema | AddtocartSchema
+	type: 'search' | 'autocomplete' | 'category' | 'recommendation' | 'shopper',
+	schema: ImpressionSchema | RecommendationsImpressionSchema | RecommendationsAddtocartSchema | AddtocartSchema | ShopperLoginSchema
 ): string {
 	let value = key;
 	value += `||${schema.context.pageLoadId}`;
 	value += `||${schema.context.sessionId}`;
 
-	if (schema.data.responseId) {
-		value += `||responseId=${schema.data.responseId}`;
+	if ((schema as ImpressionSchema | RecommendationsImpressionSchema | RecommendationsAddtocartSchema | AddtocartSchema).data?.responseId) {
+		value += `||responseId=${(schema as ImpressionSchema | RecommendationsImpressionSchema | RecommendationsAddtocartSchema | AddtocartSchema).data.responseId}`;
+	} else if (type === 'shopper' && schema.context.shopperId) {
+		value += `||shopperId=${schema.context.shopperId}`;
 	}
 
 	if (type === 'recommendation') {

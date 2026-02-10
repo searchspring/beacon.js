@@ -12,6 +12,7 @@ import {
 } from './Beacon';
 import {
 	Currency,
+	ImpressionSchemaData,
 	Product,
 	ResultProductType,
 } from './client';
@@ -312,7 +313,7 @@ describe('Beacon', () => {
 			beacon.setCurrency({ code: 'EUR' });
 
 			const context1 = beacon.getContext();
-			await new Promise((resolve) => setTimeout(resolve, 100));
+			await new Promise((resolve) => setTimeout(resolve, PREFLIGHT_DEBOUNCE_TIMEOUT));
 			const context2 = beacon.getContext();
 
 			expect(context1.userId).toBe(context2.userId);
@@ -329,7 +330,7 @@ describe('Beacon', () => {
 			expect(context1.timestamp).not.toBe(context2.timestamp);
 		});
 
-		it('can setShopperId and getShopperId', () => {
+		it('can setShopperId and getShopperId', async () => {
 			// context should not have shopperId initially
 			const context = beacon.getContext();
 			expect(context.shopperId).toEqual('');
@@ -341,6 +342,7 @@ describe('Beacon', () => {
 			// set shopperId
 			const shopperId = 'test-shopper-id';
 			beacon.setShopperId(shopperId);
+			await new Promise((resolve) => setTimeout(resolve, PREFLIGHT_DEBOUNCE_TIMEOUT));
 
 			// should be stored
 			const storedShopperId = beacon.getShopperId();
@@ -438,7 +440,9 @@ describe('Beacon', () => {
 			it('can process login event', async () => {
 				const shopperId = 'shopper123';
 				const spy = jest.spyOn(beacon['apis'].shopper, 'login');
-				beacon.setShopperId(shopperId)!;
+				beacon.setShopperId(shopperId);
+				beacon.setShopperId(shopperId);
+				beacon.setShopperId(shopperId);
 
 				const fetchPayloadAssertion = {
 					...otherFetchParams,
@@ -453,9 +457,37 @@ describe('Beacon', () => {
 				await new Promise((resolve) => setTimeout(resolve, PREFLIGHT_DEBOUNCE_TIMEOUT));
 				expect(beacon['shopperId']).toBe(shopperId);
 
-				expect(spy).toHaveBeenCalled();
-				expect(mockFetchApi).toHaveBeenNthCalledWith(1, expect.stringContaining('analytics.searchspring.net/beacon/v2'), fetchPayloadAssertion);
-				expect(mockFetchApi).toHaveBeenNthCalledWith(2, expect.stringContaining('/preflightCache'), expect.any(Object));
+				expect(spy).toHaveBeenCalledTimes(1);
+				expect(mockFetchApi).toHaveBeenCalledTimes(2);
+				expect(mockFetchApi).toHaveBeenCalledWith(expect.stringContaining('/preflightCache'), expect.any(Object));
+				expect(mockFetchApi).toHaveBeenCalledWith(expect.stringContaining('analytics.searchspring.net/beacon/v2'), fetchPayloadAssertion);
+			});
+
+			it('can batch multiple login events', async () => {
+				const shopperId = 'shopper123';
+				const spy = jest.spyOn(beacon['apis'].shopper, 'login');
+				
+				beacon.events.shopper.login({ data: { id: shopperId } });
+				beacon.events.shopper.login({ data: { id: shopperId } });
+				beacon.events.shopper.login({ data: { id: shopperId } });
+
+				const fetchPayloadAssertion = {
+					...otherFetchParams,
+					body: {
+						context: {
+							...beacon.getContext(),
+							timestamp: expect.any(String),
+						}
+					}
+				}
+
+				await new Promise((resolve) => setTimeout(resolve, PREFLIGHT_DEBOUNCE_TIMEOUT));
+				expect(beacon['shopperId']).toBe(shopperId);
+
+				expect(spy).toHaveBeenCalledTimes(1);
+				expect(mockFetchApi).toHaveBeenCalledTimes(2);
+				expect(mockFetchApi).toHaveBeenCalledWith(expect.stringContaining('/preflightCache'), expect.any(Object));
+				expect(mockFetchApi).toHaveBeenCalledWith(expect.stringContaining('analytics.searchspring.net/beacon/v2'), fetchPayloadAssertion);
 			});
 		});
 		describe('Autocomplete', () => {
@@ -625,24 +657,31 @@ describe('Beacon', () => {
 				expect(mockFetchApi).toHaveBeenCalledWith(expect.any(String), fetchPayloadAssertion);
 			});
 			it('can process impression event', async () => {
-				const data = {
+				const results = [
+					{ type: ResultProductType.Product, parentId: 'parentId1', uid: 'prodUid1', sku: 'prodSku1' },
+					{ type: ResultProductType.Product, parentId: 'parentId2', uid: 'prodUid2', sku: 'prodSku2' },
+					{ type: ResultProductType.Product, parentId: 'parentId3', uid: 'prodUid3', sku: 'prodSku3' },
+					{ type: ResultProductType.Product, parentId: 'parentId4', uid: 'prodUid4', sku: 'prodSku4' },
+					{ type: ResultProductType.Banner, uid: 'inlinebanneruid' },
+				]
+				const banners = [
+					{ uid: 'merchandisingbanneruid2' },
+					{ uid: 'merchandisingbanneruid3' }
+				]
+				const data: ImpressionSchemaData = {
 					responseId: 'test-response-id',
-					results: [
-						{ type: ResultProductType.Product, parentId: 'parentId1', uid: 'prodUid1', sku: 'prodSku1' },
-						{ type: ResultProductType.Product, parentId: 'parentId2', uid: 'prodUid2', sku: 'prodSku2' },
-						{ type: ResultProductType.Product, parentId: 'parentId3', uid: 'prodUid3', sku: 'prodSku3' },
-						{ type: ResultProductType.Product, parentId: 'parentId4', uid: 'prodUid4', sku: 'prodSku4' },
-						{ type: ResultProductType.Banner, uid: 'inlinebanneruid' },
-					],
-					banners: [
-						{ uid: 'merchandisingbanneruid' },
-					],
+					results: [],
+					banners: [],
 				};
 
 				const fetchPayloadAssertion = {
 					...otherFetchParams,
 					body: {
-						data,
+						data: {
+							...data,
+							results: [{ type: ResultProductType.Product, parentId: 'parentId0', uid: 'prodUid0', sku: 'prodSku0' }, ...results],
+							banners: [{ uid: 'merchandisingbanneruid0' }, { uid: 'merchandisingbanneruid1' }, ...banners],
+						},
 						context: {
 							...beacon.getContext(),
 							timestamp: expect.any(String),
@@ -652,7 +691,34 @@ describe('Beacon', () => {
 
 				const spy = jest.spyOn(beacon['apis'].search, 'searchImpression');
 
-				beacon.events.search.impression({ data });
+				results.forEach((result, index) => {
+					if (index === 0) {
+						beacon.events.search.impression({
+							data: {
+								...data,
+								results: [{ type: ResultProductType.Product, parentId: 'parentId0', uid: 'prodUid0', sku: 'prodSku0' }, result],
+								banners: [{ uid: 'merchandisingbanneruid0' }, { uid: 'merchandisingbanneruid1' }],
+							}
+						});
+					} else {
+						beacon.events.search.impression({
+							data: {
+								...data,
+								results: [result],
+							}
+						});
+					}
+
+				})
+				banners.forEach(banner => {
+					beacon.events.search.impression({
+						data: {
+							...data,
+							banners: [banner],
+						}
+					});
+				})
+
 				await new Promise((resolve) => setTimeout(resolve, REQUEST_GROUPING_TIMEOUT));
 
 				expect(spy).toHaveBeenCalled();
@@ -1461,7 +1527,7 @@ describe('Beacon', () => {
 			const items = [{ uid: 'uid123', sku: 'sku123', parentId: 'parentId123', qty: 1, price: 10.99 }];
 
 			const athosSiteId = 'athos-site-id';
-			beacon = new Beacon({...mockGlobals, siteId: athosSiteId}, mockConfig);
+			beacon = new Beacon({ ...mockGlobals, siteId: athosSiteId }, mockConfig);
 			beacon.storage.cart.add(items);
 
 			const body = {
