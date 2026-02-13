@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.3](https://github.com/AthosCommerce/beacon.js/compare/v1.0.2...v1.0.3) (2026-02-13)
+
+
+### Bug Fixes
+
+* add missing imports, run format, fix typo ([1b07ee5](https://github.com/AthosCommerce/beacon.js/commit/1b07ee5b56fd3509cd6531f2ac7925b48137fac4))
+
 ### [1.0.2](https://github.com/AthosCommerce/beacon.js/compare/v1.0.1...v1.0.2) (2026-02-13)
 
 
