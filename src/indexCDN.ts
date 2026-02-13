@@ -12,7 +12,7 @@ if (scriptEl) {
 
 		if (typeof window !== 'undefined') {
 			if (window.searchspring?.tracker?.track || window.athos?.tracker?.track) {
-				console.warn('Beacon: This script should be removed. An exisiting Snap instance is already on the page.');
+				console.warn('Beacon: This script should be removed. An existing Snap instance is already on the page.');
 				initializeBeacon = false;
 			}
 			if (window.athos?.tracker && !window.athos?.tracker?.track) {
