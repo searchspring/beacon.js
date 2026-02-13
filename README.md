@@ -1,5 +1,7 @@
 # beacon.js
 
+[![npm version](https://badge.fury.io/js/@athoscommerce%2Fbeacon.svg?icon=si%3Anpm&icon_color=%2300aeef)](https://badge.fury.io/js/@athoscommerce%2Fbeacon)
+
 A TypeScript library for tracking user interactions and analytics events to Athos Commerce's Beacon API. This library enables real-time tracking of user behavior across search, recommendations, autocomplete, and e-commerce interactions.
 
 This package can be used by both Athos Commerce and Searchspring accounts.

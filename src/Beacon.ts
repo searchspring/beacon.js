@@ -43,7 +43,6 @@ import {
 	ImpressionSchema,
 	AttributionInner,
 	Currency,
-	LogSchema,
 	LogSchemaData,
 	ShopperContext,
 	HTTPHeaders,
@@ -185,8 +184,12 @@ export class Beacon {
 		const fetchApi = this.config.apis?.fetch;
 
 		const domain = `${globals.siteId}`.trim().toLowerCase().startsWith('at') ? 'athos' : 'searchspring';
-		const basePath = domain === 'searchspring' ? "https://analytics.searchspring.net/beacon/v2" : undefined;
-		const apiConfig = new Configuration({ fetchApi, basePath: this.config.requesters?.beacon?.origin || basePath, headers: { 'Content-Type': 'text/plain' } });
+		const basePath = domain === 'searchspring' ? 'https://analytics.searchspring.net/beacon/v2' : undefined;
+		const apiConfig = new Configuration({
+			fetchApi,
+			basePath: this.config.requesters?.beacon?.origin || basePath,
+			headers: { 'Content-Type': 'text/plain' },
+		});
 		this.apis = {
 			shopper: new ShopperApi(apiConfig),
 			autocomplete: new AutocompleteApi(apiConfig),
@@ -245,21 +248,21 @@ export class Beacon {
 				}
 				const valueString = encodeURIComponent(value) + ';';
 				if (domain) {
-					window.document.cookie = name + "=" + valueString + expiresString + sameSiteString + secureString + "path=/; domain=" + domain;
+					window.document.cookie = name + '=' + valueString + expiresString + sameSiteString + secureString + 'path=/; domain=' + domain;
 				} else {
 					const host = window?.location?.hostname;
 					if (!host || host.split('.').length === 1) {
-						window.document.cookie = name + "=" + valueString + expiresString + sameSiteString + secureString + "path=/";
+						window.document.cookie = name + '=' + valueString + expiresString + sameSiteString + secureString + 'path=/';
 					} else {
 						const domainParts = host.split('.');
 						domainParts.shift();
 						domain = '.' + domainParts.join('.');
 
-						window.document.cookie = name + "=" + valueString + expiresString + sameSiteString + secureString + "path=/; domain=" + domain;
+						window.document.cookie = name + '=' + valueString + expiresString + sameSiteString + secureString + 'path=/; domain=' + domain;
 
 						if (this.getCookie(name) == null || this.getCookie(name) != value) {
 							domain = '.' + host;
-							window.document.cookie = name + "=" + valueString + expiresString + sameSiteString + secureString + "path=/; domain=" + domain;
+							window.document.cookie = name + '=' + valueString + expiresString + sameSiteString + secureString + 'path=/; domain=' + domain;
 						}
 					}
 				}
@@ -377,10 +380,7 @@ export class Beacon {
 					const cartProducts = [...existingCartProducts];
 
 					products.forEach((product) => {
-						const isSkuAlreadyInCart = cartProducts.find(
-							(cartProduct) =>
-								cartProduct.uid === product.uid
-						);
+						const isSkuAlreadyInCart = cartProducts.find((cartProduct) => cartProduct.uid === product.uid);
 						if (isSkuAlreadyInCart) {
 							if (isSkuAlreadyInCart.qty > 0) {
 								isSkuAlreadyInCart.qty -= product.qty || 1;
@@ -1030,7 +1030,7 @@ export class Beacon {
 		try {
 			const url = new URL(this.config.href || (typeof window !== 'undefined' && window.location.href) || '');
 			urlAttribution = url.searchParams.get(ATTRIBUTION_QUERY_PARAM);
-		} catch (e) {
+		} catch {
 			// noop - URL failed to parse empty url
 		}
 
@@ -1043,7 +1043,7 @@ export class Beacon {
 				} else if (Array.isArray(storedAttribution)) {
 					attribution = storedAttribution;
 				}
-			} catch (e) {
+			} catch {
 				// noop - failed to parse stored attribution
 			}
 		}
@@ -1111,10 +1111,10 @@ export class Beacon {
 			const api = this.getApiClient(request.apiType);
 			const apiMethod = request.endpoint;
 			const initOverrides: InitOverrideFunction = async ({ init }) => {
-				const headers = { ...init.headers, ...this.config.requesters?.beacon?.headers || {} };
+				const headers = { ...init.headers, ...(this.config.requesters?.beacon?.headers || {}) };
 				const isJSON = headers && 'Content-Type' in headers && headers['Content-Type'] === 'application/json';
 				return {
-					// Cypress intecepts does not support keepalive
+					// Cypress intercepts does not support keepalive
 					keepalive: this.mode === 'production' ? true : undefined,
 					body: isJSON ? init.body : JSON.stringify(init.body),
 					headers,
@@ -1125,7 +1125,7 @@ export class Beacon {
 			(api as any)[apiMethod as keyof typeof api](request.payload, initOverrides).catch((e: any) => {
 				// noop - do not throw errors
 				if (this.mode === 'development') {
-					console.debug(e)
+					console.debug(e);
 				}
 			});
 		}
@@ -1140,55 +1140,65 @@ export class Beacon {
 				let key = `${request.payload.siteId}||${request.endpoint}`;
 
 				switch (request.endpoint) {
-					case 'recommendationsAddtocart':
+					case 'recommendationsAddtocart': {
 						const recommendationsAddtocart = (request.payload as RecommendationsAddtocartRequest).recommendationsAddtocartSchema;
 						key += additionalRequestKeys(key, 'recommendation', recommendationsAddtocart);
 						appendResults(acc, key, 'recommendationsAddtocartSchema', request);
 						break;
-					case 'recommendationsImpression':
+					}
+					case 'recommendationsImpression': {
 						const recommendationsImpression = (request.payload as RecommendationsImpressionRequest).recommendationsImpressionSchema;
 						key += additionalRequestKeys(key, 'recommendation', recommendationsImpression);
 						appendResults(acc, key, 'recommendationsImpressionSchema', request);
 						break;
-					case 'searchAddtocart':
+					}
+					case 'searchAddtocart': {
 						const searchAddtocart = (request.payload as SearchAddtocartRequest).addtocartSchema;
 						key += additionalRequestKeys(key, 'search', searchAddtocart);
 						appendResults(acc, key, 'addtocartSchema', request);
 						break;
-					case 'searchImpression':
+					}
+					case 'searchImpression': {
 						const searchImpression = (request.payload as SearchImpressionRequest).impressionSchema;
 						key += additionalRequestKeys(key, 'search', searchImpression);
 						appendResults(acc, key, 'impressionSchema', request);
 						break;
-					case 'autocompleteAddtocart':
+					}
+					case 'autocompleteAddtocart': {
 						const autocompleteAddtocart = (request.payload as AutocompleteAddtocartRequest).addtocartSchema;
 						key += additionalRequestKeys(key, 'autocomplete', autocompleteAddtocart);
 						appendResults(acc, key, 'addtocartSchema', request);
 						break;
-					case 'autocompleteImpression':
+					}
+					case 'autocompleteImpression': {
 						const autocompleteImpression = (request.payload as AutocompleteImpressionRequest).impressionSchema;
 						key += additionalRequestKeys(key, 'autocomplete', autocompleteImpression);
 						appendResults(acc, key, 'impressionSchema', request);
 						break;
-					case 'categoryAddtocart':
+					}
+					case 'categoryAddtocart': {
 						const categoryAddtocart = (request.payload as CategoryAddtocartRequest).addtocartSchema;
 						key += additionalRequestKeys(key, 'category', categoryAddtocart);
 						appendResults(acc, key, 'addtocartSchema', request);
 						break;
-					case 'categoryImpression':
+					}
+					case 'categoryImpression': {
 						const categoryImpression = (request.payload as CategoryImpressionRequest).impressionSchema;
 						key += additionalRequestKeys(key, 'category', categoryImpression);
 						appendResults(acc, key, 'impressionSchema', request);
 						break;
-					case 'login':
+					}
+					case 'login': {
 						const shopperLogin = (request.payload as LoginRequest).shopperLoginSchema;
 						key += additionalRequestKeys(key, 'shopper', shopperLogin);
 						appendResults(acc, key, 'shopperLoginSchema', request);
 						break;
-					default:
+					}
+					default: {
 						// non-batched requests
 						acc.nonBatched.push(request);
 						break;
+					}
 				}
 
 				return acc;
@@ -1217,7 +1227,13 @@ export class Beacon {
 		}, PREFLIGHT_DEBOUNCE_TIMEOUT);
 	}
 
-	public sendPreflight(overrides?: { userId: string; siteId: string; shopper: string; cart: Product[]; lastViewed: ProductPageviewSchemaDataResult[] }): void {
+	public sendPreflight(overrides?: {
+		userId: string;
+		siteId: string;
+		shopper: string;
+		cart: Product[];
+		lastViewed: ProductPageviewSchemaDataResult[];
+	}): void {
 		const userId = overrides?.userId || this.getUserId();
 		const siteId = overrides?.siteId || this.globals.siteId;
 		const shopper = overrides?.shopper || this.getShopperId();
@@ -1240,16 +1256,16 @@ export class Beacon {
 				preflightParams.lastViewed = lastViewed.map((item) => this.getProductId(item));
 			}
 
-			const domain = `${siteId}`.toLowerCase().startsWith('at') ? 'athoscommerce.io' : 'searchspring.io';
+			const domain = `${siteId}`.toLowerCase().startsWith('at') ? 'athoscommerce.net' : 'searchspring.io';
 			const origin = this.config.requesters?.personalization?.origin || `https://${siteId}.a.${domain}`;
-			const endpoint = `${origin}/api/personalization/preflightCache`;
+			const endpoint = `${origin}/v1/preflight`;
 
 			if (this.config.apis?.fetch || typeof fetch !== 'undefined') {
 				(this.config.apis?.fetch || fetch)(endpoint, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'text/plain',
-						...this.config.requesters?.personalization?.headers || {},
+						...(this.config.requesters?.personalization?.headers || {}),
 					},
 					body: JSON.stringify(preflightParams),
 					keepalive: true,
