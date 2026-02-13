@@ -1537,7 +1537,7 @@ describe('Beacon', () => {
 				cart: items,
 			};
 			await new Promise((resolve) => setTimeout(resolve, PREFLIGHT_DEBOUNCE_TIMEOUT));
-			expect(mockFetchApi).toHaveBeenCalledWith(`https://${athosSiteId}.a.athoscommerce.io/v1/preflight`, {
+			expect(mockFetchApi).toHaveBeenCalledWith(`https://${athosSiteId}.a.athoscommerce.net/v1/preflight`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'text/plain',
