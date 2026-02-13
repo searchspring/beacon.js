@@ -1,1 +1,0 @@
-../dist/cdn/beacon.js

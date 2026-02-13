@@ -1,13 +1,11 @@
-export function getFlags(userAgent = ''): FeatureFlags {
-	userAgent = (userAgent || (typeof window == 'undefined' ? {} : window?.navigator).userAgent || '').toLowerCase();
-
+export function getFlags(): FeatureFlags {
 	return {
 		cookies: function () {
 			return typeof window == 'undefined' ? false : window?.navigator?.cookieEnabled;
 		},
 		storage: function () {
 			const test = 'ss-test';
-			if (typeof window == 'undefined'){
+			if (typeof window == 'undefined') {
 				return false;
 			}
 
@@ -16,7 +14,7 @@ export function getFlags(userAgent = ''): FeatureFlags {
 				window?.localStorage.removeItem(test);
 
 				return true;
-			} catch (e) {
+			} catch {
 				return false;
 			}
 		},
