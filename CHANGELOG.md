@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* added debount to the login event
+* added debounce to the login event
 
 ## 1.0.0 (2026-02-05)
 

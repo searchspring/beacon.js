@@ -223,13 +223,13 @@ describe('Beacon', () => {
 
 				// should save generated id to storage
 				const stored = localStorageMock.getItem(PAGE_LOAD_ID_KEY) || '{}';
-        expect(JSON.parse(stored)).toStrictEqual({
-          value: {
-            href,
-            value: pageLoadId1,
-            timestamp: expect.any(String),
-          },
-        });
+				expect(JSON.parse(stored)).toStrictEqual({
+					value: {
+						href,
+						value: pageLoadId1,
+						timestamp: expect.any(String),
+					},
+				});
 			});
 
 			it('can getPageLoadId from storage', async () => {
@@ -247,15 +247,15 @@ describe('Beacon', () => {
 
 				// stored value shouldn't change - timestamp should be different
 				const stored2 = localStorageMock.getItem(PAGE_LOAD_ID_KEY) || '{}';
-        expect(JSON.parse(stored2)).toStrictEqual({
-          value: {
-            href: stored.href,
-            value: stored.value,
-            timestamp: expect.any(String),
-          },
-        });
-        expect(JSON.parse(stored2).value.value).toBe(stored.value);
-        expect(JSON.parse(stored2).value.timestamp).not.toBe(stored.timestamp);
+				expect(JSON.parse(stored2)).toStrictEqual({
+					value: {
+						href: stored.href,
+						value: stored.value,
+						timestamp: expect.any(String),
+					},
+				});
+				expect(JSON.parse(stored2).value.value).toBe(stored.value);
+				expect(JSON.parse(stored2).value.timestamp).not.toBe(stored.timestamp);
 			});
 
 			it('does not get expired pageLoadId from storage', async () => {
@@ -277,15 +277,15 @@ describe('Beacon', () => {
 				// should save new id to storage
 				const stored2 = localStorageMock.getItem(PAGE_LOAD_ID_KEY) || '{}';
 
-        expect(JSON.parse(stored2)).toStrictEqual({
-          value: {
-            href: stored.href,
-            value: expect.any(String),
-            timestamp: expect.any(String),
-          },
-        });
-        expect(JSON.parse(stored2).value.value).not.toBe(stored.value);
-        expect(JSON.parse(stored2).value.timestamp).not.toBe(stored.timestamp);
+				expect(JSON.parse(stored2)).toStrictEqual({
+					value: {
+						href: stored.href,
+						value: expect.any(String),
+						timestamp: expect.any(String),
+					},
+				});
+				expect(JSON.parse(stored2).value.value).not.toBe(stored.value);
+				expect(JSON.parse(stored2).value.timestamp).not.toBe(stored.timestamp);
 			});
 		});
 	});
