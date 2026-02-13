@@ -319,7 +319,7 @@ describe('Beacon', () => {
 
 			const context1 = beacon.getContext();
 			jest.advanceTimersByTime(PREFLIGHT_DEBOUNCE_TIMEOUT);
-			
+
 			await flushPromises();
 			const context2 = beacon.getContext();
 
@@ -464,7 +464,7 @@ describe('Beacon', () => {
 				};
 
 				jest.advanceTimersByTime(PREFLIGHT_DEBOUNCE_TIMEOUT);
-				
+
 				await flushPromises();
 				expect(beacon['shopperId']).toBe(shopperId);
 
@@ -493,7 +493,7 @@ describe('Beacon', () => {
 				};
 
 				jest.advanceTimersByTime(PREFLIGHT_DEBOUNCE_TIMEOUT);
-				
+
 				await flushPromises();
 				expect(beacon['shopperId']).toBe(shopperId);
 
@@ -523,7 +523,7 @@ describe('Beacon', () => {
 
 				beacon.events.autocomplete.render({ data });
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -555,7 +555,7 @@ describe('Beacon', () => {
 				const spy = jest.spyOn(beacon['apis'].autocomplete, 'autocompleteImpression');
 				beacon.events.autocomplete.impression({ data });
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -587,7 +587,7 @@ describe('Beacon', () => {
 
 				beacon.events.autocomplete.addToCart({ data });
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -669,7 +669,7 @@ describe('Beacon', () => {
 
 				beacon.events.search.render({ data });
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -735,7 +735,7 @@ describe('Beacon', () => {
 				});
 
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -767,7 +767,7 @@ describe('Beacon', () => {
 
 				beacon.events.search.addToCart({ data });
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -849,7 +849,7 @@ describe('Beacon', () => {
 
 				beacon.events.category.render({ data });
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -883,7 +883,7 @@ describe('Beacon', () => {
 
 				beacon.events.category.impression({ data });
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -915,7 +915,7 @@ describe('Beacon', () => {
 
 				beacon.events.category.addToCart({ data });
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -973,7 +973,7 @@ describe('Beacon', () => {
 
 				beacon.events.recommendations.render({ data });
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -1008,7 +1008,7 @@ describe('Beacon', () => {
 
 				beacon.events.recommendations.impression({ data });
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -1041,7 +1041,7 @@ describe('Beacon', () => {
 
 				beacon.events.recommendations.addToCart({ data });
 				jest.advanceTimersByTime(REQUEST_GROUPING_TIMEOUT);
-				
+
 				await flushPromises();
 
 				expect(spy).toHaveBeenCalled();
@@ -1532,7 +1532,7 @@ describe('Beacon', () => {
 				cart: items,
 			};
 			jest.advanceTimersByTime(PREFLIGHT_DEBOUNCE_TIMEOUT);
-			
+
 			await flushPromises();
 			expect(mockFetchApi).toHaveBeenCalledWith(`https://${mockGlobals.siteId}.a.searchspring.io/api/personalization/preflightCache`, {
 				method: 'POST',
@@ -1562,7 +1562,7 @@ describe('Beacon', () => {
 				cart: items,
 			};
 			jest.advanceTimersByTime(PREFLIGHT_DEBOUNCE_TIMEOUT);
-			
+
 			await flushPromises();
 			expect(mockFetchApi).toHaveBeenCalledWith(`https://${athosSiteId}.a.athoscommerce.io/api/personalization/preflightCache`, {
 				method: 'POST',
