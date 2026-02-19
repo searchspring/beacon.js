@@ -1,5 +1,6 @@
 .openapi-generator-ignore
 apis/AutocompleteApi.ts
+apis/BundlesApi.ts
 apis/CartApi.ts
 apis/CategoryApi.ts
 apis/ErrorLogsApi.ts
@@ -15,6 +16,15 @@ docs/AddtocartSchemaData.md
 docs/AttributionInner.md
 docs/AutocompleteApi.md
 docs/BannersInner.md
+docs/BundlesAddtocartSchema.md
+docs/BundlesAddtocartSchemaData.md
+docs/BundlesApi.md
+docs/BundlesClickthroughSchema.md
+docs/BundlesClickthroughSchemaData.md
+docs/BundlesImpressionSchema.md
+docs/BundlesImpressionSchemaData.md
+docs/BundlesRenderSchema.md
+docs/BundlesRenderSchemaData.md
 docs/CartApi.md
 docs/CartSchema.md
 docs/CartSchemaData.md
@@ -79,6 +89,14 @@ models/AddtocartSchema.ts
 models/AddtocartSchemaData.ts
 models/AttributionInner.ts
 models/BannersInner.ts
+models/BundlesAddtocartSchema.ts
+models/BundlesAddtocartSchemaData.ts
+models/BundlesClickthroughSchema.ts
+models/BundlesClickthroughSchemaData.ts
+models/BundlesImpressionSchema.ts
+models/BundlesImpressionSchemaData.ts
+models/BundlesRenderSchema.ts
+models/BundlesRenderSchemaData.ts
 models/CartSchema.ts
 models/CartSchemaData.ts
 models/ClickthroughBannersInner.ts

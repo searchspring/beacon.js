@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  version: 2.2.48
+  version: 2.2.45
   title: analytics.athoscommerce.net
   x-logo:
     url: ./images/athos_commerce_logo.png
@@ -13,6 +13,8 @@ servers:
 tags:
   - name: Autocomplete
     description: Autocomplete Module tracking events. Payload data sourced from the [Autocomplete API](https://docs.searchspring.com/reference/get-autocomplete) request parameters and response body.
+  - name: Bundles
+    description: Personalized bundles tracking events. Payload data sourced from the Personalized Bundles API response.
   - name: Cart
     description: Cart tracking events
   - name: Category
@@ -294,6 +296,218 @@ paths:
           $ref: '#/components/responses/415-response'
         '500':
           $ref: '#/components/responses/500-response'
+  /{siteId}/bundles/addtocart:
+    post:
+      tags:
+        - Bundles
+      summary: addtocart
+      description: <i>/beacon/v2/{siteId}/bundles/addtocart</i><br><br>Shopper adds a Athos Commerce personalized bundle result to the cart via a `Quick Add to Cart` button in the rendered product card. **If frontend `Quick Add to Cart` is not implemented, omit usage of this endpoint.**
+      operationId: bundles-addtocart
+      security:
+        - {}
+      parameters:
+        - in: path
+          name: siteId
+          schema:
+            type: string
+            pattern: '[a-z0-9]{6}'
+          required: true
+          description: Customer siteId found in the Athos Console or Athos Management Console
+      requestBody:
+        description: Bundles payload
+        required: true
+        content:
+          text/plain:
+            schema:
+              title: Bundles Addtocart Schema
+              $ref: '#/components/schemas/bundles.addtocartSchema'
+            examples:
+              render example:
+                $ref: '#/components/examples/examples-addtocart'
+          application/json:
+            schema:
+              title: Bundles Addtocart Schema
+              $ref: '#/components/schemas/bundles.addtocartSchema'
+            examples:
+              render example:
+                $ref: '#/components/examples/examples-addtocart'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-response'
+        '400':
+          $ref: '#/components/responses/400-response'
+        '404':
+          $ref: '#/components/responses/404-response'
+        '405':
+          $ref: '#/components/responses/405-response'
+        '413':
+          $ref: '#/components/responses/413-response'
+        '415':
+          $ref: '#/components/responses/415-response'
+        '500':
+          $ref: '#/components/responses/500-response'
+  /{siteId}/bundles/clickthrough:
+    post:
+      tags:
+        - Bundles
+      summary: clickthrough
+      description: <i>/beacon/v2/{siteId}/bundles/clickthrough</i><br><br>Shopper clicks on a rendered Athos Commerce personalized bundle result, and is taken to the product detail page (PDP).
+      operationId: bundles-clickthrough
+      security:
+        - {}
+      parameters:
+        - in: path
+          name: siteId
+          schema:
+            type: string
+            pattern: '[a-z0-9]{6}'
+          required: true
+          description: Customer siteId found in the Athos Console or Athos Management Console
+      requestBody:
+        description: Bundles payload
+        required: true
+        content:
+          text/plain:
+            schema:
+              title: Bundles Clickthrough Schema
+              $ref: '#/components/schemas/bundles.clickthroughSchema'
+            examples:
+              results clickthrough example:
+                $ref: '#/components/examples/examples-results-clickthrough'
+              banners clickthrough example:
+                $ref: '#/components/examples/examples-banners-clickthrough'
+          application/json:
+            schema:
+              title: Bundles Clickthrough Schema
+              $ref: '#/components/schemas/bundles.clickthroughSchema'
+            examples:
+              results clickthrough example:
+                $ref: '#/components/examples/examples-results-clickthrough'
+              banners clickthrough example:
+                $ref: '#/components/examples/examples-banners-clickthrough'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-response'
+        '400':
+          $ref: '#/components/responses/400-response'
+        '404':
+          $ref: '#/components/responses/404-response'
+        '405':
+          $ref: '#/components/responses/405-response'
+        '413':
+          $ref: '#/components/responses/413-response'
+        '415':
+          $ref: '#/components/responses/415-response'
+        '500':
+          $ref: '#/components/responses/500-response'
+  /{siteId}/bundles/impression:
+    post:
+      tags:
+        - Bundles
+      summary: impression
+      description: <i>/beacon/v2/{siteId}/bundles/impression</i><br><br>Shopper scrolls into view rendered Athos Commerce personalized bundle results. Results sent ***must*** only be results in the shoppers view at the time of the event.
+      operationId: bundles-impression
+      security:
+        - {}
+      parameters:
+        - in: path
+          name: siteId
+          schema:
+            type: string
+            pattern: '[a-z0-9]{6}'
+          required: true
+          description: Customer siteId found in the Athos Console or Athos Management Console
+      requestBody:
+        description: Bundles payload
+        required: true
+        content:
+          text/plain:
+            schema:
+              title: Bundles Impression Schema
+              $ref: '#/components/schemas/bundles.impressionSchema'
+            examples:
+              results and banners impression example:
+                $ref: '#/components/examples/examples-impression'
+              results impression example:
+                $ref: '#/components/examples/examples-results-impression'
+              banners impression example:
+                $ref: '#/components/examples/examples-banners-impression'
+          application/json:
+            schema:
+              title: Bundles Impression Schema
+              $ref: '#/components/schemas/bundles.impressionSchema'
+            examples:
+              results and banners impression example:
+                $ref: '#/components/examples/examples-impression'
+              results impression example:
+                $ref: '#/components/examples/examples-results-impression'
+              banners impression example:
+                $ref: '#/components/examples/examples-banners-impression'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-response'
+        '400':
+          $ref: '#/components/responses/400-response'
+        '404':
+          $ref: '#/components/responses/404-response'
+        '405':
+          $ref: '#/components/responses/405-response'
+        '413':
+          $ref: '#/components/responses/413-response'
+        '415':
+          $ref: '#/components/responses/415-response'
+        '500':
+          $ref: '#/components/responses/500-response'
+  /{siteId}/bundles/render:
+    post:
+      tags:
+        - Bundles
+      summary: render
+      description: <i>/beacon/v2/{siteId}/bundles/render</i><br><br>Shopper navigates to a page where Athos Commerce personalized bundles are requested from the [Personalized Bundles API endpoint](https://docs.searchspring.com/reference/get-bundles) and rendered on the page.
+      operationId: bundles-render
+      security:
+        - {}
+      parameters:
+        - in: path
+          name: siteId
+          schema:
+            type: string
+            pattern: '[a-z0-9]{6}'
+          required: true
+          description: Customer siteId found in the Athos Console or Athos Management Console
+      requestBody:
+        description: Bundles payload
+        required: true
+        content:
+          text/plain:
+            schema:
+              title: Bundles Render Schema
+              $ref: '#/components/schemas/bundles.renderSchema'
+            examples:
+              render example:
+                $ref: '#/components/examples/examples-render'
+          application/json:
+            schema:
+              title: Bundles Render Schema
+              $ref: '#/components/schemas/bundles.renderSchema'
+            examples:
+              render example:
+                $ref: '#/components/examples/examples-render'
+      responses:
+        '200':
+          $ref: '#/components/responses/200-response'
+        '400':
+          $ref: '#/components/responses/400-response'
+        '404':
+          $ref: '#/components/responses/404-response'
+        '405':
+          $ref: '#/components/responses/405-response'
+        '413':
+          $ref: '#/components/responses/413-response'
+        '415':
+          $ref: '#/components/responses/415-response'
+        '500':
+          $ref: '#/components/responses/500-response'
   /{siteId}/cart/add:
     post:
       tags:
@@ -417,14 +631,14 @@ paths:
               $ref: '#/components/schemas/addtocartSchema'
             examples:
               addtocart example:
-                $ref: '#/components/examples/examples-addtocart'
+                $ref: '#/components/examples/components-examples-addtocart'
           application/json:
             schema:
               title: Category Addtocart Schema
               $ref: '#/components/schemas/addtocartSchema'
             examples:
               addtocart example:
-                $ref: '#/components/examples/examples-addtocart'
+                $ref: '#/components/examples/components-examples-addtocart'
       responses:
         '200':
           $ref: '#/components/responses/200-response'
@@ -467,7 +681,7 @@ paths:
               $ref: '#/components/schemas/clickthroughSchema'
             examples:
               results clickthrough example:
-                $ref: '#/components/examples/examples-results-clickthrough'
+                $ref: '#/components/examples/components-examples-results-clickthrough'
               banners clickthrough example:
                 $ref: '#/components/examples/banners-clickthrough'
           application/json:
@@ -476,7 +690,7 @@ paths:
               $ref: '#/components/schemas/clickthroughSchema'
             examples:
               results clickthrough example:
-                $ref: '#/components/examples/examples-results-clickthrough'
+                $ref: '#/components/examples/components-examples-results-clickthrough'
               banners clickthrough example:
                 $ref: '#/components/examples/banners-clickthrough'
       responses:
@@ -579,14 +793,14 @@ paths:
               $ref: '#/components/schemas/renderSchema'
             examples:
               render example:
-                $ref: '#/components/examples/examples-render'
+                $ref: '#/components/examples/components-examples-render'
           application/json:
             schema:
               title: Category Render Schema
               $ref: '#/components/schemas/renderSchema'
             examples:
               render example:
-                $ref: '#/components/examples/examples-render'
+                $ref: '#/components/examples/components-examples-render'
       responses:
         '200':
           $ref: '#/components/responses/200-response'
@@ -1113,14 +1327,14 @@ paths:
               $ref: '#/components/schemas/recommendations.addtocartSchema'
             examples:
               render example:
-                $ref: '#/components/examples/components-examples-addtocart'
+                $ref: '#/components/examples/examples-addtocart'
           application/json:
             schema:
               title: Recommendations Addtocart Schema
               $ref: '#/components/schemas/recommendations.addtocartSchema'
             examples:
               render example:
-                $ref: '#/components/examples/components-examples-addtocart'
+                $ref: '#/components/examples/examples-addtocart'
       responses:
         '200':
           $ref: '#/components/responses/200-response'
@@ -1163,7 +1377,7 @@ paths:
               $ref: '#/components/schemas/recommendations.clickthroughSchema'
             examples:
               results clickthrough example:
-                $ref: '#/components/examples/components-examples-results-clickthrough'
+                $ref: '#/components/examples/examples-results-clickthrough'
               banners clickthrough example:
                 $ref: '#/components/examples/examples-banners-clickthrough'
           application/json:
@@ -1172,7 +1386,7 @@ paths:
               $ref: '#/components/schemas/recommendations.clickthroughSchema'
             examples:
               results clickthrough example:
-                $ref: '#/components/examples/components-examples-results-clickthrough'
+                $ref: '#/components/examples/examples-results-clickthrough'
               banners clickthrough example:
                 $ref: '#/components/examples/examples-banners-clickthrough'
       responses:
@@ -1275,14 +1489,14 @@ paths:
               $ref: '#/components/schemas/recommendations.renderSchema'
             examples:
               render example:
-                $ref: '#/components/examples/components-examples-render'
+                $ref: '#/components/examples/examples-render'
           application/json:
             schema:
               title: Recommendations Render Schema
               $ref: '#/components/schemas/recommendations.renderSchema'
             examples:
               render example:
-                $ref: '#/components/examples/components-examples-render'
+                $ref: '#/components/examples/examples-render'
       responses:
         '200':
           $ref: '#/components/responses/200-response'
@@ -1375,7 +1589,7 @@ paths:
               $ref: '#/components/schemas/clickthroughSchema'
             examples:
               results clickthrough example:
-                $ref: '#/components/examples/examples-results-clickthrough'
+                $ref: '#/components/examples/components-examples-results-clickthrough'
               banners clickthrough example:
                 $ref: '#/components/examples/banners-clickthrough'
           application/json:
@@ -1384,7 +1598,7 @@ paths:
               $ref: '#/components/schemas/clickthroughSchema'
             examples:
               results clickthrough example:
-                $ref: '#/components/examples/examples-results-clickthrough'
+                $ref: '#/components/examples/components-examples-results-clickthrough'
               banners clickthrough example:
                 $ref: '#/components/examples/banners-clickthrough'
       responses:
@@ -2049,6 +2263,118 @@ components:
           properties:
             responseId:
               $ref: '#/components/schemas/responseId'
+    profile.tag:
+      type: string
+      description: Tag of the personalized recommendation profile the shopper interacted with
+    bundles.addtocartSchema:
+      type: object
+      required:
+        - context
+        - data
+      properties:
+        context:
+          $ref: '#/components/schemas/context'
+        data:
+          type: object
+          title: Bundles Addtocart Schema Data
+          description: Event details
+          required:
+            - responseId
+            - results
+            - tag
+          properties:
+            responseId:
+              $ref: '#/components/schemas/responseId'
+            tag:
+              $ref: '#/components/schemas/profile.tag'
+            results:
+              type: array
+              description: Products added to the cart
+              items:
+                $ref: '#/components/schemas/product'
+    bundles.clickthroughSchema:
+      type: object
+      required:
+        - context
+        - data
+      properties:
+        context:
+          $ref: '#/components/schemas/context'
+        data:
+          type: object
+          title: Bundles Clickthrough Schema Data
+          description: Event details
+          oneOf:
+            - title: Clickthrough Results Schema
+              required:
+                - tag
+                - responseId
+                - results
+              properties:
+                tag:
+                  $ref: '#/components/schemas/profile.tag'
+                responseId:
+                  $ref: '#/components/schemas/responseId'
+                results:
+                  $ref: '#/components/schemas/clickthrough.results'
+            - title: Clickthrough Banners Schema
+              required:
+                - tag
+                - responseId
+                - banners
+              properties:
+                tag:
+                  $ref: '#/components/schemas/profile.tag'
+                responseId:
+                  $ref: '#/components/schemas/responseId'
+                banners:
+                  $ref: '#/components/schemas/clickthrough.banners'
+    bundles.impressionSchema:
+      type: object
+      required:
+        - context
+        - data
+      properties:
+        context:
+          $ref: '#/components/schemas/context'
+        data:
+          type: object
+          title: Bundles Impression Schema Data
+          description: Event details
+          required:
+            - tag
+            - responseId
+            - banners
+          properties:
+            tag:
+              $ref: '#/components/schemas/profile.tag'
+            responseId:
+              $ref: '#/components/schemas/responseId'
+            results:
+              $ref: '#/components/schemas/results'
+            banners:
+              $ref: '#/components/schemas/banners'
+    bundles.renderSchema:
+      type: object
+      required:
+        - context
+        - data
+      properties:
+        context:
+          $ref: '#/components/schemas/context'
+        data:
+          type: object
+          title: Bundles Render Schema Data
+          description: Event details
+          required:
+            - responseId
+            - tag
+          properties:
+            tag:
+              type: string
+              $ref: '#/components/schemas/profile.tag'
+            responseId:
+              $ref: '#/components/schemas/responseId'
     cartSchema:
       type: object
       required:
@@ -2167,9 +2493,6 @@ components:
               $ref: '#/components/schemas/stack'
             details:
               $ref: '#/components/schemas/details'
-    profile.tag:
-      type: string
-      description: Tag of the personalized recommendation profile the shopper interacted with
     recommendations.addtocartSchema:
       type: object
       required:
@@ -2180,6 +2503,7 @@ components:
           $ref: '#/components/schemas/context'
         data:
           type: object
+          title: Recommendations Addtocart Schema Data
           description: Event details
           required:
             - responseId
@@ -2205,6 +2529,7 @@ components:
           $ref: '#/components/schemas/context'
         data:
           type: object
+          title: Recommendations Clickthrough Schema Data
           description: Event details
           oneOf:
             - title: Clickthrough Results Schema
@@ -2241,6 +2566,7 @@ components:
           $ref: '#/components/schemas/context'
         data:
           type: object
+          title: Recommendations Impression Schema Data
           description: Event details
           required:
             - tag
@@ -2265,6 +2591,7 @@ components:
           $ref: '#/components/schemas/context'
         data:
           type: object
+          title: Recommendations Render Schema Data
           description: Event details
           required:
             - responseId
@@ -2484,6 +2811,195 @@ components:
             code: USD
         data:
           responseId: a907d0ad-720a-4666-b046-00c0c28fb78d
+    examples-addtocart:
+      value:
+        context:
+          IP: 7309:1fdb:e0d5:7632:7f2a:c269:7519:991b
+          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+          timestamp: '2024-06-11T17:47:04.075876Z'
+          pageUrl: https://bocachica.searchspring.com/collections/mens/products/adventure-shorts-pitch-black
+          userId: 41f87850-65f5-4546-851c-f166109e57b9
+          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
+          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
+          shopperId: user123456
+          initiator: searchspring/snap/preact/0.49.1
+          attribution:
+            - type: email
+              id: '1234567890'
+          currency:
+            code: USD
+        data:
+          responseId: 42c2dc64-d203-4d74-8122-515f26afb253
+          tag: similar
+          results:
+            - parentId: '8128331911111'
+              uid: '8128331907370'
+              qty: 1
+              price: 49.99
+    examples-results-clickthrough:
+      value:
+        context:
+          IP: 89.76.6.25
+          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+          timestamp: '2006-01-02T15:04:05Z'
+          pageUrl: https://bocachica.searchspring.com/collections/shop?q=shirt&view=products
+          userId: 41f87850-65f5-4546-851c-f166109e57b9
+          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
+          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
+          shopperId: user123456
+          initiator: searchspring/snap/preact/0.49.1
+          currency:
+            code: USD
+        data:
+          responseId: a907d0ad-720a-4666-b046-00c0c28fb78d
+          tag: similar
+          results:
+            - type: product
+              parentId: '8128331911111'
+              uid: '8128331907370'
+    examples-banners-clickthrough:
+      value:
+        context:
+          IP: 89.76.6.25
+          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+          timestamp: '2006-01-02T15:04:05Z'
+          pageUrl: https://bocachica.searchspring.com/collections/shop?q=shirt&view=products
+          userId: 41f87850-65f5-4546-851c-f166109e57b9
+          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
+          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
+          shopperId: user123456
+          initiator: searchspring/snap/preact/0.49.1
+          currency:
+            code: USD
+        data:
+          responseId: a907d0ad-720a-4666-b046-00c0c28fb78d
+          tag: similar
+          banners:
+            - uid: '8128168755498'
+    examples-impression:
+      value:
+        context:
+          IP: 7309:1fdb:e0d5:7632:7f2a:c269:7519:991b
+          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+          timestamp: '2024-06-11T17:47:04.075876Z'
+          pageUrl: https://bocachica.searchspring.com/collections/mens/products/adventure-shorts-pitch-black
+          userId: 41f87850-65f5-4546-851c-f166109e57b9
+          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
+          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
+          shopperId: user123456
+          initiator: searchspring/snap/preact/0.49.1
+          attribution:
+            - type: email
+              id: '1234567890'
+          currency:
+            code: USD
+        data:
+          responseId: 42c2dc64-d203-4d74-8122-515f26afb253
+          tag: similar
+          results:
+            - type: product
+              parentId: '8128331911111'
+              uid: '8128331907370'
+            - type: product
+              parentId: '8128331922222'
+              uid: '8128021070122'
+            - type: product
+              parentId: '8128331933333'
+              uid: '8127879741738'
+            - type: product
+              parentId: '8128331944444'
+              uid: '8128173736234'
+            - type: product
+              parentId: '8128331955555'
+              uid: '8128273711402'
+            - type: product
+              parentId: '8128331966666'
+              uid: '8128028737834'
+          banners:
+            - uid: '8128168755498'
+    examples-results-impression:
+      value:
+        context:
+          IP: 7309:1fdb:e0d5:7632:7f2a:c269:7519:991b
+          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+          timestamp: '2024-06-11T17:47:04.075876Z'
+          pageUrl: https://bocachica.searchspring.com/collections/mens/products/adventure-shorts-pitch-black
+          userId: 41f87850-65f5-4546-851c-f166109e57b9
+          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
+          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
+          shopperId: user123456
+          initiator: searchspring/snap/preact/0.49.1
+          attribution:
+            - type: email
+              id: '1234567890'
+          currency:
+            code: USD
+        data:
+          responseId: 42c2dc64-d203-4d74-8122-515f26afb253
+          tag: similar
+          results:
+            - type: product
+              parentId: '8128331911111'
+              uid: '8128331907370'
+            - type: product
+              parentId: '8128331922222'
+              uid: '8128021070122'
+            - type: product
+              parentId: '8128331933333'
+              uid: '8127879741738'
+            - type: product
+              parentId: '8128331944444'
+              uid: '8128173736234'
+            - type: product
+              parentId: '8128331955555'
+              uid: '8128273711402'
+            - type: product
+              parentId: '8128331966666'
+              uid: '8128028737834'
+          banners: []
+    examples-banners-impression:
+      value:
+        context:
+          IP: 7309:1fdb:e0d5:7632:7f2a:c269:7519:991b
+          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+          timestamp: '2024-06-11T17:47:04.075876Z'
+          pageUrl: https://bocachica.searchspring.com/collections/mens/products/adventure-shorts-pitch-black
+          userId: 41f87850-65f5-4546-851c-f166109e57b9
+          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
+          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
+          shopperId: user123456
+          initiator: searchspring/snap/preact/0.49.1
+          attribution:
+            - type: email
+              id: '1234567890'
+          currency:
+            code: USD
+        data:
+          responseId: 42c2dc64-d203-4d74-8122-515f26afb253
+          tag: similar
+          results: []
+          banners:
+            - uid: '8128168755498'
+    examples-render:
+      value:
+        context:
+          IP: 7309:1fdb:e0d5:7632:7f2a:c269:7519:991b
+          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
+          timestamp: '2024-06-11T17:47:04.075876Z'
+          pageUrl: https://bocachica.searchspring.com/collections/mens/products/adventure-shorts-pitch-black
+          userId: 41f87850-65f5-4546-851c-f166109e57b9
+          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
+          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
+          shopperId: user123456
+          initiator: searchspring/snap/preact/0.49.1
+          attribution:
+            - type: email
+              id: '1234567890'
+          currency:
+            code: USD
+        data:
+          tag: similar
+          responseId: 42c2dc64-d203-4d74-8122-515f26afb253
     add:
       value:
         context:
@@ -2538,7 +3054,7 @@ components:
               uid: '0987654321'
               qty: 1
               price: 39
-    examples-addtocart:
+    components-examples-addtocart:
       value:
         context:
           IP: 89.76.6.25
@@ -2559,7 +3075,7 @@ components:
               uid: '8128331907370'
               qty: 1
               price: 22
-    examples-results-clickthrough:
+    components-examples-results-clickthrough:
       value:
         context:
           IP: 89.76.6.25
@@ -2579,7 +3095,7 @@ components:
             - type: product
               parentId: '8128331911111'
               uid: '8128331907370'
-    examples-render:
+    components-examples-render:
       value:
         context:
           IP: 89.76.6.25
@@ -2734,195 +3250,6 @@ components:
           result:
             parentId: '1234511111'
             uid: '1234567890'
-    components-examples-addtocart:
-      value:
-        context:
-          IP: 7309:1fdb:e0d5:7632:7f2a:c269:7519:991b
-          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
-          timestamp: '2024-06-11T17:47:04.075876Z'
-          pageUrl: https://bocachica.searchspring.com/collections/mens/products/adventure-shorts-pitch-black
-          userId: 41f87850-65f5-4546-851c-f166109e57b9
-          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
-          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
-          shopperId: user123456
-          initiator: searchspring/snap/preact/0.49.1
-          attribution:
-            - type: email
-              id: '1234567890'
-          currency:
-            code: USD
-        data:
-          responseId: 42c2dc64-d203-4d74-8122-515f26afb253
-          tag: similar
-          results:
-            - parentId: '8128331911111'
-              uid: '8128331907370'
-              qty: 1
-              price: 49.99
-    components-examples-results-clickthrough:
-      value:
-        context:
-          IP: 89.76.6.25
-          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
-          timestamp: '2006-01-02T15:04:05Z'
-          pageUrl: https://bocachica.searchspring.com/collections/shop?q=shirt&view=products
-          userId: 41f87850-65f5-4546-851c-f166109e57b9
-          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
-          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
-          shopperId: user123456
-          initiator: searchspring/snap/preact/0.49.1
-          currency:
-            code: USD
-        data:
-          responseId: a907d0ad-720a-4666-b046-00c0c28fb78d
-          tag: similar
-          results:
-            - type: product
-              parentId: '8128331911111'
-              uid: '8128331907370'
-    examples-banners-clickthrough:
-      value:
-        context:
-          IP: 89.76.6.25
-          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
-          timestamp: '2006-01-02T15:04:05Z'
-          pageUrl: https://bocachica.searchspring.com/collections/shop?q=shirt&view=products
-          userId: 41f87850-65f5-4546-851c-f166109e57b9
-          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
-          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
-          shopperId: user123456
-          initiator: searchspring/snap/preact/0.49.1
-          currency:
-            code: USD
-        data:
-          responseId: a907d0ad-720a-4666-b046-00c0c28fb78d
-          tag: similar
-          banners:
-            - uid: '8128168755498'
-    examples-impression:
-      value:
-        context:
-          IP: 7309:1fdb:e0d5:7632:7f2a:c269:7519:991b
-          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
-          timestamp: '2024-06-11T17:47:04.075876Z'
-          pageUrl: https://bocachica.searchspring.com/collections/mens/products/adventure-shorts-pitch-black
-          userId: 41f87850-65f5-4546-851c-f166109e57b9
-          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
-          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
-          shopperId: user123456
-          initiator: searchspring/snap/preact/0.49.1
-          attribution:
-            - type: email
-              id: '1234567890'
-          currency:
-            code: USD
-        data:
-          responseId: 42c2dc64-d203-4d74-8122-515f26afb253
-          tag: similar
-          results:
-            - type: product
-              parentId: '8128331911111'
-              uid: '8128331907370'
-            - type: product
-              parentId: '8128331922222'
-              uid: '8128021070122'
-            - type: product
-              parentId: '8128331933333'
-              uid: '8127879741738'
-            - type: product
-              parentId: '8128331944444'
-              uid: '8128173736234'
-            - type: product
-              parentId: '8128331955555'
-              uid: '8128273711402'
-            - type: product
-              parentId: '8128331966666'
-              uid: '8128028737834'
-          banners:
-            - uid: '8128168755498'
-    examples-results-impression:
-      value:
-        context:
-          IP: 7309:1fdb:e0d5:7632:7f2a:c269:7519:991b
-          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
-          timestamp: '2024-06-11T17:47:04.075876Z'
-          pageUrl: https://bocachica.searchspring.com/collections/mens/products/adventure-shorts-pitch-black
-          userId: 41f87850-65f5-4546-851c-f166109e57b9
-          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
-          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
-          shopperId: user123456
-          initiator: searchspring/snap/preact/0.49.1
-          attribution:
-            - type: email
-              id: '1234567890'
-          currency:
-            code: USD
-        data:
-          responseId: 42c2dc64-d203-4d74-8122-515f26afb253
-          tag: similar
-          results:
-            - type: product
-              parentId: '8128331911111'
-              uid: '8128331907370'
-            - type: product
-              parentId: '8128331922222'
-              uid: '8128021070122'
-            - type: product
-              parentId: '8128331933333'
-              uid: '8127879741738'
-            - type: product
-              parentId: '8128331944444'
-              uid: '8128173736234'
-            - type: product
-              parentId: '8128331955555'
-              uid: '8128273711402'
-            - type: product
-              parentId: '8128331966666'
-              uid: '8128028737834'
-          banners: []
-    examples-banners-impression:
-      value:
-        context:
-          IP: 7309:1fdb:e0d5:7632:7f2a:c269:7519:991b
-          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
-          timestamp: '2024-06-11T17:47:04.075876Z'
-          pageUrl: https://bocachica.searchspring.com/collections/mens/products/adventure-shorts-pitch-black
-          userId: 41f87850-65f5-4546-851c-f166109e57b9
-          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
-          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
-          shopperId: user123456
-          initiator: searchspring/snap/preact/0.49.1
-          attribution:
-            - type: email
-              id: '1234567890'
-          currency:
-            code: USD
-        data:
-          responseId: 42c2dc64-d203-4d74-8122-515f26afb253
-          tag: similar
-          results: []
-          banners:
-            - uid: '8128168755498'
-    components-examples-render:
-      value:
-        context:
-          IP: 7309:1fdb:e0d5:7632:7f2a:c269:7519:991b
-          userAgent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36
-          timestamp: '2024-06-11T17:47:04.075876Z'
-          pageUrl: https://bocachica.searchspring.com/collections/mens/products/adventure-shorts-pitch-black
-          userId: 41f87850-65f5-4546-851c-f166109e57b9
-          sessionId: 1c311c14-c33b-4222-952a-f17db729ea31
-          pageLoadId: 080d179f-0034-4278-8d3c-dfba71c9b897
-          shopperId: user123456
-          initiator: searchspring/snap/preact/0.49.1
-          attribution:
-            - type: email
-              id: '1234567890'
-          currency:
-            code: USD
-        data:
-          tag: similar
-          responseId: 42c2dc64-d203-4d74-8122-515f26afb253
     examples_components-examples-addtocart:
       value:
         context:
