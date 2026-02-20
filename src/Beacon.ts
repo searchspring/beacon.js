@@ -175,6 +175,7 @@ export class Beacon {
 	private requests: PayloadRequest[] = [];
 
 	constructor(globals: BeaconGlobals, config?: BeaconConfig) {
+		console.log('got here beacon!!!');
 		if (typeof globals != 'object' || typeof globals.siteId != 'string') {
 			throw new Error(`Invalid config passed to tracker. The "siteId" attribute must be provided.`);
 		}
@@ -218,7 +219,7 @@ export class Beacon {
 		}
 	}
 
-	private getCookie(name: string): string {
+	private getCookieRaw(name: string): string {
 		if (typeof window !== 'undefined' && featureFlags.cookies) {
 			const cookieName = name + '=';
 			const cookiesList = window.document.cookie.split(';');
@@ -239,40 +240,47 @@ export class Beacon {
 		return '';
 	}
 
-	private setCookie(name: string, value: string, samesite: string, expiration: number, domain?: string): void {
+	private generateCookieString(name: string, value: string, samesite: string, expiration: number, domain?: string): string {
+		const secureString = window.location.protocol == 'https:' ? 'Secure;' : '';
+		const sameSiteString = 'SameSite=' + (samesite || 'Lax') + ';';
+		let expiresString = '';
+		if (expiration) {
+			const d = new Date();
+			d.setTime(d.getTime() + expiration);
+			expiresString = 'expires=' + d['toUTCString']() + ';';
+		}
+		const valueString = encodeURIComponent(value) + ';';
+
+		if (domain) {
+			// TODO: does domain need a semicolon?
+			return name + '=' + valueString + expiresString + sameSiteString + secureString + 'path=/; domain=' + domain;
+		}
+
+		const host = window?.location?.hostname;
+		if (!host || host.split('.').length === 1) {
+			return name + '=' + valueString + expiresString + sameSiteString + secureString + 'path=/';
+		}
+
+		const domainParts = host.split('.');
+		domainParts.shift();
+		domain = '.' + domainParts.join('.');
+
+		return name + '=' + valueString + expiresString + sameSiteString + secureString + 'path=/; domain=' + domain;
+	}
+
+	private setCookie(keys: KeyPair, value: string, samesite: string, expiration: number, domain?: string): void {
 		if (featureFlags.cookies) {
-			try {
-				const secureString = window.location.protocol == 'https:' ? 'Secure;' : '';
-				const sameSiteString = 'SameSite=' + (samesite || 'Lax') + ';';
-				let expiresString = '';
-				if (expiration) {
-					const d = new Date();
-					d.setTime(d.getTime() + expiration);
-					expiresString = 'expires=' + d['toUTCString']() + ';';
-				}
-				const valueString = encodeURIComponent(value) + ';';
-				if (domain) {
-					window.document.cookie = name + '=' + valueString + expiresString + sameSiteString + secureString + 'path=/; domain=' + domain;
-				} else {
-					const host = window?.location?.hostname;
-					if (!host || host.split('.').length === 1) {
-						window.document.cookie = name + '=' + valueString + expiresString + sameSiteString + secureString + 'path=/';
-					} else {
-						const domainParts = host.split('.');
-						domainParts.shift();
-						domain = '.' + domainParts.join('.');
-
-						window.document.cookie = name + '=' + valueString + expiresString + sameSiteString + secureString + 'path=/; domain=' + domain;
-
-						if (this.getCookie(name) == null || this.getCookie(name) != value) {
-							domain = '.' + host;
-							window.document.cookie = name + '=' + valueString + expiresString + sameSiteString + secureString + 'path=/; domain=' + domain;
-						}
+			[keys.primary, keys.legacy].forEach((name) => {
+				try {
+					window.document.cookie = this.generateCookieString(name, value, samesite, expiration, domain);
+					if (this.getCookieRaw(name) == null || this.getCookieRaw(name) != value) {
+						domain = '.' + window.location.hostname;
+						window.document.cookie = this.generateCookieString(name, value, samesite, expiration, domain);
 					}
+				} catch (e: any) {
+					console.error(`Failed to set '${name}' cookie:`, e);
 				}
-			} catch (e: any) {
-				console.error(`Failed to set '${name}' cookie:`, e);
-			}
+			});
 		}
 	}
 
@@ -307,13 +315,8 @@ export class Beacon {
 		}
 	}
 
-	private getDualCookie(keys: KeyPair): string {
-		return this.getCookie(keys.primary) || this.getCookie(keys.legacy);
-	}
-
-	private setDualCookie(keys: KeyPair, value: string, samesite: string, expiration: number, domain?: string): void {
-		this.setCookie(keys.primary, value, samesite, expiration, domain);
-		this.setCookie(keys.legacy, value, samesite, expiration, domain);
+	private getCookie(keys: KeyPair): string {
+		return this.getCookieRaw(keys.primary) || this.getCookieRaw(keys.legacy);
 	}
 
 	private removeDualLocalStorageItem(keys: KeyPair): void {
@@ -337,10 +340,10 @@ export class Beacon {
 						// corrupted - delete entry
 						this.removeDualLocalStorageItem(KEYS.CART_PRODUCTS);
 
-						this.setDualCookie(KEYS.CART_PRODUCTS, '', COOKIE_SAMESITE, 0, COOKIE_DOMAIN);
+						this.setCookie(KEYS.CART_PRODUCTS, '', COOKIE_SAMESITE, 0, COOKIE_DOMAIN);
 					}
 				} else {
-					const storedSkus = this.getDualCookie(KEYS.CART_PRODUCTS);
+					const storedSkus = this.getCookie(KEYS.CART_PRODUCTS);
 					// split on ',' and remap to Product[], setting qty and price to unknowns (0?)
 					return storedSkus
 						.split(',')
@@ -363,7 +366,7 @@ export class Beacon {
 
 				// also set cookie with re-mapping - favoring the more specific variant
 				const storedProductsCookie = products.map((product) => this.getProductId(product)).join(',');
-				this.setDualCookie(KEYS.CART_PRODUCTS, storedProductsCookie, COOKIE_SAMESITE, 0, COOKIE_DOMAIN);
+				this.setCookie(KEYS.CART_PRODUCTS, storedProductsCookie, COOKIE_SAMESITE, 0, COOKIE_DOMAIN);
 
 				const productsHaveChanged = JSON.stringify(currentCartProducts) !== stringifiedProducts;
 				if (productsHaveChanged) {
@@ -438,10 +441,10 @@ export class Beacon {
 						// corrupted - delete entry
 						this.removeDualLocalStorageItem(KEYS.VIEWED_PRODUCTS);
 
-						this.setDualCookie(KEYS.VIEWED_PRODUCTS, '', COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
+						this.setCookie(KEYS.VIEWED_PRODUCTS, '', COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
 					}
 				} else {
-					const storedSkus = this.getDualCookie(KEYS.VIEWED_PRODUCTS);
+					const storedSkus = this.getCookie(KEYS.VIEWED_PRODUCTS);
 					// split on ',' and remap to Product[], setting qty and price to unknowns (0?)
 					return storedSkus
 						.split(',')
@@ -467,7 +470,7 @@ export class Beacon {
 
 				// also set cookie with re-mapping - favoring the more specific variant
 				const storedProductsCookie = normalizedItems.map((item) => this.getProductId(item)).join(',');
-				this.setDualCookie(KEYS.VIEWED_PRODUCTS, storedProductsCookie, COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
+				this.setCookie(KEYS.VIEWED_PRODUCTS, storedProductsCookie, COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
 
 				const productsHaveChanged = JSON.stringify(currentViewedItems) !== stringifiedNormalizedItems;
 				if (productsHaveChanged) {
@@ -932,7 +935,7 @@ export class Beacon {
 
 		try {
 			// try to get the value from the cookie
-			storedCookieValue = this.getDualCookie(keyPair);
+			storedCookieValue = this.getCookie(keyPair);
 
 			// try to get the value from the local storage
 			const data = this.getLocalStorageItem(keyPair) as { timestamp: string; value: string };
@@ -960,8 +963,8 @@ export class Beacon {
 			}
 
 			// set cookie
-			this.setDualCookie(keyPair, data.value, COOKIE_SAMESITE, EXPIRED_COOKIE, COOKIE_DOMAIN); // clear old subdomain cookie
-			this.setDualCookie(keyPair, data.value, COOKIE_SAMESITE, expiration); // attempt to store in cookie
+			this.setCookie(keyPair, data.value, COOKIE_SAMESITE, EXPIRED_COOKIE, COOKIE_DOMAIN); // clear old subdomain cookie
+			this.setCookie(keyPair, data.value, COOKIE_SAMESITE, expiration); // attempt to store in cookie
 
 			// set local storage
 			try {
@@ -1013,7 +1016,7 @@ export class Beacon {
 	public getShopperId(): string {
 		try {
 			// cookie value is always a string, but localstorage could be a number
-			const cookieValue = this.getDualCookie(KEYS.SHOPPER_ID);
+			const cookieValue = this.getCookie(KEYS.SHOPPER_ID);
 			const storageValue = this.getLocalStorageItem(KEYS.SHOPPER_ID) as string;
 
 			// set the shopperId to the cookie value if it exists, otherwise use the local storage value and then convert to string if they exist
@@ -1035,7 +1038,7 @@ export class Beacon {
 		const existingShopperId = this.getShopperId();
 		if (existingShopperId !== shopperId) {
 			this.shopperId = '' + shopperId; // ensure string
-			this.setDualCookie(KEYS.SHOPPER_ID, this.shopperId, COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
+			this.setCookie(KEYS.SHOPPER_ID, this.shopperId, COOKIE_SAMESITE, MAX_EXPIRATION, COOKIE_DOMAIN);
 			try {
 				this.setLocalStorageItem(KEYS.SHOPPER_ID, this.shopperId);
 			} catch (e: any) {
@@ -1057,7 +1060,7 @@ export class Beacon {
 			// noop - URL failed to parse empty url
 		}
 
-		const storedAttribution = this.getDualCookie(KEYS.ATTRIBUTION) || (this.getLocalStorageItem(KEYS.ATTRIBUTION) as AttributionInner[]);
+		const storedAttribution = this.getCookie(KEYS.ATTRIBUTION) || (this.getLocalStorageItem(KEYS.ATTRIBUTION) as AttributionInner[]);
 		if (storedAttribution) {
 			try {
 				if (typeof storedAttribution === 'string') {
@@ -1084,7 +1087,7 @@ export class Beacon {
 
 		if (attribution.length) {
 			const stringifiedAttribution = JSON.stringify(attribution);
-			this.setDualCookie(KEYS.ATTRIBUTION, stringifiedAttribution, COOKIE_SAMESITE, THIRTY_MINUTES, COOKIE_DOMAIN);
+			this.setCookie(KEYS.ATTRIBUTION, stringifiedAttribution, COOKIE_SAMESITE, THIRTY_MINUTES, COOKIE_DOMAIN);
 			try {
 				this.setLocalStorageItem(KEYS.ATTRIBUTION, attribution);
 			} catch (e: any) {
