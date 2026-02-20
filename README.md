@@ -949,7 +949,7 @@ beacon.updateContext('pageUrl', window.location.href);
 
 ### Attribution Tracking
 
-Attribution is automatically captured from url parameters (ie. https://example.com/products?ss_attribution=email:campaign-123) and will be placed on the beacon context.
+Attribution is automatically captured from url parameters (ie. https://example.com/products?athos_attribution=email:campaign-123) and will be placed on the beacon context.
 
 
 ## Error Handling

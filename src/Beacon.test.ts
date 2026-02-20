@@ -3,9 +3,8 @@ import {
 	additionalRequestKeys,
 	appendResults,
 	Beacon,
-	CART_KEY,
 	PAGE_LOAD_ID_EXPIRATION,
-	PAGE_LOAD_ID_KEY,
+	KEYS,
 	PayloadRequest,
 	PREFLIGHT_DEBOUNCE_TIMEOUT,
 	REQUEST_GROUPING_TIMEOUT,
@@ -111,15 +110,15 @@ describe('Beacon', () => {
 				const cartData = beacon.storage.cart.get();
 				expect(cartData).toEqual(mockProducts);
 
-				// cookie contains cart data
-				expect(global.document.cookie).toContain(
-					`${CART_KEY}=${encodeURIComponent(mockProducts.map((product) => product.sku || product.uid).join(','))}`
-				);
+				// cookie contains cart data (both primary and legacy keys)
+				const encodedCartCookie = encodeURIComponent(mockProducts.map((product) => product.sku || product.uid).join(','));
+				expect(global.document.cookie).toContain(`${KEYS.CART_PRODUCTS.primary}=${encodedCartCookie}`);
+				expect(global.document.cookie).toContain(`${KEYS.CART_PRODUCTS.legacy}=${encodedCartCookie}`);
 
-				// localStorage contains cart data
+				// localStorage contains cart data (both primary and legacy keys)
 				expect(localStorageMock.setItem).toHaveBeenCalled();
-				const data = localStorageMock.getItem(CART_KEY);
-				expect(data).toBe(JSON.stringify({ value: mockProducts }));
+				expect(localStorageMock.getItem(KEYS.CART_PRODUCTS.primary)).toBe(JSON.stringify({ value: mockProducts }));
+				expect(localStorageMock.getItem(KEYS.CART_PRODUCTS.legacy)).toBe(JSON.stringify({ value: mockProducts }));
 
 				// can add to existing cart data and should be at the front
 				const product = { uid: 'productUid5', parentId: 'productparentId5', sku: 'productSku5', qty: 1, price: 9.99 };
@@ -164,9 +163,10 @@ describe('Beacon', () => {
 				beacon.storage.cart.clear();
 				const clearedCartData = beacon.storage.cart.get();
 				expect(clearedCartData).toEqual([]);
-				expect(global.document.cookie).toEqual(`${CART_KEY}=`);
-				const rawClearedItem = localStorageMock.getItem(CART_KEY);
-				expect(rawClearedItem).toBe(JSON.stringify({ value: [] }));
+				expect(global.document.cookie).toContain(`${KEYS.CART_PRODUCTS.primary}=`);
+				expect(global.document.cookie).toContain(`${KEYS.CART_PRODUCTS.legacy}=`);
+				expect(localStorageMock.getItem(KEYS.CART_PRODUCTS.primary)).toBe(JSON.stringify({ value: [] }));
+				expect(localStorageMock.getItem(KEYS.CART_PRODUCTS.legacy)).toBe(JSON.stringify({ value: [] }));
 			});
 		});
 		describe('Methods', () => {
@@ -174,12 +174,12 @@ describe('Beacon', () => {
 				// must use real timers with cookie expiration
 				jest.useRealTimers();
 
-				const id1 = beacon['getStoredId']('userId', 'storage-key', 0);
+				const id1 = beacon['getStoredId']('userId', { primary: 'storage-key', legacy: 'legacy-storage-key' }, 0);
 				expect(id1).toStrictEqual(expect.any(String));
 
 				await new Promise((resolve) => setTimeout(resolve, 101)); // wait for timestamp to change
 
-				const id2 = beacon['getStoredId']('userId', 'storage-key', 0);
+				const id2 = beacon['getStoredId']('userId', { primary: 'storage-key', legacy: 'legacy-storage-key' }, 0);
 				expect(id2).toStrictEqual(expect.any(String));
 				expect(id1).toBe(id2);
 			});
@@ -189,18 +189,18 @@ describe('Beacon', () => {
 				jest.useRealTimers();
 
 				const expiration = 100;
-				const id1 = beacon['getStoredId']('userId', 'storage-key', expiration);
+				const id1 = beacon['getStoredId']('userId', { primary: 'storage-key', legacy: 'legacy-storage-key' }, expiration);
 				expect(id1).toStrictEqual(expect.any(String));
 
 				await new Promise((resolve) => setTimeout(resolve, expiration / 2));
 
-				const id2 = beacon['getStoredId']('userId', 'storage-key', expiration);
+				const id2 = beacon['getStoredId']('userId', { primary: 'storage-key', legacy: 'legacy-storage-key' }, expiration);
 				expect(id2).toStrictEqual(expect.any(String));
 				expect(id1).toBe(id2);
 
 				await new Promise((resolve) => setTimeout(resolve, expiration + 100));
 
-				const id3 = beacon['getStoredId']('userId', 'storage-key', expiration);
+				const id3 = beacon['getStoredId']('userId', { primary: 'storage-key', legacy: 'legacy-storage-key' }, expiration);
 				expect(id3).toStrictEqual(expect.any(String));
 				expect(id3).not.toBe(id2);
 			});
@@ -222,7 +222,7 @@ describe('Beacon', () => {
 				expect(pageLoadId2).toStrictEqual(pageLoadId1);
 
 				// should save generated id to storage
-				const stored = localStorageMock.getItem(PAGE_LOAD_ID_KEY) || '{}';
+				const stored = localStorageMock.getItem(KEYS.PAGE_LOAD_ID.primary) || '{}';
 				expect(JSON.parse(stored)).toStrictEqual({
 					value: {
 						href,
@@ -233,8 +233,9 @@ describe('Beacon', () => {
 			});
 
 			it('can getPageLoadId from storage', async () => {
+				localStorageMock.clear(); // clear stale data from beforeEach beacon construction
 				const stored = { href: 'test-href', value: 'test-value', timestamp: beacon.getTimestamp() };
-				localStorageMock.setItem(PAGE_LOAD_ID_KEY, JSON.stringify({ value: stored }));
+				localStorageMock.setItem(KEYS.PAGE_LOAD_ID.primary, JSON.stringify({ value: stored }));
 
 				jest.advanceTimersByTime(100); // wait for timestamp to change
 				// reconstruct beacon due to pageLoadId being created in constructor
@@ -246,7 +247,7 @@ describe('Beacon', () => {
 				expect(beacon['pageLoadId']).toStrictEqual(stored.value);
 
 				// stored value shouldn't change - timestamp should be different
-				const stored2 = localStorageMock.getItem(PAGE_LOAD_ID_KEY) || '{}';
+				const stored2 = localStorageMock.getItem(KEYS.PAGE_LOAD_ID.primary) || '{}';
 				expect(JSON.parse(stored2)).toStrictEqual({
 					value: {
 						href: stored.href,
@@ -261,7 +262,7 @@ describe('Beacon', () => {
 			it('does not get expired pageLoadId from storage', async () => {
 				localStorageMock.clear();
 				const stored = { href: 'test-href', value: 'test-value', timestamp: beacon.getTimestamp() };
-				localStorageMock.setItem(PAGE_LOAD_ID_KEY, JSON.stringify({ value: stored }));
+				localStorageMock.setItem(KEYS.PAGE_LOAD_ID.primary, JSON.stringify({ value: stored }));
 
 				jest.advanceTimersByTime(PAGE_LOAD_ID_EXPIRATION + 10);
 
@@ -275,7 +276,7 @@ describe('Beacon', () => {
 				expect(beacon['pageLoadId']).toStrictEqual(expect.any(String));
 
 				// should save new id to storage
-				const stored2 = localStorageMock.getItem(PAGE_LOAD_ID_KEY) || '{}';
+				const stored2 = localStorageMock.getItem(KEYS.PAGE_LOAD_ID.primary) || '{}';
 
 				expect(JSON.parse(stored2)).toStrictEqual({
 					value: {
