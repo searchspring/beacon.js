@@ -1,7 +1,7 @@
 import packageJSON from '../package.json';
 export const { version } = packageJSON;
 import { Beacon } from './Beacon';
-import { getContext } from '@searchspring/snap-toolbox';
+import { getContext } from './utils/getContext';
 
 const scriptEl = document.currentScript as HTMLScriptElement;
 if (scriptEl) {
